@@ -18,5 +18,5 @@
     "autoload": {
         "psr-0": { "Tecnoready\\Common": "" }
     },
-    "target-dir": "tecnoready/Common"
+    "target-dir": "Tecnoready/Common"
 }
