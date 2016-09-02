@@ -1,0 +1,22 @@
+{
+    "name": "tecnoready/common",
+    "description": "Provee funciones comunes que uso frecuente en proyectos PHP",
+    "keywords": ["Basic features"],
+    "homepage": "https://github.com/Tecnoready/common",
+    "type": "php",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Carlos Mendoza",
+            "email": "inhack20@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=5.3.3"
+    },
+    "autoload": {
+        "psr-0": { "Tecnoready\\Common": "" }
+    },
+    "target-dir": "tecnoready/Common"
+}
