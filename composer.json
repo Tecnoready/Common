@@ -11,7 +11,7 @@
             "email": "inhack20@gmail.com"
         }
     ],
-    "minimum-stability": "dev",
+    "minimum-stability": "dev"
     "require": {
         "php": ">=5.3.3"
     },
