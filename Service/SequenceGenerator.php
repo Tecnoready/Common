@@ -91,8 +91,7 @@ class SequenceGenerator
      */
     protected function generate(\Tecnoready\Commom\Service\SequenceGenerator\Adapter\SequenceGeneratorAdapterInterface $qb, $mask,$field,$mode = self::MODE_NEXT,$parameters = array()) 
     {
-        $aliases = $qb->getRootAliases();
-        $alias = $aliases[0];
+        $alias = $qb->getRootAlias();
         $field = $alias.'.'.$field;
         
         if($mode === null){

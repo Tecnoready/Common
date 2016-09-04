@@ -45,8 +45,10 @@ class DoctrineORMAdapter implements SequenceGeneratorAdapterInterface
         return $this->qb->getQuery()->getOneOrNullResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
     }
 
-    public function getRootAliases() {
-        return $this->qb->getRootAliases();
+    public function getRootAlias() {
+        $aliases = $this->qb->getRootAliases();
+        $alias = $aliases[0];
+        return $alias;
     }
 
     public function like($x, $y) {

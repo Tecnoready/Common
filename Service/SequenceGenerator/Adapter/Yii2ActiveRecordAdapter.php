@@ -35,7 +35,7 @@ class Yii2ActiveRecordAdapter implements SequenceGeneratorAdapterInterface {
         return $this->qb->one();
     }
 
-    public function getRootAliases() {
+    public function getRootAlias() {
         return "r";
     }
 

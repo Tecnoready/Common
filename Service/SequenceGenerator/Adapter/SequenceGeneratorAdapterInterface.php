@@ -17,7 +17,7 @@ namespace Tecnoready\Commom\Service\SequenceGenerator\Adapter;
  */
 interface SequenceGeneratorAdapterInterface {
     
-    public function getRootAliases();
+    public function getRootAlias();
     
     public function select($select = null);
     
