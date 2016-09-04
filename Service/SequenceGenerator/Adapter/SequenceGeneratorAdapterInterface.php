@@ -15,6 +15,15 @@ namespace Tecnoready\Commom\Service\SequenceGenerator\Adapter;
  * Adaptador de generacion de secuencia
  * @author Carlos Mendoza <inhack20@gmail.com>
  */
-interface SequenceGeneratorAdapter {
-    //put your code here
+interface SequenceGeneratorAdapterInterface {
+    
+    public function getRootAliases();
+    
+    public function select($select = null);
+    
+    public function andWhere();
+    public function like($x, $y);
+    public function notLike($x, $y);
+    
+    public function getOneOrNullResult();
 }

@@ -16,14 +16,8 @@ namespace Tecnoready\Commom\Service;
  *
  * @author Carlos Mendoza <inhack20@tecnocreaciones.com>
  */
-class SequenceGenerator implements \Symfony\Component\DependencyInjection\ContainerAwareInterface
+class SequenceGenerator
 {
-    /**
-     *
-     * @var \Symfony\Component\DependencyInjection\ContainerInterface
-     */
-    private $container;
-    
     /**
      * Mode generates the next sequence
      */
@@ -87,7 +81,7 @@ class SequenceGenerator implements \Symfony\Component\DependencyInjection\Contai
     /**
      * Generated based on the sequence parameters
      * 
-     * @param \Doctrine\ORM\QueryBuilder $qb
+     * @param \Tecnoready\Commom\Service\SequenceGenerator\Adapter\SequenceGeneratorAdapterInterface $qb
      * @param type $mask
      * @param string $field
      * @param type $mode
@@ -95,7 +89,7 @@ class SequenceGenerator implements \Symfony\Component\DependencyInjection\Contai
      * @return type
      * @throws \InvalidArgumentException
      */
-    protected function generate(\Doctrine\ORM\QueryBuilder $qb, $mask,$field,$mode = self::MODE_NEXT,$parameters = array()) 
+    protected function generate(\Tecnoready\Commom\Service\SequenceGenerator\Adapter\SequenceGeneratorAdapterInterface $qb, $mask,$field,$mode = self::MODE_NEXT,$parameters = array()) 
     {
         $aliases = $qb->getRootAliases();
         $alias = $aliases[0];
@@ -167,11 +161,11 @@ class SequenceGenerator implements \Symfony\Component\DependencyInjection\Contai
         $counter = 0;
         $qb->select('MAX('.$sqlstring.') as v')
                 ;
-        $qb->andWhere($qb->expr()->like($field, "'".$maskLike."'"));
+        $qb->like($field, "'".$maskLike."'");
         if(!preg_match('/'.$this->getTemporaryMask().'/', $maskLike)){
-            $qb->andWhere($qb->expr()->notLike($field, "'%".$this->getTemporaryMask()."%'"));
+            $qb->notLike($field, "'%".$this->getTemporaryMask()."%'");
         }
-        $result = $qb->getQuery()->getOneOrNullResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
+        $result = $qb->getOneOrNullResult();
         if ($result) {
             $counter = $result['v'];
         }
@@ -217,26 +211,26 @@ class SequenceGenerator implements \Symfony\Component\DependencyInjection\Contai
     /**
      * Generates the next sequence according to the parameters
      * 
-     * @param \Doctrine\ORM\QueryBuilder $qb
+     * @param \Tecnoready\Commom\Service\SequenceGenerator\Adapter\SequenceGeneratorAdapterInterface $qb
      * @param type $mask Mask sequence to build for example "Example-{dd}-{mm}-{yy}-{yyyy}-{000})"
      * @param type $field Field to consult the entity
      * @param type $parameters Values of additional masks array('miMask' => 'Value')
      * @return type
      */
-    function generateLast(\Doctrine\ORM\QueryBuilder $qb,$mask,$field,$parameters = array()) {
+    function generateLast(\Tecnoready\Commom\Service\SequenceGenerator\Adapter\SequenceGeneratorAdapterInterface $qb,$mask,$field,$parameters = array()) {
         return $this->generate($qb, $mask,$field,self::MODE_LAST,$parameters);
     }
     
     /**
      * Generates the next sequence according to the parameters
      * 
-     * @param \Doctrine\ORM\QueryBuilder $qb
+     * @param \Tecnoready\Commom\Service\SequenceGenerator\Adapter\SequenceGeneratorAdapterInterface $qb
      * @param type $mask Mask sequence to build for example "Example-{dd}-{mm}-{yy}-{yyyy}-{000})"
      * @param type $field Field to consult the entity
      * @param type $parameters Values of additional masks array('miMask' => 'Value')
      * @return type
      */
-    function generateNext(\Doctrine\ORM\QueryBuilder $qb,$mask,$field,$parameters = array())
+    function generateNext(\Tecnoready\Commom\Service\SequenceGenerator\Adapter\SequenceGeneratorAdapterInterface $qb,$mask,$field,$parameters = array())
     {
         return $this->generate($qb, $mask,$field,self::MODE_NEXT,$parameters);
     }
@@ -244,44 +238,14 @@ class SequenceGenerator implements \Symfony\Component\DependencyInjection\Contai
     /**
      * Generates the last sequence temporaly according to the parameters
      * 
-     * @param \Doctrine\ORM\QueryBuilder $qb
+     * @param \Tecnoready\Commom\Service\SequenceGenerator\Adapter\SequenceGeneratorAdapterInterface $qb
      * @param type $field Field to consult the entity
      * @return type
      */
-    function generateNextTemp(\Doctrine\ORM\QueryBuilder $qb,$field)
+    function generateNextTemp(\Tecnoready\Commom\Service\SequenceGenerator\Adapter\SequenceGeneratorAdapterInterface $qb,$field)
     {
         $temporaryMask = $this->getTemporaryMask().'-{000}';
         return $this->generate($qb,$temporaryMask ,$field,self::MODE_NEXT);
-    }
-    
-    /**
-     * Shortcut to return the Doctrine Registry service.
-     *
-     * @return \Doctrine\Bundle\DoctrineBundle\Registry
-     *
-     * @throws \LogicException If DoctrineBundle is not available
-     */
-    protected function getDoctrine()
-    {
-        if (!$this->container->has('doctrine')) {
-            throw new \LogicException('The DoctrineBundle is not registered in your application.');
-        }
-
-        return $this->container->get('doctrine');
-    }
-    
-    public function setContainer(\Symfony\Component\DependencyInjection\ContainerInterface $container = null)
-    {
-         $this->container = $container;
-    }
-    
-    /**
-     * Returns a doctrine query builder
-     * @param type $alias
-     * @return \Doctrine\ORM\QueryBuilder
-     */
-    public final function createQueryBuilder($alias = 'q') {
-         return $this->getDoctrine()->getManager()->createQueryBuilder($alias);
     }
     
     private function dol_string_nospecial($str,$newstr='_',$badchars='')
