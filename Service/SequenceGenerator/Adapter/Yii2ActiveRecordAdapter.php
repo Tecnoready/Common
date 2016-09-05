@@ -22,7 +22,7 @@ class Yii2ActiveRecordAdapter implements SequenceGeneratorAdapterInterface {
      */
     private $qb;
     
-    public function __construct(\yii\db\QueryBuilder $qb) {
+    public function __construct(\yii\db\ActiveQuery $qb) {
         $this->qb = $qb;
     }
 
