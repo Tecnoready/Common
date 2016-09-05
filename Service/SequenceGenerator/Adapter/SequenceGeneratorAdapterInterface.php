@@ -26,4 +26,6 @@ interface SequenceGeneratorAdapterInterface {
     public function notLike($x, $y);
     
     public function getOneOrNullResult();
+    public function createAdapter($className);
+    
 }

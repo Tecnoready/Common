@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Tecnocreaciones\Bundle\ToolsBundle\Service\SequenceGenerator;
+namespace Tecnoready\Common\Service\SequenceGenerator;
 
 use Doctrine\Common\Util\ClassUtils;
 use LogicException;
@@ -19,14 +19,20 @@ use LogicException;
  *
  * @author Carlos Mendoza <inhack20@gmail.com>
  */
-abstract class SequenceGeneratorBase implements SequenceGeneratorBaseInterface
+abstract class SequenceGeneratorServiceBase implements SequenceGeneratorBaseInterface
 {
     /**
      * Instancia del generador de secuencias
-     * @var \Tecnocreaciones\Bundle\ToolsBundle\Service\SequenceGenerator
+     * @var \Tecnoready\Common\Service\SequenceGenerator\SequenceGenerator
      */
     protected $sequenceGenerator;
     
+    /**
+     *
+     * @var \Tecnoready\Common\Service\SequenceGenerator\Adapter\SequenceGeneratorAdapterInterface
+     */
+    protected $adapter;
+
     /**
      * Construye la referencia por defecto
      * @param ItemReferenceInterface $item
@@ -37,9 +43,9 @@ abstract class SequenceGeneratorBase implements SequenceGeneratorBaseInterface
         $mask = $config['mask'];
         $className = $config['className'];
         $field = $config['field'];
-        $qb = $this->sequenceGenerator->createQueryBuilder();
-        $qb->from($className,'p');
-        return $this->sequenceGenerator->generateNext($qb, $mask,$field);
+        
+        $adapter = $this->adapter->createAdapter($className);
+        return $this->sequenceGenerator->generateNext($adapter, $mask,$field);
     }
     
     /**
@@ -75,5 +81,10 @@ abstract class SequenceGeneratorBase implements SequenceGeneratorBaseInterface
      */
     function setSequenceGenerator(\Tecnocreaciones\Bundle\ToolsBundle\Service\SequenceGenerator $sequenceGenerator) {
         $this->sequenceGenerator = $sequenceGenerator;
+    }
+    
+    public function setAdapter(\Tecnoready\Common\Service\SequenceGenerator\Adapter\SequenceGeneratorAdapterInterface $adapter) {
+        $this->adapter = $adapter;
+        return $this;
     }
 }

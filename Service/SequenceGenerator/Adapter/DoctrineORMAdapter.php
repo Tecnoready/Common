@@ -29,9 +29,6 @@ class DoctrineORMAdapter implements SequenceGeneratorAdapterInterface
      */
     private $container;
     
-    public function __construct(\Doctrine\ORM\QueryBuilder $qb) {
-        $this->qb = $qb;
-    }
     /**
      *
      * @var \Symfony\Component\DependencyInjection\ContainerInterface
@@ -64,15 +61,6 @@ class DoctrineORMAdapter implements SequenceGeneratorAdapterInterface
     }
     
     /**
-     * Returns a doctrine query builder
-     * @param type $alias
-     * @return \Tecnoready\Common\Service\SequenceGenerator\Adapter\SequenceGeneratorAdapterInterface
-     */
-    public final function createQueryBuilder($alias = 'q') {
-         return $this->getDoctrine()->getManager()->createQueryBuilder($alias);
-    }
-    
-    /**
      * Shortcut to return the Doctrine Registry service.
      *
      * @return \Doctrine\Bundle\DoctrineBundle\Registry
@@ -91,5 +79,14 @@ class DoctrineORMAdapter implements SequenceGeneratorAdapterInterface
     public function setContainer(\Symfony\Component\DependencyInjection\ContainerInterface $container = null)
     {
          $this->container = $container;
+    }
+
+    public function createAdapter($className) {
+        $alias = "p";
+        $qb = $this->getDoctrine()->getManager()->createQueryBuilder($alias);
+        $qb->from($className,$alias);
+        $adapter = new self();
+        $adapter->setQb($qb);
+        return $adapter;
     }
 }

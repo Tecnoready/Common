@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Tecnoready\Common\Service;
+namespace Tecnoready\Common\Service\SequenceGenerator;
 
 /**
  * Generate sequences from fields entities database with doctrine and a mask

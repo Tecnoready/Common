@@ -15,7 +15,7 @@ namespace Tecnocreaciones\Bundle\ToolsBundle\Service\SequenceGenerator;
  *
  * @author Carlos Mendoza <inhack20@gmail.com>
  */
-interface SequenceGeneratorBaseInterface 
+interface SequenceGeneratorServiceInterface 
 {
     /**
      * Retorna las clases que esta manejando el generador de secuencia
