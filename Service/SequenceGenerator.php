@@ -92,7 +92,11 @@ class SequenceGenerator
     protected function generate(\Tecnoready\Common\Service\SequenceGenerator\Adapter\SequenceGeneratorAdapterInterface $qb, $mask,$field,$mode = self::MODE_NEXT,$parameters = array()) 
     {
         $alias = $qb->getRootAlias();
-        $field = $alias.'.'.$field;
+        if($alias !== null){
+            $field = $alias.'.'.$field;
+        }else {
+            $field = $field;
+        }
         
         if($mode === null){
             $mode = self::MODE_NEXT;
@@ -106,7 +110,6 @@ class SequenceGenerator
         $maskOffSetAdd = $maskOffSetSubtract = 0;
         if (strlen($maskcounter) < 2)
             throw new \InvalidArgumentException('The sequence of the mask must not be less than 2 digits "{00}"');
-        
 
         $masktype_value = "";
         $maskwithnocode = $mask;
@@ -158,15 +161,21 @@ class SequenceGenerator
         $maskLike = str_replace($this->dol_string_nospecial('{' . $masktri . '}'), str_pad("", strlen($maskcounter), "_"), $maskLike);
         // Get counter in database
         $counter = 0;
-        $qb->select('MAX('.$sqlstring.') as v')
-                ;
+        $select = 'MAX('.$sqlstring.') as v';
+        $qb->select($select);
         $qb->like($field, "'".$maskLike."'");
+        
         if(!preg_match('/'.$this->getTemporaryMask().'/', $maskLike)){
             $qb->notLike($field, "'%".$this->getTemporaryMask()."%'");
         }
+        
         $result = $qb->getOneOrNullResult();
         if ($result) {
-            $counter = $result['v'];
+            if(is_array($result)){
+                $counter = $result['v'];
+            }else{
+                $counter = $result;
+            }
         }
         if (empty($counter) || preg_match('/[^0-9]/i', $counter))
             $counter = $maskOffSetAdd;

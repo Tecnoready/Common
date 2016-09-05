@@ -23,6 +23,7 @@ class Yii2ActiveRecordAdapter implements SequenceGeneratorAdapterInterface {
     private $qb;
     
     public function __construct(\yii\db\ActiveQuery $qb) {
+        
         $this->qb = $qb;
     }
 
@@ -32,23 +33,24 @@ class Yii2ActiveRecordAdapter implements SequenceGeneratorAdapterInterface {
     }
 
     public function getOneOrNullResult() {
-        return $this->qb->one();
+        return $this->qb->scalar();
     }
 
     public function getRootAlias() {
-        return "r";
+        return null;
     }
 
     public function like($x, $y) {
-        return $this->qb->andWhere($x." ILIKE '%" . $y . "%'");
+        return $this->qb->andWhere($x." ILIKE " . $y . "");
     }
 
     public function notLike($x, $y) {
-        return $this->qb->andWhere($x." NOT ILIKE '%" . $y . "%'");
+        return $this->qb->andWhere($x." NOT ILIKE " . $y . "");
     }
 
     public function select($select = null) {
-        return $this->select($select);
+        $expression = new \yii\db\Expression($select);
+        return $this->qb->select($expression);
     }
 
 }
