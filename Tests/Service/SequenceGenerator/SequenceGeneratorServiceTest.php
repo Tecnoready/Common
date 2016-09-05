@@ -28,8 +28,6 @@ class SequenceGeneratorServiceTest extends TestCase {
 //        $sequenceGeneratorService->setClassMap([
 //            \client\advertising\modules\core\models\billing\Order::class => ["mask" => $mask]
 //        ]);
-//        $query = \client\advertising\modules\core\models\billing\Order::find();
-//        $adapter->setQb($query);
 //        
 //        $next = $sequenceGeneratorService->generateNext(new \client\advertising\modules\core\models\billing\Order, $mask, $field);
 //        $next = $sequenceGeneratorService->setRef(new \client\advertising\modules\core\models\billing\Order);

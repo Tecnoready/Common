@@ -130,7 +130,12 @@ class SequenceGeneratorService
         }
         return $this->sequenceGenerator;
     }
-        
+    
+    /**
+     * Establece el adapdador con el cual trabajara el generador
+     * @param \Tecnoready\Common\Service\SequenceGenerator\Adapter\SequenceGeneratorAdapterInterface $adapter
+     * @return \Tecnoready\Common\Service\SequenceGenerator\SequenceGeneratorService
+     */
     public function setAdapter(\Tecnoready\Common\Service\SequenceGenerator\Adapter\SequenceGeneratorAdapterInterface $adapter) {
         $this->adapter = $adapter;
         return $this;
@@ -153,9 +158,16 @@ class SequenceGeneratorService
         $this->classMap = $classMap;
         return $this;
     }
+    /**
+     * Añade mas configuracion al generador de secuencia
+     * @param array $classMap
+     * @return \Tecnoready\Common\Service\SequenceGenerator\SequenceGeneratorService
+     */
     public function addToClassMap(array $classMap) {
+        if($this->classMap === null){
+            $this->classMap = [];
+        }
         $this->classMap = array_merge($this->classMap,$classMap);
-        var_dump($this->classMap);
         return $this;
     }
 }
