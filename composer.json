@@ -16,7 +16,8 @@
         "php": ">=5.3.3"
     },
     "autoload": {
-        "psr-0": { "Tecnoready\\Common": "" }
-    },
-    "target-dir": "Tecnoready/Common"
+        "psr-4": {
+            "Tecnoready": "Tecnoready\\"
+        }
+    }
 }
