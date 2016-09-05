@@ -81,7 +81,7 @@ class SequenceGenerator
     /**
      * Generated based on the sequence parameters
      * 
-     * @param \Tecnoready\Commom\Service\SequenceGenerator\Adapter\SequenceGeneratorAdapterInterface $qb
+     * @param \Tecnoready\Common\Service\SequenceGenerator\Adapter\SequenceGeneratorAdapterInterface $qb
      * @param type $mask
      * @param string $field
      * @param type $mode
@@ -89,7 +89,7 @@ class SequenceGenerator
      * @return type
      * @throws \InvalidArgumentException
      */
-    protected function generate(\Tecnoready\Commom\Service\SequenceGenerator\Adapter\SequenceGeneratorAdapterInterface $qb, $mask,$field,$mode = self::MODE_NEXT,$parameters = array()) 
+    protected function generate(\Tecnoready\Common\Service\SequenceGenerator\Adapter\SequenceGeneratorAdapterInterface $qb, $mask,$field,$mode = self::MODE_NEXT,$parameters = array()) 
     {
         $alias = $qb->getRootAlias();
         $field = $alias.'.'.$field;
@@ -210,38 +210,38 @@ class SequenceGenerator
     /**
      * Generates the next sequence according to the parameters
      * 
-     * @param \Tecnoready\Commom\Service\SequenceGenerator\Adapter\SequenceGeneratorAdapterInterface $qb
+     * @param \Tecnoready\Common\Service\SequenceGenerator\Adapter\SequenceGeneratorAdapterInterface $qb
      * @param type $mask Mask sequence to build for example "Example-{dd}-{mm}-{yy}-{yyyy}-{000})"
      * @param type $field Field to consult the entity
      * @param type $parameters Values of additional masks array('miMask' => 'Value')
      * @return type
      */
-    function generateLast(\Tecnoready\Commom\Service\SequenceGenerator\Adapter\SequenceGeneratorAdapterInterface $qb,$mask,$field,$parameters = array()) {
+    function generateLast(\Tecnoready\Common\Service\SequenceGenerator\Adapter\SequenceGeneratorAdapterInterface $qb,$mask,$field,$parameters = array()) {
         return $this->generate($qb, $mask,$field,self::MODE_LAST,$parameters);
     }
     
     /**
      * Generates the next sequence according to the parameters
      * 
-     * @param \Tecnoready\Commom\Service\SequenceGenerator\Adapter\SequenceGeneratorAdapterInterface $qb
+     * @param \Tecnoready\Common\Service\SequenceGenerator\Adapter\SequenceGeneratorAdapterInterface $qb
      * @param type $mask Mask sequence to build for example "Example-{dd}-{mm}-{yy}-{yyyy}-{000})"
      * @param type $field Field to consult the entity
      * @param type $parameters Values of additional masks array('miMask' => 'Value')
      * @return type
      */
-    function generateNext(\Tecnoready\Commom\Service\SequenceGenerator\Adapter\SequenceGeneratorAdapterInterface $qb,$mask,$field,$parameters = array())
+    function generateNext(\Tecnoready\Common\Service\SequenceGenerator\Adapter\SequenceGeneratorAdapterInterface $adapter,$mask,$field,$parameters = array())
     {
-        return $this->generate($qb, $mask,$field,self::MODE_NEXT,$parameters);
+        return $this->generate($adapter, $mask,$field,self::MODE_NEXT,$parameters);
     }
     
     /**
      * Generates the last sequence temporaly according to the parameters
      * 
-     * @param \Tecnoready\Commom\Service\SequenceGenerator\Adapter\SequenceGeneratorAdapterInterface $qb
+     * @param \Tecnoready\Common\Service\SequenceGenerator\Adapter\SequenceGeneratorAdapterInterface $qb
      * @param type $field Field to consult the entity
      * @return type
      */
-    function generateNextTemp(\Tecnoready\Commom\Service\SequenceGenerator\Adapter\SequenceGeneratorAdapterInterface $qb,$field)
+    function generateNextTemp(\Tecnoready\Common\Service\SequenceGenerator\Adapter\SequenceGeneratorAdapterInterface $qb,$field)
     {
         $temporaryMask = $this->getTemporaryMask().'-{000}';
         return $this->generate($qb,$temporaryMask ,$field,self::MODE_NEXT);
