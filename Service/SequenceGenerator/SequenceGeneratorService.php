@@ -153,4 +153,9 @@ class SequenceGeneratorService
         $this->classMap = $classMap;
         return $this;
     }
+    public function addToClassMap(array $classMap) {
+        $this->classMap = array_merge($this->classMap,$classMap);
+        var_dump($this->classMap);
+        return $this;
+    }
 }
