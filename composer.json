@@ -3,7 +3,7 @@
     "description": "Provee funciones comunes que uso frecuente en proyectos PHP",
     "keywords": ["Basic features"],
     "homepage": "https://github.com/Tecnoready/common",
-    "type": "php",
+    "type": "library",
     "license": "MIT",
     "authors": [
         {
