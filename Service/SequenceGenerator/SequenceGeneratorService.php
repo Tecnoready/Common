@@ -15,7 +15,7 @@ use Doctrine\Common\Util\ClassUtils;
 use LogicException;
 
 /**
- * Base del generador de secuencias
+ * Base del servicio del generador de secuencias
  *
  * @author Carlos Mendoza <inhack20@gmail.com>
  */
@@ -28,11 +28,15 @@ class SequenceGeneratorService
     protected $sequenceGenerator;
     
     /**
-     *
+     * Adaptador con el cual trabajara el generador
      * @var \Tecnoready\Common\Service\SequenceGenerator\Adapter\SequenceGeneratorAdapterInterface
      */
     protected $adapter;
     
+    /**
+     * Configuracion de las clases
+     * @var array
+     */
     protected $classMap;
 
     /**
@@ -106,6 +110,11 @@ class SequenceGeneratorService
         return $config;
     }
     
+    /**
+     * Resuelve el nombre real de un objeto
+     * @param type $item
+     * @return type
+     */
     protected function getClassName($item) {
         $className = get_class($item);
         //Si se usa doctrine2 ORM, con esto se obtiene la clase original
