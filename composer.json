@@ -16,8 +16,9 @@
         "php": ">=5.3.3"
     },
     "autoload": {
-        "psr-4": {
-            "Tecnoready\\": "/"
-        }
+        "psr-4": { "Tecnoready\\Common\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
     }
 }
