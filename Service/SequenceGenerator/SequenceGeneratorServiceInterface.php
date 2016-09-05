@@ -9,8 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Tecnocreaciones\Bundle\ToolsBundle\Service\SequenceGenerator;
-
+namespace Tecnoready\Common\Service\SequenceGenerator;
 /**
  *
  * @author Carlos Mendoza <inhack20@gmail.com>

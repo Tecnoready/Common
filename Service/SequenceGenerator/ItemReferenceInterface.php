@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Tecnocreaciones\Bundle\ToolsBundle\Service\SequenceGenerator;
+namespace Tecnoready\Common\Service\SequenceGenerator;
 
 /**
  * Interfaz para establecer referencia a objetos
