@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Tecnoready\Commom\Service\SequenceGenerator\Adapter;
+namespace Tecnoready\Common\Service\SequenceGenerator\Adapter;
 
 /**
  * Adaptador de generacion de secuencia

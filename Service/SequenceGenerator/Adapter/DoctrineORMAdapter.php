@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Tecnoready\Commom\Service\SequenceGenerator\Adapter;
+namespace Tecnoready\Common\Service\SequenceGenerator\Adapter;
 
 /**
  * Description of DoctrineORMAdapter
@@ -66,7 +66,7 @@ class DoctrineORMAdapter implements SequenceGeneratorAdapterInterface
     /**
      * Returns a doctrine query builder
      * @param type $alias
-     * @return \Tecnoready\Commom\Service\SequenceGenerator\Adapter\SequenceGeneratorAdapterInterface
+     * @return \Tecnoready\Common\Service\SequenceGenerator\Adapter\SequenceGeneratorAdapterInterface
      */
     public final function createQueryBuilder($alias = 'q') {
          return $this->getDoctrine()->getManager()->createQueryBuilder($alias);
