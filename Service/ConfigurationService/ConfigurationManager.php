@@ -116,19 +116,50 @@ class ConfigurationManager {
         }
         $class = $this->options['configuration_cache_class'];
         $cache = $this->getConfigCache();
-        if (!$cache->isFresh()) {
+        $metadata = $cache->getPath().'.meta';
+        $meta = [];
+        
+        $cacheClass = null;
+        if(is_file($metadata)){
+            $meta = unserialize(file_get_contents($metadata));
+            if(isset($meta["cache_class"])){
+                $cacheClass = $meta["cache_class"];
+            }
+        }
+//        var_dump("Inicial '".$cacheClass."' is fresh? ".$cache->isFresh());
+//        var_dump($meta);
+//        die;
+        
+        if (!$cache->isFresh() || $cacheClass === null ) {
+            static $i = 0;
+            $i++;
+            $time = time().$i;
+            $cacheClass = $class.$time;
             $dumper = $this->getAvailableConfigurationDumperInstance();
 
             $options = array(
-                'class'      => $class,
+                'class'      => $cacheClass,
                 'base_class'      => $this->options['configuration_base_dumper_class']
             );
-            $metadata = ["dumped_at" => time()];
-            $cache->write($dumper->dump($options),$metadata);
+            $metadata = [
+                "dumped_at" => $time,
+                "cache_class" => $cacheClass,
+            ];
+            $newCacheClass = $dumper->dump($options);
+            $cache->write($newCacheClass,$metadata);
+            //var_dump($cache->getPath());
+            //var_dump($newCacheClass);
+//            var_dump($cacheClass);
+            eval(str_replace("<?php","",$newCacheClass));
+            //die;
         }
         require_once $cache->getPath();
-
-        return $this->configurationCacheAvailable = new $class();
+        if(!class_exists($cacheClass)){
+//            var_dump("la clase '".$cacheClass."' no ha sido cargada.");
+            $newCacheClass = file_get_contents($cache->getPath());
+            eval(str_replace("<?php","",$newCacheClass));
+        }
+        return $this->configurationCacheAvailable = new $cacheClass();
     }
     
     /**
@@ -160,13 +191,16 @@ class ConfigurationManager {
      * @param mixed $value valor de la configuracion
      * @param string|null $description Descripcion de la configuracion|null para actualizar solo el key
      */
-    function set($key,$value = null,$description = null,$wrapperName = "default")
+    function set($key,$value = null,$description = null,$wrapperName = null,$clearCache = false)
     {
+        if($wrapperName === null){
+            $wrapperName = "default";
+        }
         if(!isset($this->configurationsWrapper[$wrapperName])){
             throw new \InvalidArgumentException(sprintf("The ConfigurationWrapper with name '%s' dont exist.",$wrapperName));
         }
         $success = $this->adapter->update($key, $value, $description,$wrapperName);
-        if($success === true){
+        if($success === true && $clearCache ){
             $this->clearCache();
         }
         return $success;

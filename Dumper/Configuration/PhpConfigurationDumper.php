@@ -24,6 +24,8 @@ class PhpConfigurationDumper
     }
     
     public function dump(array $options = array()) {
+        $now = new \DateTime();
+        $dumpedAt = $now->format("Y-m-d H:i:s");
         $options = array_replace(array(
             'class'      => 'ProjectConfigurationAvailable',
             'base_class'      => 'Tecnocreaciones\\Bundle\\ToolsBundle\\Model\\Configuration\\ConfigurationAvailable',
@@ -36,7 +38,8 @@ class PhpConfigurationDumper
  * {$options['class']}
  *
  * This class has been auto-generated
- * by the Tecnocreaciones Tools Component.
+ * by the Tecnoready Tools Component.
+ * dumped at {$dumpedAt}
  */
 class {$options['class']} extends {$options['base_class']}
 {
