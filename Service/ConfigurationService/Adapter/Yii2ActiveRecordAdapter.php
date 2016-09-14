@@ -24,8 +24,22 @@ class Yii2ActiveRecordAdapter implements ConfigurationAdapterInterface
         return ConfigurationYii2AR::find()->all();
     }
 
-    public function update($key, $value, $description) {
+    public function update($key, $value, $description,$wrapperName) {
+        $entity = $this->find($key);
         
+        if($entity === null){
+            $entity = $this->createNew();
+        }else{
+            $entity->setUpdatedAt();
+        }
+        $entity->setKey($key)
+               ->setValue($value);
+        if($description != null){
+            $entity->setDescription($description);
+        }
+        $entity->setNameWrapper($wrapperName);
+        $success = $entity->save();
+        return $success;
     }
 
     public function createNew() {
@@ -37,6 +51,10 @@ class Yii2ActiveRecordAdapter implements ConfigurationAdapterInterface
                 ->andWhere(["key" => $key])
                 ->one()
                 ;
+    }
+
+    public function flush() {
+        
     }
 
 }

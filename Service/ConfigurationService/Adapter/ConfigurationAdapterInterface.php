@@ -19,7 +19,12 @@ interface ConfigurationAdapterInterface {
     public function find($key);
     public function findAll();
     
-    public function update($key,$value,$description);
+    /*
+     * Guarda los cambios en la base de datos
+     */
+    public function flush();
+    
+    public function update($key,$value,$description,$nameConfiguration);
     
     public function createNew();
 }

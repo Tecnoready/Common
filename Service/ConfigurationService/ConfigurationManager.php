@@ -12,6 +12,7 @@
 namespace Tecnoready\Common\Service\ConfigurationService;
 
 use Symfony\Component\Config\ConfigCache;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Manejador de configuracion
@@ -45,6 +46,9 @@ class ConfigurationManager {
     {
         if(!class_exists("Symfony\Component\Config\ConfigCache")){
             throw new \Exception("The package '%s' is required, please install https://packagist.org/packages/symfony/config",'"symfony/config": "^3.1"');
+        }
+        if(!class_exists("Symfony\Component\OptionsResolver\OptionsResolver")){
+            throw new \Exception("The package '%s' is required, please install https://packagist.org/packages/symfony/options-resolver",'"symfony/options-resolver": "^3.1"');
         }
         $this->setOptions($options);
         $this->adapter = $adapter;
@@ -81,63 +85,22 @@ class ConfigurationManager {
      */
     public function setOptions(array $options)
     {
-        $this->options = array(
+        $resolver = new OptionsResolver();
+        $resolver->setDefaults([
             'cache_dir'              => null,
             'debug'                  => false,
             'configuration_dumper_class' => 'Tecnoready\\Common\\Dumper\\Configuration\\PhpConfigurationDumper',
             'configuration_base_dumper_class' => 'Tecnoready\\Common\\Model\\Configuration\\ConfigurationCacheAvailable',
             'configuration_cache_class'  => 'ProjectConfigurationAvailable',
             'configuration_class'  => null,
-        );
-
-        // check option names and live merge, if errors are encountered Exception will be thrown
-        $invalid = array();
-        foreach ($options as $key => $value) {
-            if (array_key_exists($key, $this->options)) {
-                $this->options[$key] = $value;
-            } else {
-                $invalid[] = $key;
-            }
-        }
+        ]);
         
-        if ($invalid) {
-            throw new \InvalidArgumentException(sprintf('The Configuration does not support the following options: "%s".', implode('", "', $invalid)));
-        }
-    }
-    
-    /**
-     * Sets an option.
-     *
-     * @param string $key   The key
-     * @param mixed  $value The value
-     *
-     * @throws \InvalidArgumentException
-     */
-    public function setOption($key, $value)
-    {
-        if (!array_key_exists($key, $this->options)) {
-            throw new \InvalidArgumentException(sprintf('The Configuration does not support the "%s" option.', $key));
-        }
-
-        $this->options[$key] = $value;
-    }
-    
-    /**
-     * Gets an option value.
-     *
-     * @param string $key The key
-     *
-     * @return mixed The value
-     *
-     * @throws \InvalidArgumentException
-     */
-    public function getOption($key)
-    {
-        if (!array_key_exists($key, $this->options)) {
-            throw new \InvalidArgumentException(sprintf('The Configuration does not support the "%s" option.', $key));
-        }
-
-        return $this->options[$key];
+        $resolver->setRequired(["cache_dir"]);
+        
+//        if ($invalid) {
+//            throw new \InvalidArgumentException(sprintf('The Configuration does not support the following options: "%s".', implode('", "', $invalid)));
+//        }
+        $this->options = $resolver->resolve($options);
     }
     
     /**
@@ -196,27 +159,13 @@ class ConfigurationManager {
      * @param mixed $value valor de la configuracion
      * @param string|null $description Descripcion de la configuracion|null para actualizar solo el key
      */
-    function set($key,$value = null,$description = null,$nameConfiguration = null)
+    function set($key,$value = null,$description = null,$wrapperName = "default")
     {
-        
-        $id = $this->getAvailableConfiguration()->getIdByKey($key);
-        $this->adapter->update($key, $value, $description);
-        $entity = $this->getConfiguration($id);
-        if($entity === null){
-            $entity = $this->createNew();
-        }else{
-            $entity->setUpdatedAt();
+        if(!isset($this->configurationsWrapper[$wrapperName])){
+            throw new \InvalidArgumentException(sprintf("The configurationWrapper '%s' dont exist.",$wrapperName));
         }
-        $entity->setKey($key)
-               ->setValue($value);
-        if($description != null){
-            $entity->setDescription($description);
-        }
-        if($group != null){
-            $entity->setGroup($group);
-        }
-        $em = $this->getManager();
-        $em->persist($entity);
+        $success = $this->adapter->update($key, $value, $description,$wrapperName);
+        return $success;
     }
     
     /**
@@ -224,8 +173,7 @@ class ConfigurationManager {
      */
     function flush($andClearCache = true)
     {
-        $em = $this->getManager();
-        $em->flush();
+        $this->adapter->flush();
         if($andClearCache){
             $this->clearCache();
         }
@@ -255,23 +203,8 @@ class ConfigurationManager {
      */
     protected function getAvailableConfigurationDumperInstance()
     {
-        if($this->options['configuration_class'] === null){
-            throw new \LogicException('You must assign class configuration_class');
-        }
-        
         $entities = $this->adapter->findAll();
         return new $this->options['configuration_dumper_class']($entities);
-    }
-    
-    /**
-     * 
-     * @return \Tecnocreaciones\Bundle\ToolsBundle\Model\Configuration
-     */
-    protected function createNew()
-    {
-        $entity = new $this->options['configuration_class'];
-        $entity->setCreatedAt();
-        return $entity;
     }
     
     /**
