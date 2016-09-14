@@ -71,10 +71,10 @@ EOF;
             $data = array();
             $data['key'] = $configuration->getKey();
             $data['value'] = $configuration->getValue();
-            $data['active'] = $configuration->getActive();
+            $data['enabled'] = $configuration->getEnabled();
 //            $data['createdAt'] = $configuration->getCreatedAt();
 //            $data['updatedAt'] = $configuration->getUpdatedAt();
-            $data['id'] = $configuration->getId();
+            //$data['id'] = $configuration->getId();
             $code .= sprintf("'%s' => %s,",$configuration->getKey(),var_export($data,true));
         }
 

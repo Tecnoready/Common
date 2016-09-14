@@ -123,7 +123,8 @@ class ConfigurationManager {
                 'class'      => $class,
                 'base_class'      => $this->options['configuration_base_dumper_class']
             );
-            $cache->write($dumper->dump($options));
+            $metadata = ["dumped_at" => time()];
+            $cache->write($dumper->dump($options),$metadata);
         }
         require_once $cache->getPath();
 
@@ -165,6 +166,9 @@ class ConfigurationManager {
             throw new \InvalidArgumentException(sprintf("The ConfigurationWrapper with name '%s' dont exist.",$wrapperName));
         }
         $success = $this->adapter->update($key, $value, $description,$wrapperName);
+        if($success === true){
+            $this->clearCache();
+        }
         return $success;
     }
     
@@ -194,7 +198,7 @@ class ConfigurationManager {
     {
         $this->configurationCacheAvailable = null;
         $cache = $this->getConfigCache();
-        @unlink($cache);
+        @unlink($cache->getPath());
         $this->warmUp();
     }
     
