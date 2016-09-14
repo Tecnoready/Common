@@ -20,10 +20,11 @@ abstract class ConfigurationCacheAvailable
 {
     protected $configurations;
             
-    function get($key,$default = null)
+    function get($key,$default = null,$wrapperName = null)
     {
-        if(isset($this->configurations[$key])){
-            return $this->configurations[$key]['value'];
+        $id = \Tecnoready\Common\Util\ConfigurationUtil::generateId($wrapperName,$key);
+        if(isset($this->configurations[$id])){
+            return $this->configurations[$id]['value'];
         }
         return $default;
     }

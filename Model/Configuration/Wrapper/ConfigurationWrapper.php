@@ -31,9 +31,9 @@ abstract class ConfigurationWrapper
      * @param type $description
      * @return Configuration
      */
-    protected function set($key,$value = null,$description = null,\Tecnocreaciones\Bundle\ToolsBundle\Entity\Configuration\BaseGroup $group = null)
+    protected function set($key,$value = null,$description = null)
     {
-        $this->manager->set($key, $value, $description,$group);
+        $this->manager->set($key, $value, $description,$this->getName());
         
         return $this;
     }
@@ -47,7 +47,7 @@ abstract class ConfigurationWrapper
      */
     protected function get($key,$default = null)
     {
-        return $this->manager->get($key, $default);
+        return $this->manager->get($key, $default,$this->getName());
     }
     
     

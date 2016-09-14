@@ -78,7 +78,8 @@ EOF;
 //            $data['createdAt'] = $configuration->getCreatedAt();
 //            $data['updatedAt'] = $configuration->getUpdatedAt();
             //$data['id'] = $configuration->getId();
-            $code .= sprintf("'%s' => %s,",$configuration->getKey(),var_export($data,true));
+            
+            $code .= sprintf("'%s' => %s,",  \Tecnoready\Common\Util\ConfigurationUtil::generateId($configuration->getNameWrapper(),$configuration->getKey()),var_export($data,true));
         }
 
         return $code;

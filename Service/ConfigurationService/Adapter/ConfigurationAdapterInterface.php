@@ -24,7 +24,7 @@ interface ConfigurationAdapterInterface {
      */
     public function flush();
     
-    public function update($key,$value,$description,$nameConfiguration);
+    public function update($key,$value,$description,$wrapperName);
     
     public function createNew();
 }

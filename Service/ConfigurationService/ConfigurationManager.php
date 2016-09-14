@@ -107,7 +107,7 @@ class ConfigurationManager {
     /**
      * Gets the Configuration Value instance associated with this Confurations.
      * 
-     * @return \Tecnocreaciones\Bundle\ToolsBundle\Model\Configuration\ConfigurationAvailable
+     * @return \Tecnoready\Common\Model\Configuration\ConfigurationCacheAvailable
      */
     public function getAvailableConfiguration()
     {
@@ -180,8 +180,12 @@ class ConfigurationManager {
      * @param mixed $default Valor que se retornara en caso de que no exista el indice
      * @return mixed
      */
-    function get($key,$default = null) {
-        return $this->getAvailableConfiguration()->get($key,$default);
+    function get($key,$default = null,$wrapperName = null) {
+        $key = strtoupper($key);
+        if($wrapperName === null){
+            $wrapperName = "default";
+        }
+        return $this->getAvailableConfiguration()->get($key,$default,$wrapperName);
     }
     
     /**
@@ -193,6 +197,7 @@ class ConfigurationManager {
      */
     function set($key,$value = null,$description = null,$wrapperName = null,$clearCache = false)
     {
+        $key = strtoupper($key);
         if($wrapperName === null){
             $wrapperName = "default";
         }
