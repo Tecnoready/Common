@@ -32,7 +32,7 @@ class ConfigurationManager {
     private $configurationCacheAvailable;
             
     /**
-     * @var \Tecnoready\Common\Model\Configuration\ConfigurationWrapper
+     * @var \Tecnoready\Common\Model\Configuration\Wrapper\ConfigurationWrapper
      */
     private $configurationsWrapper = null;
     /**
@@ -53,15 +53,18 @@ class ConfigurationManager {
         $this->setOptions($options);
         $this->adapter = $adapter;
         $this->configurationsWrapper = [];
+        if($this->options["add_default_wrapper"] === true){
+            $this->addConfiguration(new \Tecnoready\Common\Model\Configuration\Wrapper\DefaultConfigurationWrapper());
+        }
     }
     
     /**
      * Añade un grupo de configuracion
      * @param \Tecnoready\Common\Model\Configuration\ConfigurationWrapper $configuration
-     * @return \Tecnoready\Common\Service\ConfigurationService\ConfigurationManager
+     * @return \Tecnoready\Common\Model\Configuration\Wrapper\ConfigurationWrapper
      * @throws \RuntimeException
      */
-    public function addConfiguration(\Tecnoready\Common\Model\Configuration\ConfigurationWrapper $configuration) 
+    public function addConfiguration(\Tecnoready\Common\Model\Configuration\Wrapper\ConfigurationWrapper $configuration) 
     {
         if(isset($this->configurationsWrapper[$configuration->getName()])){
             throw new \RuntimeException(sprintf("The configuration name '%s' already added",$configuration->getName()));
@@ -91,14 +94,13 @@ class ConfigurationManager {
             'configuration_dumper_class' => 'Tecnoready\\Common\\Dumper\\Configuration\\PhpConfigurationDumper',
             'configuration_base_dumper_class' => 'Tecnoready\\Common\\Model\\Configuration\\ConfigurationCacheAvailable',
             'configuration_cache_class'  => 'ProjectConfigurationAvailable',
+            'add_default_wrapper'  => false,
         ]);
         
         $resolver->setRequired(["cache_dir","configuration_dumper_class","configuration_base_dumper_class","configuration_cache_class"]);
         $resolver->addAllowedTypes("cache_dir","string");
+        $resolver->addAllowedTypes("add_default_wrapper","boolean");
         
-//        if ($invalid) {
-//            throw new \InvalidArgumentException(sprintf('The Configuration does not support the following options: "%s".', implode('", "', $invalid)));
-//        }
         $this->options = $resolver->resolve($options);
     }
     
@@ -160,7 +162,7 @@ class ConfigurationManager {
     function set($key,$value = null,$description = null,$wrapperName = "default")
     {
         if(!isset($this->configurationsWrapper[$wrapperName])){
-            throw new \InvalidArgumentException(sprintf("The configurationWrapper '%s' dont exist.",$wrapperName));
+            throw new \InvalidArgumentException(sprintf("The ConfigurationWrapper with name '%s' dont exist.",$wrapperName));
         }
         $success = $this->adapter->update($key, $value, $description,$wrapperName);
         return $success;

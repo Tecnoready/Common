@@ -27,6 +27,8 @@ use Yii;
  */
 class ConfigurationYii2AR extends \yii\db\ActiveRecord implements ConfigurationInterface
 {
+    const DATE_TIME_FORMAT = 'Y-m-d H:i:s';
+    
     /**
      * @inheritdoc
      */
@@ -41,7 +43,7 @@ class ConfigurationYii2AR extends \yii\db\ActiveRecord implements ConfigurationI
     public function rules()
     {
         return [
-            [['key', 'name_wrapper', 'enabled', 'created_at', 'updated_at'], 'required'],
+            [['key', 'name_wrapper', 'enabled'], 'required'],
             [['value'], 'string'],
             [['enabled'], 'integer'],
             [['created_at', 'updated_at'], 'safe'],
@@ -69,10 +71,11 @@ class ConfigurationYii2AR extends \yii\db\ActiveRecord implements ConfigurationI
     
     public function beforeSave($insert) {
         if (parent::beforeSave($insert)) {
+            $now = new \DateTime();
             if(!$this->created_at){
-                $this->created_at = new \DateTime();
+                $this->created_at = $now->format(self::DATE_TIME_FORMAT);
             }
-            $this->updated_at = new \DateTime();
+            $this->updated_at = $now->format(self::DATE_TIME_FORMAT);
              return true;
          } else {
              return false;
@@ -108,7 +111,8 @@ class ConfigurationYii2AR extends \yii\db\ActiveRecord implements ConfigurationI
     }
 
     public function setCreatedAt() {
-        $this->created_at = new \DateTime();
+        $now = new \DateTime();
+        $this->created_at = $now->format(self::DATE_TIME_FORMAT);
     }
 
     public function setDescription($description) {
@@ -128,7 +132,8 @@ class ConfigurationYii2AR extends \yii\db\ActiveRecord implements ConfigurationI
     }
 
     public function setUpdatedAt() {
-        $this->updated_at = new \DateTime();
+        $now = new \DateTime();
+        $this->updated_at = $now->format(self::DATE_TIME_FORMAT);
     }
 
     public function setValue($value) {

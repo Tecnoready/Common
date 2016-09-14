@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Tecnoready\Common\Model\Configuration;
+namespace Tecnoready\Common\Model\Configuration\Wrapper;
 
 /**
  * Grupo de configuracion
@@ -19,14 +19,9 @@ namespace Tecnoready\Common\Model\Configuration;
 abstract class ConfigurationWrapper
 {    
     /**
-     *
      * @var \Tecnoready\Common\Service\ConfigurationService\ConfigurationManager
      */
-    private $configurationManager;
-    
-    public function __construct(\Tecnoready\Common\Service\ConfigurationService\ConfigurationManager $configurationManager) {
-        $this->configurationManager = $configurationManager;
-    }
+    private $manager;
     
     /**
      * Guarda o actualiza la configuracion en la base de datos y regenera la cache
@@ -38,7 +33,7 @@ abstract class ConfigurationWrapper
      */
     protected function set($key,$value = null,$description = null,\Tecnocreaciones\Bundle\ToolsBundle\Entity\Configuration\BaseGroup $group = null)
     {
-        $this->getConfigurationManager()->set($key, $value, $description,$group);
+        $this->manager->set($key, $value, $description,$group);
         
         return $this;
     }
@@ -52,7 +47,7 @@ abstract class ConfigurationWrapper
      */
     protected function get($key,$default = null)
     {
-        return $this->getConfigurationManager()->get($key, $default);
+        return $this->manager->get($key, $default);
     }
     
     
@@ -60,9 +55,14 @@ abstract class ConfigurationWrapper
      * Retorna el servicio que maneja la configuracion del sistema
      * @return \Tecnoready\Common\Service\ConfigurationService\ConfigurationManager
      */
-    protected function getConfigurationManager() {
-        return $this->container->get('tecnocreaciones_tools.configuration_service');
+    protected function getManager() {
+        return $this->manager;
     }
     
-    public static function getName();
+    public function setManager(\Tecnoready\Common\Service\ConfigurationService\ConfigurationManager $manager) {
+        $this->manager = $manager;
+        return $this;
+    }
+    
+    public abstract static function getName();
 }

@@ -26,14 +26,14 @@ class Yii2ActiveRecordAdapter implements ConfigurationAdapterInterface
 
     public function update($key, $value, $description,$wrapperName) {
         $entity = $this->find($key);
-        
         if($entity === null){
             $entity = $this->createNew();
+            $entity->setEnabled(true);
         }else{
             $entity->setUpdatedAt();
         }
-        $entity->setKey($key)
-               ->setValue($value);
+        $entity->setKey($key);
+        $entity->setValue($value);
         if($description != null){
             $entity->setDescription($description);
         }
