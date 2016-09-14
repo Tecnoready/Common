@@ -1,6 +1,6 @@
 {
     "name": "tecnoready/common",
-    "description": "Provee funciones comunes que uso frecuente en proyectos PHP",
+    "description": "Provee funciones comunes de uso frecuente en proyectos PHP",
     "keywords": ["Basic features"],
     "homepage": "https://github.com/Tecnoready/common",
     "type": "library",
