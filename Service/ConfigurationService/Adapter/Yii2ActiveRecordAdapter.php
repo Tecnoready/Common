@@ -11,6 +11,8 @@
 
 namespace Tecnoready\Common\Service\ConfigurationService\Adapter;
 
+use Tecnoready\Common\Model\Configuration\BaseEntity\ConfigurationYii2AR;
+
 /**
  * Adaptador de yii2
  *
@@ -18,5 +20,23 @@ namespace Tecnoready\Common\Service\ConfigurationService\Adapter;
  */
 class Yii2ActiveRecordAdapter implements ConfigurationAdapterInterface 
 {
-    //put your code here
+    public function findAll() {
+        return ConfigurationYii2AR::find()->all();
+    }
+
+    public function update($key, $value, $description) {
+        
+    }
+
+    public function createNew() {
+        return new ConfigurationYii2AR();
+    }
+
+    public function find($key) {
+        return ConfigurationYii2AR::find()
+                ->andWhere(["key" => $key])
+                ->one()
+                ;
+    }
+
 }

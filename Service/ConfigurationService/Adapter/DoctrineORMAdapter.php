@@ -27,4 +27,29 @@ class DoctrineORMAdapter implements ConfigurationAdapterInterface
     public function __construct(\Doctrine\ORM\EntityManager $em) {
         $this->em = $em;
     }
+
+    public function findAll() {
+        
+    }
+
+    public function update($key, $value, $description) {
+        $id = $this->getAvailableConfiguration()->getIdByKey($key);
+        $entity = $this->getConfiguration($id);
+        if($entity === null){
+            $entity = $this->createNew();
+        }else{
+            $entity->setUpdatedAt();
+        }
+        $entity->setKey($key)
+               ->setValue($value);
+        if($description != null){
+            $entity->setDescription($description);
+        }
+        if($group != null){
+            $entity->setGroup($group);
+        }
+        $em = $this->getManager();
+        $em->persist($entity);
+    }
+
 }

@@ -16,5 +16,10 @@ namespace Tecnoready\Common\Service\ConfigurationService\Adapter;
  * @author Carlos Mendoza <inhack20@gmail.com>
  */
 interface ConfigurationAdapterInterface {
+    public function find($key);
     public function findAll();
+    
+    public function update($key,$value,$description);
+    
+    public function createNew();
 }

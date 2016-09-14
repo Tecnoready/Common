@@ -26,14 +26,14 @@ class ConfigurationManager {
     
     /**
      * Configuraciones disponibles
-     * @var \Tecnocreaciones\Bundle\ToolsBundle\Model\Configuration\ConfigurationAvailable
+     * @var \Tecnoready\Common\Model\Configuration\ConfigurationCacheAvailable
      */
-    private $availableConfiguration;
+    private $configurationCacheAvailable;
             
     /**
-     * @var \Tecnoready\Common\Model\Configuration\Configuration
+     * @var \Tecnoready\Common\Model\Configuration\ConfigurationWrapper
      */
-    private $configurations = null;
+    private $configurationsWrapper = null;
     /**
             
      * Adaptador origen de los datos
@@ -48,21 +48,21 @@ class ConfigurationManager {
         }
         $this->setOptions($options);
         $this->adapter = $adapter;
-        $this->configurations = [];
+        $this->configurationsWrapper = [];
     }
     
     /**
      * Añade un grupo de configuracion
-     * @param \Tecnoready\Common\Model\Configuration\Configuration $configuration
+     * @param \Tecnoready\Common\Model\Configuration\ConfigurationWrapper $configuration
      * @return \Tecnoready\Common\Service\ConfigurationService\ConfigurationManager
      * @throws \RuntimeException
      */
-    public function addConfiguration(\Tecnoready\Common\Model\Configuration\Configuration $configuration) 
+    public function addConfiguration(\Tecnoready\Common\Model\Configuration\ConfigurationWrapper $configuration) 
     {
-        if(isset($this->configurations[$configuration->getName()])){
+        if(isset($this->configurationsWrapper[$configuration->getName()])){
             throw new \RuntimeException(sprintf("The configuration name '%s' already added",$configuration->getName()));
         }
-        $this->configurations[$configuration->getName()] = $configuration;
+        $this->configurationsWrapper[$configuration->getName()] = $configuration;
         return $this;
     }
 
@@ -147,8 +147,8 @@ class ConfigurationManager {
      */
     public function getAvailableConfiguration()
     {
-        if (null !== $this->availableConfiguration) {
-            return $this->availableConfiguration;
+        if (null !== $this->configurationCacheAvailable) {
+            return $this->configurationCacheAvailable;
         }
         $class = $this->options['configuration_cache_class'];
         $cache = $this->getConfigCache();
@@ -164,7 +164,7 @@ class ConfigurationManager {
 
         require_once $cache;
 
-        return $this->availableConfiguration = new $class();
+        return $this->configurationCacheAvailable = new $class();
     }
     
     /**
@@ -196,9 +196,11 @@ class ConfigurationManager {
      * @param mixed $value valor de la configuracion
      * @param string|null $description Descripcion de la configuracion|null para actualizar solo el key
      */
-    function set($key,$value = null,$description = null,Group $group = null)
+    function set($key,$value = null,$description = null,$nameConfiguration = null)
     {
+        
         $id = $this->getAvailableConfiguration()->getIdByKey($key);
+        $this->adapter->update($key, $value, $description);
         $entity = $this->getConfiguration($id);
         if($entity === null){
             $entity = $this->createNew();
@@ -242,7 +244,7 @@ class ConfigurationManager {
      */
     function clearCache()
     {
-        $this->availableConfiguration = null;
+        $this->configurationCacheAvailable = null;
         $cache = $this->getConfigCache();
         @unlink($cache);
         $this->warmUp();

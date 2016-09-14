@@ -16,7 +16,7 @@ namespace Tecnoready\Common\Model\Configuration;
  *
  * @author Carlos Mendoza <inhack20@tecnocreaciones.com>
  */
-abstract class Configuration 
+abstract class ConfigurationWrapper
 {    
     /**
      *
