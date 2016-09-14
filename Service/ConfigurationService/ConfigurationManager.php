@@ -42,7 +42,7 @@ class ConfigurationManager {
      */
     private $adapter;
     
-    function __construct(\Tecnoready\Common\Service\SequenceGenerator\Adapter\ConfigurationAdapterInterface $adapter,array $options = array())
+    function __construct(Adapter\ConfigurationAdapterInterface $adapter,array $options = array())
     {
         if(!class_exists("Symfony\Component\Config\ConfigCache")){
             throw new \Exception("The package '%s' is required, please install https://packagist.org/packages/symfony/config",'"symfony/config": "^3.1"');
@@ -87,15 +87,14 @@ class ConfigurationManager {
     {
         $resolver = new OptionsResolver();
         $resolver->setDefaults([
-            'cache_dir'              => null,
             'debug'                  => false,
             'configuration_dumper_class' => 'Tecnoready\\Common\\Dumper\\Configuration\\PhpConfigurationDumper',
             'configuration_base_dumper_class' => 'Tecnoready\\Common\\Model\\Configuration\\ConfigurationCacheAvailable',
             'configuration_cache_class'  => 'ProjectConfigurationAvailable',
-            'configuration_class'  => null,
         ]);
         
-        $resolver->setRequired(["cache_dir"]);
+        $resolver->setRequired(["cache_dir","configuration_dumper_class","configuration_base_dumper_class","configuration_cache_class"]);
+        $resolver->addAllowedTypes("cache_dir","string");
         
 //        if ($invalid) {
 //            throw new \InvalidArgumentException(sprintf('The Configuration does not support the following options: "%s".', implode('", "', $invalid)));
@@ -124,8 +123,7 @@ class ConfigurationManager {
             );
             $cache->write($dumper->dump($options));
         }
-
-        require_once $cache;
+        require_once $cache->getPath();
 
         return $this->configurationCacheAvailable = new $class();
     }
