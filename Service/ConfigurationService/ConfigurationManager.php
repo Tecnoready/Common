@@ -130,49 +130,20 @@ class ConfigurationManager {
         }
         $class = $this->options['configuration_cache_class'];
         $cache = $this->getConfigCache();
-        $metadata = $cache->getPath().'.meta';
-        $meta = [];
-        
-        $cacheClass = null;
-        if(is_file($metadata)){
-            $meta = unserialize(file_get_contents($metadata));
-            if(isset($meta["cache_class"])){
-                $cacheClass = $meta["cache_class"];
-            }
-        }
-//        var_dump("Inicial '".$cacheClass."' is fresh? ".$cache->isFresh());
-//        var_dump($meta);
-//        die;
         $data = null;
-        if (!$cache->isFresh() || $cacheClass === null ) {
-            $time = time();
-            $cacheClass = $class;
+        if (!$cache->isFresh()) {
             $dumper = $this->getAvailableConfigurationDumperInstance();
 
             $options = array(
-                'class'      => $cacheClass,
+                'class'      => $class,
                 'base_class'      => $this->options['configuration_base_dumper_class']
             );
-            $metadata = [
-                "dumped_at" => $time,
-                "cache_class" => $cacheClass,
-            ];
             $newCacheClass = $dumper->dump($options);
-            $cache->write($newCacheClass,$metadata);
+            $cache->write($newCacheClass);
             $data = $dumper->getData();
-            //var_dump($cache->getPath());
-            //var_dump($newCacheClass);
-//            var_dump($cacheClass);
-            //eval(str_replace("<?php","",$newCacheClass));
-            //die;
         }
         require_once $cache->getPath();
-//        if(!class_exists($cacheClass)){
-////            var_dump("la clase '".$cacheClass."' no ha sido cargada.");
-//            $newCacheClass = file_get_contents($cache->getPath());
-//            eval(str_replace("<?php","",$newCacheClass));
-//        }
-        $this->configurationCacheAvailable = new $cacheClass();
+        $this->configurationCacheAvailable = new $class();
         if($data !== null){
             $this->configurationCacheAvailable->setConfigurations($data);
         }
