@@ -54,7 +54,7 @@ class ConfigurationManager {
         $this->adapter = $adapter;
         $this->configurationsWrapper = [];
         if($this->options["add_default_wrapper"] === true){
-            $this->addConfiguration(new \Tecnoready\Common\Model\Configuration\Wrapper\DefaultConfigurationWrapper());
+            $this->addWrapper(new \Tecnoready\Common\Model\Configuration\Wrapper\DefaultConfigurationWrapper());
         }
     }
     
@@ -64,7 +64,7 @@ class ConfigurationManager {
      * @return \Tecnoready\Common\Model\Configuration\Wrapper\ConfigurationWrapper
      * @throws \RuntimeException
      */
-    public function addConfiguration(\Tecnoready\Common\Model\Configuration\Wrapper\ConfigurationWrapper $configuration) 
+    public function addWrapper(\Tecnoready\Common\Model\Configuration\Wrapper\ConfigurationWrapper $configuration) 
     {
         if(isset($this->configurationsWrapper[$configuration->getName()])){
             throw new \RuntimeException(sprintf("The configuration name '%s' already added",$configuration->getName()));
@@ -79,7 +79,7 @@ class ConfigurationManager {
      * @return \Tecnoready\Common\Model\Configuration\Wrapper\ConfigurationWrapper
      * @throws \RuntimeException
      */
-    public function getConfiguration($name)
+    public function getWrapper($name)
     {
         if(!isset($this->configurationsWrapper[$name])){
             throw new \RuntimeException(sprintf("The configuration name '%s' is not added",$name));
