@@ -66,11 +66,12 @@ class ConfigurationManager {
      */
     public function addWrapper(\Tecnoready\Common\Model\Configuration\Wrapper\ConfigurationWrapper $configuration) 
     {
-        if(isset($this->configurationsWrapper[$configuration->getName()])){
+        $name = strtoupper($configuration->getName());
+        if($this->hasWrapper($name)){
             throw new \RuntimeException(sprintf("The configuration name '%s' already added",$configuration->getName()));
         }
         $configuration->setManager($this);
-        $this->configurationsWrapper[$configuration->getName()] = $configuration;
+        $this->configurationsWrapper[$name] = $configuration;
         return $this;
     }
     /**
@@ -81,10 +82,24 @@ class ConfigurationManager {
      */
     public function getWrapper($name)
     {
-        if(!isset($this->configurationsWrapper[$name])){
+        $name = strtoupper($name);
+        if(!$this->hasWrapper($name)){
             throw new \RuntimeException(sprintf("The configuration name '%s' is not added",$name));
         }
         return $this->configurationsWrapper[$name];
+    }
+    
+    public function hasWrapper($wrapperName,$throwException = false) {
+        $wrapperName = strtoupper($wrapperName);
+        $added = false;
+        if(isset($this->configurationsWrapper[$wrapperName])){
+            $added = true;
+        }else{
+            if($throwException === true){
+                throw new \InvalidArgumentException(sprintf("The ConfigurationWrapper with name '%s' dont exist.",$wrapperName));
+            }
+        }
+        return $added;
     }
 
     /**
@@ -169,10 +184,11 @@ class ConfigurationManager {
      * @return mixed
      */
     function get($key,$default = null,$wrapperName = null) {
-        $key = strtoupper($key);
         if($wrapperName === null){
-            $wrapperName = "default";
+            $wrapperName = \Tecnoready\Common\Model\Configuration\Wrapper\DefaultConfigurationWrapper::getName();
         }
+        $key = strtoupper($key);
+        $wrapperName = strtoupper($wrapperName);
         return $this->getAvailableConfiguration()->get($key,$default,$wrapperName);
     }
     
@@ -185,13 +201,12 @@ class ConfigurationManager {
      */
     function set($key,$value = null,$description = null,$wrapperName = null,$clearCache = false)
     {
-        $key = strtoupper($key);
         if($wrapperName === null){
-            $wrapperName = "default";
+            $wrapperName = \Tecnoready\Common\Model\Configuration\Wrapper\DefaultConfigurationWrapper::getName();
         }
-        if(!isset($this->configurationsWrapper[$wrapperName])){
-            throw new \InvalidArgumentException(sprintf("The ConfigurationWrapper with name '%s' dont exist.",$wrapperName));
-        }
+        $key = strtoupper($key);
+        $wrapperName = strtoupper($wrapperName);
+        $this->hasWrapper($wrapperName,true);
         $success = $this->adapter->update($key, $value, $description,$wrapperName);
         if($success === true && $clearCache ){
             $this->clearCache();
