@@ -19,6 +19,6 @@ namespace Tecnoready\Common\Model\Configuration\Wrapper;
 class DefaultConfigurationWrapper extends ConfigurationWrapper 
 {
     public static function getName() {
-        return "default";
+        return "DEFAULT";
     }
 }
