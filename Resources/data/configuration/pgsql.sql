@@ -11,7 +11,8 @@ CREATE TABLE app_configuration
   enabled smallint NOT NULL,
   created_at timestamp without time zone NOT NULL,
   updated_at timestamp without time zone NOT NULL,
-  CONSTRAINT app_configuration_pkey PRIMARY KEY (key)
+  CONSTRAINT app_configuration_pkey PRIMARY KEY (key),
+  CONSTRAINT unique_key_configuration UNIQUE (key)
 )
 WITH (
   OIDS=FALSE
