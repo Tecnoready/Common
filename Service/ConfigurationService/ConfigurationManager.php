@@ -143,12 +143,10 @@ class ConfigurationManager {
 //        var_dump("Inicial '".$cacheClass."' is fresh? ".$cache->isFresh());
 //        var_dump($meta);
 //        die;
-        
+        $data = null;
         if (!$cache->isFresh() || $cacheClass === null ) {
-            static $i = 0;
-            $i++;
-            $time = time().$i;
-            $cacheClass = $class.$time;
+            $time = time();
+            $cacheClass = $class;
             $dumper = $this->getAvailableConfigurationDumperInstance();
 
             $options = array(
@@ -161,19 +159,24 @@ class ConfigurationManager {
             ];
             $newCacheClass = $dumper->dump($options);
             $cache->write($newCacheClass,$metadata);
+            $data = $dumper->getData();
             //var_dump($cache->getPath());
             //var_dump($newCacheClass);
 //            var_dump($cacheClass);
-            eval(str_replace("<?php","",$newCacheClass));
+            //eval(str_replace("<?php","",$newCacheClass));
             //die;
         }
         require_once $cache->getPath();
-        if(!class_exists($cacheClass)){
-//            var_dump("la clase '".$cacheClass."' no ha sido cargada.");
-            $newCacheClass = file_get_contents($cache->getPath());
-            eval(str_replace("<?php","",$newCacheClass));
+//        if(!class_exists($cacheClass)){
+////            var_dump("la clase '".$cacheClass."' no ha sido cargada.");
+//            $newCacheClass = file_get_contents($cache->getPath());
+//            eval(str_replace("<?php","",$newCacheClass));
+//        }
+        $this->configurationCacheAvailable = new $cacheClass();
+        if($data !== null){
+            $this->configurationCacheAvailable->setConfigurations($data);
         }
-        return $this->configurationCacheAvailable = new $cacheClass();
+        return $this->configurationCacheAvailable;
     }
     
     /**

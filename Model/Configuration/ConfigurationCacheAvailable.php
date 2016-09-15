@@ -28,4 +28,9 @@ abstract class ConfigurationCacheAvailable
         }
         return $default;
     }
+    
+    public function setConfigurations(array $configurations) {
+        $this->configurations = $configurations;
+        return $this;
+    }
 }

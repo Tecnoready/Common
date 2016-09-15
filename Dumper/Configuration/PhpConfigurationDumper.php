@@ -10,6 +10,9 @@
  */
 namespace Tecnoready\Common\Dumper\Configuration;
 
+use DateTime;
+use Tecnoready\Common\Util\ConfigurationUtil;
+
 /**
  * Genera la cache de la configuracion
  *
@@ -18,13 +21,16 @@ namespace Tecnoready\Common\Dumper\Configuration;
 class PhpConfigurationDumper 
 {
     private $configurations;
+    
+    private $data;
 
     public function __construct(array $configurations) {
         $this->configurations = $configurations;
+        $this->data = [];
     }
     
     public function dump(array $options = array()) {
-        $now = new \DateTime();
+        $now = new DateTime();
         $dumpedAt = $now->format("Y-m-d H:i:s");
         $options = array_replace(array(
             'class'      => 'ProjectConfigurationAvailable',
@@ -79,9 +85,15 @@ EOF;
 //            $data['updatedAt'] = $configuration->getUpdatedAt();
             //$data['id'] = $configuration->getId();
             
-            $code .= sprintf("'%s' => %s,",  \Tecnoready\Common\Util\ConfigurationUtil::generateId($configuration->getNameWrapper(),$configuration->getKey()),var_export($data,true));
+            $id = ConfigurationUtil::generateId($configuration->getNameWrapper(),$configuration->getKey());
+            $code .= sprintf("'%s' => %s,", $id ,var_export($data,true));
+            $this->data[$id] = $data;
         }
 
         return $code;
+    }
+    
+    public function getData() {
+        return $this->data;
     }
 }
