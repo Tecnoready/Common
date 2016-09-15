@@ -33,9 +33,7 @@ abstract class ConfigurationWrapper
      */
     protected function set($key,$value = null,$description = null)
     {
-        $this->manager->set($key, $value, $description,$this->getName());
-        
-        return $this;
+        return $this->manager->set($key, $value, $description,$this->getName());
     }
     
     /**
@@ -51,14 +49,12 @@ abstract class ConfigurationWrapper
     }
     
     
-    /**
-     * Retorna el servicio que maneja la configuracion del sistema
-     * @return \Tecnoready\Common\Service\ConfigurationService\ConfigurationManager
-     */
-    protected function getManager() {
-        return $this->manager;
+    public final function clearCache() {
+        $this->manager->clearCache();
+        $this->manager->warmUp();
     }
-    
+
+
     public function setManager(\Tecnoready\Common\Service\ConfigurationService\ConfigurationManager $manager) {
         $this->manager = $manager;
         return $this;

@@ -69,8 +69,22 @@ class ConfigurationManager {
         if(isset($this->configurationsWrapper[$configuration->getName()])){
             throw new \RuntimeException(sprintf("The configuration name '%s' already added",$configuration->getName()));
         }
+        $configuration->setManager($this);
         $this->configurationsWrapper[$configuration->getName()] = $configuration;
         return $this;
+    }
+    /**
+     * Retorna el wrapper de una configuracion
+     * @param type $name
+     * @return \Tecnoready\Common\Model\Configuration\Wrapper\ConfigurationWrapper
+     * @throws \RuntimeException
+     */
+    public function getConfiguration($name)
+    {
+        if(!isset($this->configurationsWrapper[$name])){
+            throw new \RuntimeException(sprintf("The configuration name '%s' is not added",$name));
+        }
+        return $this->configurationsWrapper[$name];
     }
 
     /**
@@ -207,6 +221,7 @@ class ConfigurationManager {
         $success = $this->adapter->update($key, $value, $description,$wrapperName);
         if($success === true && $clearCache ){
             $this->clearCache();
+            $this->warmUp();
         }
         return $success;
     }
@@ -219,6 +234,7 @@ class ConfigurationManager {
         $this->adapter->flush();
         if($andClearCache){
             $this->clearCache();
+            $this->warmUp();
         }
     }
     
@@ -238,7 +254,6 @@ class ConfigurationManager {
         $this->configurationCacheAvailable = null;
         $cache = $this->getConfigCache();
         @unlink($cache->getPath());
-        $this->warmUp();
     }
     
     /**
@@ -249,39 +264,4 @@ class ConfigurationManager {
         $entities = $this->adapter->findAll();
         return new $this->options['configuration_dumper_class']($entities);
     }
-    
-    /**
-     * Retorna la entidad de la base de datos de la configuracion
-     * @param type $id
-     * @return \Tecnocreaciones\Bundle\ToolsBundle\Model\Configuration\Configuration
-     */
-    protected function getConfiguration($id)
-    {
-        if(null === $this->configurations){
-            $this->getConfigurations();
-        }
-        if(isset($this->configurations[$id])){
-            return $this->configurations[$id];
-        }
-        return null;
-    }
-    
-    /**
-     * Configuraciones actuales en la base de datos
-     * 
-     * @return \Tecnocreaciones\Bundle\ToolsBundle\Model\Configuration\Configuration
-     */
-    protected function getConfigurations()
-    {
-        if(null !== $this->configurations){
-            return $this->configurations;
-        }
-        $configurations = $this->adapter->findAll();
-        $this->configurations = array();
-        foreach ($configurations as $entity) {
-            $this->configurations[$entity->getId()] = $entity;
-        }
-        return $this->configurations;
-    }
-    
 }

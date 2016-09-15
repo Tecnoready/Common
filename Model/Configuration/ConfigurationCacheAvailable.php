@@ -28,20 +28,4 @@ abstract class ConfigurationCacheAvailable
         }
         return $default;
     }
-    
-    function getIdByKey($key)
-    {
-        if(isset($this->configurations[$key])){
-            return $this->configurations[$key]['id'];
-        }
-        return null;
-    }
-    
-    function hasKey($key)
-    {
-        if(isset($this->configurations[$key])){
-            return true;
-        }
-        return false;
-    }
 }

@@ -25,7 +25,7 @@ class ConfigurationUtil {
      */
     public static function generateId($nameWrapper,$key)
     {
-        return sprintf("%s__%s",$nameWrapper,$key);
+        return sprintf("%s___%s",$nameWrapper,$key);
     }
     
 }

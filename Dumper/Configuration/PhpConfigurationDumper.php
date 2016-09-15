@@ -72,9 +72,9 @@ EOF;
         
         foreach ($this->configurations as $key => $configuration) {
             $data = array();
-            $data['key'] = $configuration->getKey();
+            //$data['key'] = $configuration->getKey();
             $data['value'] = $configuration->getValue();
-            $data['enabled'] = $configuration->getEnabled();
+            //$data['enabled'] = $configuration->getEnabled();
 //            $data['createdAt'] = $configuration->getCreatedAt();
 //            $data['updatedAt'] = $configuration->getUpdatedAt();
             //$data['id'] = $configuration->getId();
