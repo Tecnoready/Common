@@ -137,7 +137,7 @@ class SequenceGenerator
         //Se remplaza el valor de las mascaras adicionales para obtener la longitud correcta
         foreach ($this->getAdditionalMasks() as $key => $value) {
             if(isset($parameters[$value])){
-                $maskwithnocode = preg_replace('/\{'.$value.'\}/i',$parameters[$value], $maskwithnocode);
+                $maskwithnocode = preg_replace('/'.$value.'/i',$parameters[$value], $maskwithnocode);
             }
         }
         
@@ -155,7 +155,7 @@ class SequenceGenerator
         }
         foreach ($this->getAdditionalMasks() as $key => $value) {
             if(isset($parameters[$value])){
-                $maskLike = preg_replace('/\{'.$value.'\}/i',$parameters[$value], $maskLike);
+                $maskLike = preg_replace('/'.$value.'/i',$parameters[$value], $maskLike);
             }
         }
         $maskLike = str_replace($this->dol_string_nospecial('{' . $masktri . '}'), str_pad("", strlen($maskcounter), "_"), $maskLike);
@@ -202,7 +202,7 @@ class SequenceGenerator
         
         foreach ($this->getAdditionalMasks() as $additionalMask) {
             if(isset($parameters[$additionalMask])){
-                $numFinal = preg_replace('/\{'.$additionalMask.'\}/i', $parameters[$additionalMask], $numFinal);
+                $numFinal = preg_replace('/'.$additionalMask.'/i', $parameters[$additionalMask], $numFinal);
             }
         }
         // Now we replace the counter
@@ -238,7 +238,7 @@ class SequenceGenerator
      * @param type $parameters Values of additional masks array('miMask' => 'Value')
      * @return type
      */
-    function generateNext(\Tecnoready\Common\Service\SequenceGenerator\Adapter\SequenceGeneratorAdapterInterface $adapter,$mask,$field,$parameters = array())
+    function generateNext(\Tecnoready\Common\Service\SequenceGenerator\Adapter\SequenceGeneratorAdapterInterface $adapter,$mask,$field,array $parameters = array())
     {
         return $this->generate($adapter, $mask,$field,self::MODE_NEXT,$parameters);
     }

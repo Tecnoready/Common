@@ -38,6 +38,18 @@ class SequenceGeneratorService
      * @var array
      */
     protected $classMap;
+    /**
+     * Opciones
+     * @var array
+     */
+    protected $options;
+    
+    public function __construct(array $options = []) {
+        
+        if(isset($options["sequenceGeneratorOptions"])){
+            $this->sequenceGenerator = new SequenceGenerator($options["sequenceGeneratorOptions"]);
+        }
+    }
 
     /**
      * Construye la referencia por defecto
@@ -45,13 +57,13 @@ class SequenceGeneratorService
      * @param array $config
      * @return type
      */
-    public function buildRef($item,array $config) {
+    public function buildRef($item,array $config,array $parameters = []) {
         $mask = $config['mask'];
         $className = $config['className'];
         $field = $config['field'];
         
         $adapter = $this->adapter->createAdapter($className);
-        return $this->getSequenceGenerator()->generateNext($adapter, $mask,$field);
+        return $this->getSequenceGenerator()->generateNext($adapter, $mask,$field,$parameters);
     }
     
     /**
@@ -60,7 +72,7 @@ class SequenceGeneratorService
      * @return type
      * @throws LogicException
      */
-    public function setRef(ItemReferenceInterface $item) 
+    public function setRef(ItemReferenceInterface $item,array $parameters = []) 
     {
         $className = $this->getClassName($item);
         $classMap = $this->getClassMap();
@@ -68,8 +80,24 @@ class SequenceGeneratorService
             throw new LogicException(sprintf("No ha definido la configuracion de '%s' para generar su referencia",$className));
         }
         $config = $this->mergeConfig($className);
-        $ref = $this->generateNext($item,$config["mask"],$config["field"]);
+        $ref = $this->generateNext($item,$config["mask"],$config["field"],$parameters);
         $item->setRef($ref);
+        return $ref;
+    }
+    /**
+     * Obtiene la siguiente secuencia de un objeto
+     * @param type $item
+     * @return type
+     * @throws LogicException
+     */
+    public function generateSequence($item,array $parameters = []) {
+        $className = $this->getClassName($item);
+        $classMap = $this->getClassMap();
+        if(!isset($classMap[$className])){
+            throw new LogicException(sprintf("No ha definido la configuracion de '%s' para generar su referencia",$className));
+        }
+        $config = $this->mergeConfig($className);
+        $ref = $this->generateNext($item,$config["mask"],$config["field"],$parameters);
         return $ref;
     }
     
@@ -78,14 +106,14 @@ class SequenceGeneratorService
      * @param type $item
      * @return type
      */
-    public function generateNext($item,$mask, $field = "ref") {
+    public function generateNext($item,$mask, $field = "ref",array $parameters = []) {
         $className = $this->getClassName($item);
         $config = $this->mergeConfig($className);
         
         $method = $config['method'];
         $config['mask'] = $mask;
         $config['field'] = $field;
-        $ref = $this->$method($item,$config);
+        $ref = $this->$method($item,$config,$parameters);
         return $ref;
     }
     
