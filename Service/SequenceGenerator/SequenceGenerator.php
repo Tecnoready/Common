@@ -61,6 +61,7 @@ class SequenceGenerator
             'additional_masks'  => array(),
             'debug'             => false,
             'temporary_mask'    => 'TEMP',
+            'cache'    => true,
         );
 
         // check option names and live merge, if errors are encountered Exception will be thrown
@@ -180,7 +181,7 @@ class SequenceGenerator
         if (empty($counter) || preg_match('/[^0-9]/i', $counter))
             $counter = $maskOffSetAdd;
         $maskMd5 = md5($mask);
-        if(!isset($this->cacheMemoryMasks[$maskMd5])){
+        if(!isset($this->cacheMemoryMasks[$maskMd5]) || $this->options["cache"] === false ){
             $this->cacheMemoryMasks[$maskMd5] = 0;
         }else{
             $this->cacheMemoryMasks[$maskMd5] = (integer)$this->cacheMemoryMasks[$maskMd5] + 1;
