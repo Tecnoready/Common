@@ -26,6 +26,7 @@ namespace Tecnoready\Common\Service\TimeAgo;
     '1 month ago' => 'hace 1 mes',
     '1 year ago' => 'hace 1 año',
     '{years} years ago' => 'hace {years} años',
+    '{months} months ago' => 'hace {months} meses',
     
     //Futuro
     'in less than {seconds} seconds' => 'en menos de {seconds} segundos',
@@ -37,6 +38,8 @@ namespace Tecnoready\Common\Service\TimeAgo;
     'in about {hours} hours' => 'en aproximadamente {hours} horas',
     'in 1 day' => 'en 1 día',
     'in {days} days' => 'en {days} días',
+    'in {months} months' => 'en {months} meses',
+    'in {years} years' => 'en {years} años',
  * ]
  */
 
@@ -171,16 +174,14 @@ class TimeAgoService
             $distance_in_days = round($distance_in_minutes/1440);
             if (!$include_months || $distance_in_days <= 30) {
                 return $this->trans('{days} days ago', array('{days}' => round($distance_in_days)));
-            }
-            elseif ($distance_in_days < 345) {
+            } elseif ($distance_in_days < 345) {
                 $months = round($distance_in_days/30);
                 if($months == 1){
                     return $this->trans('1 month ago');
                 }else{
                     return $this->trans('{months} months ago', array('{months}' => $months));
                 }
-            }
-            else {
+            } else {
                 $years = round($distance_in_days/365);
                 if($years == 1){
                     return $this->trans("1 year ago");
@@ -192,6 +193,8 @@ class TimeAgoService
     }
 
     private function future($distance_in_minutes,$include_seconds,$distance_in_seconds){
+        $distance_in_months = round($distance_in_minutes/43200);
+        $distance_in_years = round($distance_in_minutes/518400);
         if ($distance_in_minutes <= 1){
             if ($include_seconds){
                 if ($distance_in_seconds < 5){
@@ -226,6 +229,12 @@ class TimeAgoService
         }
         elseif ($distance_in_minutes <= 2880){
             return $this->trans('in 1 day');
+        }
+        elseif ($distance_in_months <= 12){
+            return $this->trans('in {months} months', array('{months}' => $distance_in_months));
+        }
+        elseif ($distance_in_years <= 10){
+            return $this->trans('in {years} years', array('{years}' => $distance_in_years));
         }
         else{
             return $this->trans('in {days} days', array('{days}' => round($distance_in_minutes/1440)));
