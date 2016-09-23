@@ -193,6 +193,7 @@ class TimeAgoService
     }
 
     private function future($distance_in_minutes,$include_seconds,$distance_in_seconds){
+        $distance_in_days = round($distance_in_minutes/1440);
         $distance_in_months = round($distance_in_minutes/43200);
         $distance_in_years = round($distance_in_minutes/518400);
         if ($distance_in_minutes <= 1){
@@ -230,14 +231,17 @@ class TimeAgoService
         elseif ($distance_in_minutes <= 2880){
             return $this->trans('in 1 day');
         }
-        elseif ($distance_in_months <= 12){
+        elseif ($distance_in_days <= 31){
+            return $this->trans('in {days} days', array('{days}' => $distance_in_days));
+        }
+        elseif ($distance_in_months > 0 && $distance_in_months <= 12){
             return $this->trans('in {months} months', array('{months}' => $distance_in_months));
         }
-        elseif ($distance_in_years <= 10){
+        elseif ($distance_in_years > 0){
             return $this->trans('in {years} years', array('{years}' => $distance_in_years));
         }
         else{
-            return $this->trans('in {days} days', array('{days}' => round($distance_in_minutes/1440)));
+            return $this->trans('in {days} days', array('{days}' => $distance_in_days));
         }
     }
 }
