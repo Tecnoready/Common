@@ -194,11 +194,11 @@ class StatisticsManager
         $value++;
         $this->setValueDay($foundStatisticsMonth, $day, $value);
         $foundStatisticsMonth->totalize();
-
+        //Guardo cambios en el mes (totales)
         $this->adapter->persist($foundStatisticsMonth);
         
+        //Totalizo el valor del anio con los valores actualizados del mes.
         $foundStatisticsYear->totalize();
-        
         $this->adapter->persist($foundStatisticsYear);
         $this->adapter->flush();
         
