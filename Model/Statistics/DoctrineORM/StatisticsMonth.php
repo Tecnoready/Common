@@ -255,7 +255,7 @@ class StatisticsMonth implements \Tecnoready\Common\Model\Statistics\StatisticsM
      */
     protected $updatedFromIp;
     
-    use Tecnoready\Common\Model\TraceableTrait;
+    use \Tecnoready\Common\Model\TraceableTrait;
     
     public function getYear() {
         return $this->year;

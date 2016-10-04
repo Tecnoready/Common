@@ -102,7 +102,7 @@ class StatisticsYear extends \yii\db\ActiveRecord implements \Tecnoready\Common\
         }
     }
     
-    use Tecnoready\Common\Model\TraceableTrait;    
+    use \Tecnoready\Common\Model\TraceableTrait;
     
     /**
      * Total de todos los meses
@@ -457,11 +457,9 @@ class StatisticsYear extends \yii\db\ActiveRecord implements \Tecnoready\Common\
     /**
      * Add month
      *
-     * @param \Pandco\Bundle\AppBundle\Entity\Core\Statistics\StatisticsMonth $month
-     *
      * @return StatisticsYear
      */
-    public function addMonth(\Pandco\Bundle\AppBundle\Entity\Core\Statistics\StatisticsMonth $month)
+    public function addMonth(\Tecnoready\Common\Model\Statistics\StatisticsMonthInterface $month)
     {
         $this->months->set($month->getMonth(),$month);
 
@@ -470,10 +468,8 @@ class StatisticsYear extends \yii\db\ActiveRecord implements \Tecnoready\Common\
 
     /**
      * Remove month
-     *
-     * @param \Pandco\Bundle\AppBundle\Entity\Core\Statistics\StatisticsMonth $month
      */
-    public function removeMonth(\Pandco\Bundle\AppBundle\Entity\Core\Statistics\StatisticsMonth $month)
+    public function removeMonth(\Tecnoready\Common\Model\Statistics\StatisticsMonthInterface $month)
     {
         $this->months->removeElement($month);
     }

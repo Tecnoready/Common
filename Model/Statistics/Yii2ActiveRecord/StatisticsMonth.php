@@ -53,7 +53,7 @@ use Yii;
  *
  * @property StatisticsYear $yearEntity
  */
-class StatisticsMonth extends \yii\db\ActiveRecord implements \Tecnoready\Common\Model\Configuration\Statistics\StatisticsMonthInterface
+class StatisticsMonth extends \yii\db\ActiveRecord implements \Tecnoready\Common\Model\Statistics\StatisticsMonthInterface
 {
     /**
      * @inheritdoc
@@ -144,7 +144,7 @@ class StatisticsMonth extends \yii\db\ActiveRecord implements \Tecnoready\Common
         }
     }
     
-    use Tecnoready\Common\Model\TraceableTrait;
+    use \Tecnoready\Common\Model\TraceableTrait;
     
     public function getYear() {
         return $this->year;
@@ -462,7 +462,7 @@ class StatisticsMonth extends \yii\db\ActiveRecord implements \Tecnoready\Common
         $this->total = $total;
     }
     
-    public function setYearEntity(StatisticsYear $yearEntity) {
+    public function setYearEntity(\Tecnoready\Common\Model\Statistics\StatisticsYearInterface $yearEntity) {
         $this->yearEntity = $yearEntity;
         return $this;
     }

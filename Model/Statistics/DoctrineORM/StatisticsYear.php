@@ -148,7 +148,7 @@ class StatisticsYear implements \Tecnoready\Common\Model\Statistics\StatisticsYe
      */
     protected $updatedFromIp;
     
-    use Tecnoready\Common\Model\TraceableTrait;
+    use \Tecnoready\Common\Model\TraceableTrait;
     
     public function __construct() {
         $this->months = new \Doctrine\Common\Collections\ArrayCollection();

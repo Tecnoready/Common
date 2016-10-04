@@ -7,7 +7,7 @@ namespace Tecnoready\Common\Model;
  *
  * @author Carlos Mendoza <inhack20@gmail.com>
  */
-class TraceableTrait 
+trait TraceableTrait 
 {
     public function getDeletedAt()
     {
