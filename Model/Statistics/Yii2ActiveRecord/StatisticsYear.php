@@ -1,6 +1,6 @@
 <?php
 
-namespace Tecnoready\Common\Model\Configuration\Statistics\Yii2ActiveRecord;
+namespace Tecnoready\Common\Model\Statistics\Yii2ActiveRecord;
 
 use Yii;
 
@@ -33,7 +33,7 @@ use Yii;
  *
  * @property StatisticsMonthly[] $statisticsMonthlies
  */
-class StatisticsYear extends \yii\db\ActiveRecord implements \Tecnoready\Common\Model\Configuration\Statistics\StatisticsYearInterface
+class StatisticsYear extends \yii\db\ActiveRecord implements \Tecnoready\Common\Model\Statistics\StatisticsYearInterface
 {
     /**
      * @inheritdoc
@@ -102,7 +102,7 @@ class StatisticsYear extends \yii\db\ActiveRecord implements \Tecnoready\Common\
         }
     }
     
-    use Tecnoready\Common\Model\Configuration\TraceableTrait;
+    use Tecnoready\Common\Model\TraceableTrait;    
     
     /**
      * Total de todos los meses

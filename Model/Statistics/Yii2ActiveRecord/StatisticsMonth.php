@@ -1,6 +1,6 @@
 <?php
 
-namespace Tecnoready\Common\Model\Configuration\Statistics\Yii2ActiveRecord;
+namespace Tecnoready\Common\Model\Statistics\Yii2ActiveRecord;
 
 use Yii;
 
@@ -144,7 +144,7 @@ class StatisticsMonth extends \yii\db\ActiveRecord implements \Tecnoready\Common
         }
     }
     
-    use Tecnoready\Common\Model\Configuration\TraceableTrait;
+    use Tecnoready\Common\Model\TraceableTrait;
     
     public function getYear() {
         return $this->year;

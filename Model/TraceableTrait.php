@@ -1,6 +1,6 @@
 <?php
 
-namespace Tecnoready\Common\Model\Configuration;
+namespace Tecnoready\Common\Model;
 
 /**
  * TraceableTrait

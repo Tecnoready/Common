@@ -1,6 +1,6 @@
 <?php
 
-namespace Tecnoready\Common\Model\Configuration\Statistics\DoctrineORM;
+namespace Tecnoready\Common\Model\Statistics\DoctrineORM;
 
 use Doctrine\ORM\Mapping as ORM;
 
@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @author Carlos Mendoza <inhack20@gmail.com>
  */
-class StatisticsYear implements \Tecnoready\Common\Model\Configuration\Statistics\StatisticsYearInterface
+class StatisticsYear implements \Tecnoready\Common\Model\Statistics\StatisticsYearInterface
 {
     /**
      * @var integer
@@ -148,7 +148,7 @@ class StatisticsYear implements \Tecnoready\Common\Model\Configuration\Statistic
      */
     protected $updatedFromIp;
     
-    use Tecnoready\Common\Model\Configuration\TraceableTrait;
+    use Tecnoready\Common\Model\TraceableTrait;
     
     public function __construct() {
         $this->months = new \Doctrine\Common\Collections\ArrayCollection();

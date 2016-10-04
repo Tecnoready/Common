@@ -1,10 +1,10 @@
 <?php
 
-namespace Tecnoready\Common\Model\Configuration\Statistics;
+namespace Tecnoready\Common\Model\Statistics;
 
-use Tecnoready\Common\Model\Configuration\Statistics\StatisticsMonthInterface;
-use Tecnoready\Common\Model\Configuration\Statistics\StatisticsYearInterface;
-use Tecnoready\Common\Model\Configuration\TraceableInterface;
+use Tecnoready\Common\Model\Statistics\StatisticsMonthInterface;
+use Tecnoready\Common\Model\Statistics\StatisticsYearInterface;
+use Tecnoready\Common\Model\TraceableInterface;
 
 /**
  *

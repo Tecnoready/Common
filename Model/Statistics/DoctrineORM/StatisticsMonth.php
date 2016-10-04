@@ -1,6 +1,6 @@
 <?php
 
-namespace Tecnoready\Common\Model\Configuration\Statistics\DoctrineORM;
+namespace Tecnoready\Common\Model\Statistics\DoctrineORM;
 
 use Doctrine\ORM\Mapping as ORM;
 
@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Table(name="statistics_monthly")
  * @ORM\Entity()
  */
-class StatisticsMonth implements \Tecnoready\Common\Model\Configuration\Statistics\StatisticsMonthInterface
+class StatisticsMonth implements \Tecnoready\Common\Model\Statistics\StatisticsMonthInterface
 {
     /**
      * @var StatisticsYear
@@ -255,7 +255,7 @@ class StatisticsMonth implements \Tecnoready\Common\Model\Configuration\Statisti
      */
     protected $updatedFromIp;
     
-    use Tecnoready\Common\Model\Configuration\TraceableTrait;
+    use Tecnoready\Common\Model\TraceableTrait;
     
     public function getYear() {
         return $this->year;
