@@ -72,7 +72,7 @@ class StatisticsMonth extends \yii\db\ActiveRecord implements \Tecnoready\Common
             [['year', 'month', 'total', 'day1', 'day2', 'day3', 'day4', 'day5', 'day6', 'day7', 'day8', 'day9', 'day10', 'day11', 'day12', 'day13', 'day14', 'day15', 'day16', 'day17', 'day18', 'day19', 'day20', 'day21', 'day22', 'day23', 'day24', 'day25', 'day26', 'day27', 'day28', 'day29', 'day30', 'day31', 'created_at', 'updated_at', 'yearEntity_id'], 'required'],
             [['year', 'month', 'yearEntity_id'], 'integer'],
             [['created_at', 'updated_at', 'deleted_at'], 'safe'],
-            [['total', 'day1', 'day2', 'day3', 'day4', 'day5', 'day6', 'day7', 'day8', 'day9', 'day10', 'day11', 'day12', 'day13', 'day14', 'day15', 'day16', 'day17', 'day18', 'day19', 'day20', 'day21', 'day22', 'day23', 'day24', 'day25', 'day26', 'day27', 'day28', 'day29', 'day30', 'day31'], 'string', 'max' => 255],
+            //[['total', 'day1', 'day2', 'day3', 'day4', 'day5', 'day6', 'day7', 'day8', 'day9', 'day10', 'day11', 'day12', 'day13', 'day14', 'day15', 'day16', 'day17', 'day18', 'day19', 'day20', 'day21', 'day22', 'day23', 'day24', 'day25', 'day26', 'day27', 'day28', 'day29', 'day30', 'day31'], 'string', 'max' => 255],
             [['created_from_ip', 'updated_from_ip'], 'string', 'max' => 45],
             [['yearEntity_id'], 'exist', 'skipOnError' => true, 'targetClass' => StatisticsYear::className(), 'targetAttribute' => ['yearEntity_id' => 'id']],
         ];
@@ -134,14 +134,6 @@ class StatisticsMonth extends \yii\db\ActiveRecord implements \Tecnoready\Common
     public function getYearEntity()
     {
         return $this->hasOne(StatisticsYear::className(), ['id' => 'yearEntity_id']);
-    }
-    
-    public function init() {
-        parent::init();
-        $this->total = 0;
-        for($i=1;$i<=31;$i++){
-            $this->{"day".$i} = 0;
-        }
     }
     
     use \Tecnoready\Common\Model\TraceableTrait;
@@ -463,7 +455,7 @@ class StatisticsMonth extends \yii\db\ActiveRecord implements \Tecnoready\Common
     }
     
     public function setYearEntity(\Tecnoready\Common\Model\Statistics\StatisticsYearInterface $yearEntity) {
-        $this->yearEntity = $yearEntity;
+        $this->yearEntity_id = $yearEntity->id;
         return $this;
     }
 }

@@ -22,9 +22,9 @@ interface StatisticsAdapterInterface {
     /**
      * @return \Tecnoready\Common\Model\Configuration\Statistics\StatisticsYearInterface Description
      */
-    public function newYearStatistics();
+    public function newYearStatistics(\Tecnoready\Common\Service\Statistics\StatisticsManager $statisticsManager);
     /**
      * @return \Tecnoready\Common\Model\Configuration\Statistics\StatisticsMonthInterface Description
      */
-    public function newStatisticsMonth();
+    public function newStatisticsMonth(\Tecnoready\Common\Service\Statistics\StatisticsManager $statisticsManager);
 }

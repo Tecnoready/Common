@@ -40,7 +40,10 @@ class StatisticsManager
         if(!class_exists("Symfony\Component\OptionsResolver\OptionsResolver")){
             throw new \Exception(sprintf("The package '%s' is required, please install https://packagist.org/packages/symfony/options-resolver",'"symfony/options-resolver": "^3.1"'));
         }
-        $this->propertyAccess = \Symfony\Component\PropertyAccess\PropertyAccess::createPropertyAccessor();
+        $builder = \Symfony\Component\PropertyAccess\PropertyAccess::createPropertyAccessorBuilder();
+        $builder->enableMagicCall();
+        
+        $this->propertyAccess = $builder->getPropertyAccessor();
         $this->adapter = $adapter;
         
         $this->setOptions($options);
@@ -190,8 +193,9 @@ class StatisticsManager
         $value = (int)$this->getValueDay($day,$foundStatisticsMonth);
         $value++;
         $this->setValueDay($foundStatisticsMonth, $day, $value);
-        
+        $foundStatisticsMonth->totalize();
         $foundStatisticsYear->totalize();
+
         $this->adapter->persist($foundStatisticsMonth);
         $this->adapter->persist($foundStatisticsYear);
         $this->adapter->flush();
@@ -250,9 +254,8 @@ class StatisticsManager
             $year = $now->format("Y");
         }
         
-        
         $nowString = $now->format($this->options["date_format"]);
-        $yearStatistics = $this->adapter->newYearStatistics();
+        $yearStatistics = $this->adapter->newYearStatistics($this);
         $yearStatistics->setYear($year);
         $yearStatistics->setCreatedAt($nowString);
         $yearStatistics->setUpdatedAt($nowString);
@@ -262,7 +265,7 @@ class StatisticsManager
         $this->adapter->persist($yearStatistics);
         
         for($month = 1; $month <= 12; $month++){
-            $statisticsMonth = $this->adapter->newStatisticsMonth();
+            $statisticsMonth = $this->adapter->newStatisticsMonth($this);
             $statisticsMonth->setMonth($month);
             $statisticsMonth->setYear($year);
             $statisticsMonth->setYearEntity($yearStatistics);
@@ -292,5 +295,9 @@ class StatisticsManager
             $summary[$month] = $this->getStatisticsMonthTotal($object, $propertyPath, $year, $month);
         }
         return $summary;
+    }
+    
+    public function getOptions() {
+        return $this->options;
     }
 }

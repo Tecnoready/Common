@@ -26,15 +26,6 @@ interface StatisticsYearInterface extends TraceableInterface
     public function getYear();
 
     /**
-     * Set total
-     *
-     * @param string $total
-     *
-     * @return StatisticsYearInterface
-     */
-    public function setTotal($total);
-
-    /**
      * Get total
      *
      * @return string

@@ -52,7 +52,7 @@ class StatisticsYear extends \yii\db\ActiveRecord implements \Tecnoready\Common\
             [['year', 'total', 'total_month_1', 'total_month_2', 'total_month_3', 'total_month_4', 'total_month_5', 'total_month_6', 'total_month_7', 'total_month_8', 'total_month_9', 'total_month_10', 'total_month_11', 'total_month_12', 'created_at', 'updated_at'], 'required'],
             [['year'], 'integer'],
             [['created_at', 'updated_at', 'deleted_at'], 'safe'],
-            [['total', 'total_month_1', 'total_month_2', 'total_month_3', 'total_month_4', 'total_month_5', 'total_month_6', 'total_month_7', 'total_month_8', 'total_month_9', 'total_month_10', 'total_month_11', 'total_month_12'], 'string', 'max' => 255],
+            //[['total', 'total_month_1', 'total_month_2', 'total_month_3', 'total_month_4', 'total_month_5', 'total_month_6', 'total_month_7', 'total_month_8', 'total_month_9', 'total_month_10', 'total_month_11', 'total_month_12'], 'string', 'max' => 255],
             [['created_from_ip', 'updated_from_ip'], 'string', 'max' => 45],
         ];
     }
@@ -94,29 +94,7 @@ class StatisticsYear extends \yii\db\ActiveRecord implements \Tecnoready\Common\
         return $this->hasMany(StatisticsMonthly::className(), ['yearEntity_id' => 'id']);
     }
     
-    public function init() {
-        parent::init();
-        $this->total = 0;
-        for($i=1; $i<=12;$i++){
-            $this->{"totalMonth".$i} = 0;
-        }
-    }
-    
     use \Tecnoready\Common\Model\TraceableTrait;
-    
-    /**
-     * Total de todos los meses
-     * @var integer
-     * @ORM\Column(name="total",type="decimal", precision=50, scale=18, nullable=false)
-     */
-    protected $total = 0;
-    
-    /**
-     * Meses
-     * @var StatisticsMonth
-     * @ORM\OneToMany(targetEntity="Pandco\Bundle\AppBundle\Entity\Core\Statistics\StatisticsMonth",cascade={"persist","remove"},mappedBy="yearEntity")
-     */
-    protected $months;
 
     /**
      * Set year
@@ -143,20 +121,6 @@ class StatisticsYear extends \yii\db\ActiveRecord implements \Tecnoready\Common\
     }
 
     /**
-     * Set total
-     *
-     * @param string $total
-     *
-     * @return StatisticsYear
-     */
-    public function setTotal($total)
-    {
-        $this->total = $total;
-
-        return $this;
-    }
-
-    /**
      * Get total
      *
      * @return string
@@ -175,7 +139,7 @@ class StatisticsYear extends \yii\db\ActiveRecord implements \Tecnoready\Common\
      */
     public function setTotalMonth1($totalMonth1)
     {
-        $this->totalMonth1 = $totalMonth1;
+        $this->total_month_1 = $totalMonth1;
 
         return $this;
     }
@@ -187,7 +151,7 @@ class StatisticsYear extends \yii\db\ActiveRecord implements \Tecnoready\Common\
      */
     public function getTotalMonth1()
     {
-        return $this->totalMonth1;
+        return $this->total_month_1;
     }
 
     /**
@@ -199,7 +163,7 @@ class StatisticsYear extends \yii\db\ActiveRecord implements \Tecnoready\Common\
      */
     public function setTotalMonth2($totalMonth2)
     {
-        $this->totalMonth2 = $totalMonth2;
+        $this->total_month_2 = $totalMonth2;
 
         return $this;
     }
@@ -211,7 +175,7 @@ class StatisticsYear extends \yii\db\ActiveRecord implements \Tecnoready\Common\
      */
     public function getTotalMonth2()
     {
-        return $this->totalMonth2;
+        return $this->total_month_2;
     }
 
     /**
@@ -223,7 +187,7 @@ class StatisticsYear extends \yii\db\ActiveRecord implements \Tecnoready\Common\
      */
     public function setTotalMonth3($totalMonth3)
     {
-        $this->totalMonth3 = $totalMonth3;
+        $this->total_month_3 = $totalMonth3;
 
         return $this;
     }
@@ -235,7 +199,7 @@ class StatisticsYear extends \yii\db\ActiveRecord implements \Tecnoready\Common\
      */
     public function getTotalMonth3()
     {
-        return $this->totalMonth3;
+        return $this->total_month_3;
     }
 
     /**
@@ -247,7 +211,7 @@ class StatisticsYear extends \yii\db\ActiveRecord implements \Tecnoready\Common\
      */
     public function setTotalMonth4($totalMonth4)
     {
-        $this->totalMonth4 = $totalMonth4;
+        $this->total_month_4 = $totalMonth4;
 
         return $this;
     }
@@ -259,7 +223,7 @@ class StatisticsYear extends \yii\db\ActiveRecord implements \Tecnoready\Common\
      */
     public function getTotalMonth4()
     {
-        return $this->totalMonth4;
+        return $this->total_month_4;
     }
 
     /**
@@ -271,7 +235,7 @@ class StatisticsYear extends \yii\db\ActiveRecord implements \Tecnoready\Common\
      */
     public function setTotalMonth5($totalMonth5)
     {
-        $this->totalMonth5 = $totalMonth5;
+        $this->total_month_5 = $totalMonth5;
 
         return $this;
     }
@@ -283,7 +247,7 @@ class StatisticsYear extends \yii\db\ActiveRecord implements \Tecnoready\Common\
      */
     public function getTotalMonth5()
     {
-        return $this->totalMonth5;
+        return $this->total_month_5;
     }
 
     /**
@@ -295,7 +259,7 @@ class StatisticsYear extends \yii\db\ActiveRecord implements \Tecnoready\Common\
      */
     public function setTotalMonth6($totalMonth6)
     {
-        $this->totalMonth6 = $totalMonth6;
+        $this->total_month_6 = $totalMonth6;
 
         return $this;
     }
@@ -307,7 +271,7 @@ class StatisticsYear extends \yii\db\ActiveRecord implements \Tecnoready\Common\
      */
     public function getTotalMonth6()
     {
-        return $this->totalMonth6;
+        return $this->total_month_6;
     }
 
     /**
@@ -319,7 +283,7 @@ class StatisticsYear extends \yii\db\ActiveRecord implements \Tecnoready\Common\
      */
     public function setTotalMonth7($totalMonth7)
     {
-        $this->totalMonth7 = $totalMonth7;
+        $this->total_month_7 = $totalMonth7;
 
         return $this;
     }
@@ -331,7 +295,7 @@ class StatisticsYear extends \yii\db\ActiveRecord implements \Tecnoready\Common\
      */
     public function getTotalMonth7()
     {
-        return $this->totalMonth7;
+        return $this->total_month_7;
     }
 
     /**
@@ -343,7 +307,7 @@ class StatisticsYear extends \yii\db\ActiveRecord implements \Tecnoready\Common\
      */
     public function setTotalMonth8($totalMonth8)
     {
-        $this->totalMonth8 = $totalMonth8;
+        $this->total_month_8 = $totalMonth8;
 
         return $this;
     }
@@ -355,7 +319,7 @@ class StatisticsYear extends \yii\db\ActiveRecord implements \Tecnoready\Common\
      */
     public function getTotalMonth8()
     {
-        return $this->totalMonth8;
+        return $this->total_month_8;
     }
 
     /**
@@ -367,7 +331,7 @@ class StatisticsYear extends \yii\db\ActiveRecord implements \Tecnoready\Common\
      */
     public function setTotalMonth9($totalMonth9)
     {
-        $this->totalMonth9 = $totalMonth9;
+        $this->total_month_9 = $totalMonth9;
 
         return $this;
     }
@@ -379,7 +343,7 @@ class StatisticsYear extends \yii\db\ActiveRecord implements \Tecnoready\Common\
      */
     public function getTotalMonth9()
     {
-        return $this->totalMonth9;
+        return $this->total_month_9;
     }
 
     /**
@@ -391,7 +355,7 @@ class StatisticsYear extends \yii\db\ActiveRecord implements \Tecnoready\Common\
      */
     public function setTotalMonth10($totalMonth10)
     {
-        $this->totalMonth10 = $totalMonth10;
+        $this->total_month_10 = $totalMonth10;
 
         return $this;
     }
@@ -403,7 +367,7 @@ class StatisticsYear extends \yii\db\ActiveRecord implements \Tecnoready\Common\
      */
     public function getTotalMonth10()
     {
-        return $this->totalMonth10;
+        return $this->total_month_10;
     }
 
     /**
@@ -415,7 +379,7 @@ class StatisticsYear extends \yii\db\ActiveRecord implements \Tecnoready\Common\
      */
     public function setTotalMonth11($totalMonth11)
     {
-        $this->totalMonth11 = $totalMonth11;
+        $this->total_month_11 = $totalMonth11;
 
         return $this;
     }
@@ -427,7 +391,7 @@ class StatisticsYear extends \yii\db\ActiveRecord implements \Tecnoready\Common\
      */
     public function getTotalMonth11()
     {
-        return $this->totalMonth11;
+        return $this->total_month_11;
     }
 
     /**
@@ -439,7 +403,7 @@ class StatisticsYear extends \yii\db\ActiveRecord implements \Tecnoready\Common\
      */
     public function setTotalMonth12($totalMonth12)
     {
-        $this->totalMonth12 = $totalMonth12;
+        $this->total_month_12 = $totalMonth12;
 
         return $this;
     }
@@ -451,7 +415,7 @@ class StatisticsYear extends \yii\db\ActiveRecord implements \Tecnoready\Common\
      */
     public function getTotalMonth12()
     {
-        return $this->totalMonth12;
+        return $this->total_month_12;
     }
 
     /**
@@ -461,7 +425,7 @@ class StatisticsYear extends \yii\db\ActiveRecord implements \Tecnoready\Common\
      */
     public function addMonth(\Tecnoready\Common\Model\Statistics\StatisticsMonthInterface $month)
     {
-        $this->months->set($month->getMonth(),$month);
+        $month->setYearEntity($this);
 
         return $this;
     }
@@ -474,16 +438,6 @@ class StatisticsYear extends \yii\db\ActiveRecord implements \Tecnoready\Common\
         $this->months->removeElement($month);
     }
 
-    /**
-     * Get months
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getMonths()
-    {
-        return $this->months;
-    }
-    
     public function getMonth($month)
     {
         $month = (int)$month;
@@ -508,5 +462,13 @@ class StatisticsYear extends \yii\db\ActiveRecord implements \Tecnoready\Common\
                 $total = $total + $totalMonth;
         }
         $this->total = $total;
+    }
+    
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getMonths()
+    {
+        return $this->hasMany(StatisticsMonth::className(), ['yearEntity_id' => 'id'])->all();
     }
 }
