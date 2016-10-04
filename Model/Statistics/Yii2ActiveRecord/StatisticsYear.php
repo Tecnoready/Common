@@ -458,9 +458,10 @@ class StatisticsYear extends \yii\db\ActiveRecord implements \Tecnoready\Common\
                 $totalMonth = $month->getTotal();
                 $setTotalMonth = sprintf("setTotalMonth%s",$month->getMonth());
                 $this->$setTotalMonth($totalMonth);
-//                var_dump("setTotalMonth ".$totalMonth);
+                var_dump($setTotalMonth." = ".$totalMonth);
                 $total = $total + $totalMonth;
         }
+        var_dump("total year ".$total);
         $this->total = $total;
     }
     

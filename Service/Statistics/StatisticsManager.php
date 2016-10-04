@@ -194,9 +194,11 @@ class StatisticsManager
         $value++;
         $this->setValueDay($foundStatisticsMonth, $day, $value);
         $foundStatisticsMonth->totalize();
-        $foundStatisticsYear->totalize();
 
         $this->adapter->persist($foundStatisticsMonth);
+        
+        $foundStatisticsYear->totalize();
+        
         $this->adapter->persist($foundStatisticsYear);
         $this->adapter->flush();
         
