@@ -11,15 +11,12 @@
 
 namespace Tecnoready\Common\Service\Statistics;
 
-use Pandco\Bundle\AppBundle\Entity\Core\Statistics\StatisticsMonth;
-use Pandco\Bundle\AppBundle\Service\BaseService;
-
 /**
- * Manejador de estadisticas (app.service.core.statistics_manager)
+ * Manejador de estadisticas
  *
  * @author Carlos Mendoza <inhack20@gmail.com>
  */
-class StatisticsManager extends BaseService
+class StatisticsManager
 {
     /**
      * @var \Symfony\Component\PropertyAccess\PropertyAccessor 
@@ -36,12 +33,12 @@ class StatisticsManager extends BaseService
      */
     protected $options = array();
     
-    public function __construct(Adapter\StatisticsAdapterInterface $adapter,array $options = []) {
+    public function __construct(Adapter\StatisticsAdapterInterface $adapter,array $options) {
         if(!class_exists("Symfony\Component\PropertyAccess\PropertyAccess")){
-            throw new \Exception("The package '%s' is required, please install https://packagist.org/packages/symfony/property-access",'"symfony/property-access": "^3.1"');
+            throw new \Exception(sprintf("The package '%s' is required, please install https://packagist.org/packages/symfony/property-access",'"symfony/property-access": "^3.1"'));
         }
         if(!class_exists("Symfony\Component\OptionsResolver\OptionsResolver")){
-            throw new \Exception("The package '%s' is required, please install https://packagist.org/packages/symfony/options-resolver",'"symfony/options-resolver": "^3.1"');
+            throw new \Exception(sprintf("The package '%s' is required, please install https://packagist.org/packages/symfony/options-resolver",'"symfony/options-resolver": "^3.1"'));
         }
         $this->propertyAccess = \Symfony\Component\PropertyAccess\PropertyAccess::createPropertyAccessor();
         $this->adapter = $adapter;
@@ -246,7 +243,6 @@ class StatisticsManager extends BaseService
 
     /**
      * Crea una nueva estadistica
-     * @return StatisticsMonth
      */
     private function newYearStatistics($year = null){
         $now = new \DateTime();

@@ -45,10 +45,10 @@ class ConfigurationManager {
     function __construct(Adapter\ConfigurationAdapterInterface $adapter,array $options = array())
     {
         if(!class_exists("Symfony\Component\Config\ConfigCache")){
-            throw new \Exception("The package '%s' is required, please install https://packagist.org/packages/symfony/config",'"symfony/config": "^3.1"');
+            throw new \Exception(sprintf("The package '%s' is required, please install https://packagist.org/packages/symfony/config",'"symfony/config": "^3.1"'));
         }
         if(!class_exists("Symfony\Component\OptionsResolver\OptionsResolver")){
-            throw new \Exception("The package '%s' is required, please install https://packagist.org/packages/symfony/options-resolver",'"symfony/options-resolver": "^3.1"');
+            throw new \Exception(sprintf("The package '%s' is required, please install https://packagist.org/packages/symfony/options-resolver",'"symfony/options-resolver": "^3.1"'));
         }
         $this->setOptions($options);
         $this->adapter = $adapter;
