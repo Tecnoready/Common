@@ -144,7 +144,11 @@ class SequenceGeneratorService
      * @return type
      */
     protected function getClassName($item) {
-        $className = get_class($item);
+        if(is_string($item)){
+            $className = $item;
+        }else{
+            $className = get_class($item);
+        }
         //Si se usa doctrine2 ORM, con esto se obtiene la clase original
         if(class_exists("Doctrine\Common\Util\ClassUtils")){
             $className = ClassUtils::getRealClass($className);
