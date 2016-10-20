@@ -28,4 +28,22 @@ class ConfigurationUtil {
         return sprintf("%s___%s",$nameWrapper,$key);
     }
     
+    static $libs = [
+        "optionsResolver" => "checkOptionsResolver"
+    ];
+    
+    public static function checkLib($name) {
+        if(!isset(self::$libs[$name])){
+            throw new \InvalidArgumentException(sprintf("The libname '%s' is not valid."));
+        }
+        $method = self::$libs[$name];
+        self::{$method}();
+    }
+    
+    private static function checkOptionsResolver() {
+        if(!class_exists("Symfony\Component\OptionsResolver\OptionsResolver")){
+            throw new \Exception(sprintf("The package '%s' is required, please install https://packagist.org/packages/symfony/options-resolver",'"symfony/options-resolver": "^3.1"'));
+        }
+    }
+    
 }
