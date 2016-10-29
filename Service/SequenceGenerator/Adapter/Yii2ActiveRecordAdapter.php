@@ -25,7 +25,7 @@ class Yii2ActiveRecordAdapter implements SequenceGeneratorAdapterInterface {
 
     public function andWhere() {
         $args = func_get_args();
-        return $this->qb->andWhere($args);
+        return call_user_func_array([$this->qb,"andWhere"], $args);
     }
 
     public function getOneOrNullResult() {

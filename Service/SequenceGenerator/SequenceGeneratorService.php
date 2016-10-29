@@ -113,7 +113,11 @@ class SequenceGeneratorService
         $method = $config['method'];
         $config['mask'] = $mask;
         $config['field'] = $field;
-        $ref = $this->$method($item,$config,$parameters);
+        if(is_callable($method)){
+            $ref = call_user_func_array($method,[$this,$item,$config,$parameters]);
+        }else{
+            $ref = $this->$method($item,$config,$parameters);
+        }
         return $ref;
     }
     
@@ -210,5 +214,9 @@ class SequenceGeneratorService
         }
         $this->classMap = array_merge($this->classMap,$classMap);
         return $this;
+    }
+    
+    public function getAdapter() {
+        return $this->adapter;
     }
 }
