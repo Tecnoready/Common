@@ -27,7 +27,7 @@ abstract class DoctrineORMConfiguration implements ConfigurationInterface
      * Indice de configuracion
      * 
      * @var string
-     * @ORM\Column(name="key", type="string",length=200)
+     * @ORM\Column(name="key", type="string",length=200,nullable=false)
      */
     protected $key;
     

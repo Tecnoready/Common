@@ -36,14 +36,12 @@ interface ConfigurationInterface {
     /**
      * 
      * @param \DateTime $createdAt
-     * @ORM\PrePersist
      */
     public function setCreatedAt();
     
     /**
      * 
      * @param \DateTime $createdAt
-     * @ORM\PreUpdate
      */
     public function setUpdatedAt();
 
