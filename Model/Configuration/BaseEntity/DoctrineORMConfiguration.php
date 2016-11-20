@@ -51,7 +51,7 @@ abstract class DoctrineORMConfiguration implements ConfigurationInterface
      * Descripcion de la configuracion
      * 
      * @var string
-     * @ORM\Column(name="description", type="string",length=200)
+     * @ORM\Column(name="description", type="string",length=250)
      */
     protected $description;
     
