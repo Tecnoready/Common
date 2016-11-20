@@ -85,7 +85,7 @@ EOF;
 //            $data['updatedAt'] = $configuration->getUpdatedAt();
             //$data['id'] = $configuration->getId();
             
-            $id = ConfigurationUtil::generateId($configuration->getNameWrapper(),$configuration->getKey());
+            $id = ConfigurationUtil::generateId($configuration->getNameWrapper(), strtoupper($configuration->getKey()));
             $code .= sprintf("'%s' => %s,", $id ,var_export($data,true));
             $this->data[$id] = $data;
         }
