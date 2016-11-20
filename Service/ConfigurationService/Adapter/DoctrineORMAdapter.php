@@ -33,6 +33,7 @@ abstract class DoctrineORMAdapter implements ConfigurationAdapterInterface
         if($entity === null){
             $entity = $this->createNew();
             $entity->setEnabled(true);
+            $entity->setCreatedAt(new \DateTime());
         }else{
             $entity->setUpdatedAt();
         }

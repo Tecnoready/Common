@@ -27,7 +27,7 @@ abstract class DoctrineORMConfiguration implements ConfigurationInterface
      * Indice de configuracion
      * 
      * @var string
-     * @ORM\Column(name="`key`", type="string",length=200,nullable=false)
+     * @ORM\Column(name="item_key", type="string",length=200,nullable=false)
      */
     protected $key;
     
@@ -35,7 +35,7 @@ abstract class DoctrineORMConfiguration implements ConfigurationInterface
      * Valor de configuracion
      * 
      * @var string
-     * @ORM\Column(name="`value`", type="text")
+     * @ORM\Column(name="item_value", type="text")
      */
     protected $value;
     
