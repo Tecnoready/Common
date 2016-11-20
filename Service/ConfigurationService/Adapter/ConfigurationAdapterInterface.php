@@ -26,5 +26,8 @@ interface ConfigurationAdapterInterface {
     
     public function update($key,$value,$description,$wrapperName);
     
+    /**
+     * @return \Tecnoready\Common\Model\Configuration\BaseEntity\ConfigurationInterface Description
+     */
     public function createNew();
 }

@@ -27,17 +27,9 @@ abstract class DoctrineORMConfiguration implements ConfigurationInterface
      * Indice de configuracion
      * 
      * @var string
-     * @ORM\Column(name="keyIndex", type="string",length=200)
+     * @ORM\Column(name="key", type="string",length=200)
      */
     protected $key;
-    
-    /**
-     * Id wrapper
-     * 
-     * @var string
-     * @ORM\Column(name="idWrapper", type="string",length=200,nullable=true)
-     */
-    protected $idWrapper;
     
     /**
      * Valor de configuracion
@@ -48,6 +40,14 @@ abstract class DoctrineORMConfiguration implements ConfigurationInterface
     protected $value;
     
     /**
+     * Nombre del contenedor
+     * 
+     * @var string
+     * @ORM\Column(name="name_wrapper", type="string",length=200,nullable=false)
+     */
+    protected $nameWrapper;
+    
+    /**
      * Descripcion de la configuracion
      * 
      * @var string
@@ -56,72 +56,26 @@ abstract class DoctrineORMConfiguration implements ConfigurationInterface
     protected $description;
     
     /**
-     * Grupo de la configuracion
-     * 
-     * @var \Tecnocreaciones\Bundle\ToolsBundle\Entity\Configuration\BaseGroup
-     * @ORM\ManyToOne(targetEntity="Tecnocreaciones\Bundle\ToolsBundle\Entity\Configuration\BaseGroup")
-     */
-    protected $group;
-    
-    /**
-     * Valor de configuracion
+     * ¿Habilitado?
      * 
      * @var boolean
-     * @ORM\Column(name="active", type="boolean")
+     * @ORM\Column(name="enabled", type="boolean")
      */
-    protected $active = true;
+    protected $enabled = true;
     
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="createdAt", type="datetime")
+     * @ORM\Column(name="created_at", type="datetime")
      */
     protected $createdAt;
 
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="updatedAt", type="datetime",nullable=true)
+     * @ORM\Column(name="updated_ut", type="datetime",nullable=true)
      */
     protected $updatedAt;
-    
-    public function getKey() {
-        return $this->key;
-    }
-
-    public function getValue() {
-        return $this->value;
-    }
-
-    public function setKey($key) {
-        $this->key = $key;
-        
-        return $this;
-    }
-
-    public function setValue($value) {
-        $this->value = $value;
-        
-        return $this;
-    }
-    
-    public function getActive() {
-        return $this->active;
-    }
-
-    public function getCreatedAt() {
-        return $this->createdAt;
-    }
-
-    public function getUpdatedAt() {
-        return $this->updatedAt;
-    }
-
-    public function setActive($active) {
-        $this->active = $active;
-        
-        return $this;
-    }
     
     /**
      * 
@@ -147,41 +101,59 @@ abstract class DoctrineORMConfiguration implements ConfigurationInterface
         return $this;
     }
 
-    abstract function getId();
-    
-    function setId($id)
-    {
-        $this->id = $id;
+    public function getKey() {
+        return $this->key;
     }
-    
+
+    public function getValue() {
+        return $this->value;
+    }
+
+    public function getNameWrapper() {
+        return $this->nameWrapper;
+    }
+
     public function getDescription() {
         return $this->description;
+    }
+
+    public function getEnabled() {
+        return $this->enabled;
+    }
+
+    public function setKey($key) {
+        $this->key = $key;
+        return $this;
+    }
+
+    public function setValue($value) {
+        $this->value = $value;
+        return $this;
+    }
+
+    public function setNameWrapper($nameWrapper) {
+        $this->nameWrapper = $nameWrapper;
+        return $this;
     }
 
     public function setDescription($description) {
         $this->description = $description;
         return $this;
     }
-    
-    public function getGroup() {
-        return $this->group;
-    }
 
-    public function setGroup(\Tecnocreaciones\Bundle\ToolsBundle\Entity\Configuration\BaseGroup $group)
-    {
-        $this->group = $group;
+    public function setEnabled($enabled) {
+        $this->enabled = $enabled;
         return $this;
     }
-    
-    public function getIdWrapper() {
-        return $this->idWrapper;
+
+    public function getCreatedAt(): \DateTime {
+        return $this->createdAt;
     }
 
-    public function setIdWrapper($idWrapper) {
-        $this->idWrapper = $idWrapper;
-        return $this;
+    public function getUpdatedAt(): \DateTime {
+        return $this->updatedAt;
     }
-        
+
     public function __toString() {
         return $this->getDescription()?: '-';
     }

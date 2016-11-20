@@ -16,40 +16,36 @@ namespace Tecnoready\Common\Service\ConfigurationService\Adapter;
  *
  * @author Carlos Mendoza <inhack20@gmail.com>
  */
-class DoctrineORMAdapter implements ConfigurationAdapterInterface
+abstract class DoctrineORMAdapter implements ConfigurationAdapterInterface
 {
     /**
      * Manejador de entidades
      * @var \Doctrine\ORM\EntityManager
      */
-    private $em;
+    protected $em;
     
     public function __construct(\Doctrine\ORM\EntityManager $em) {
         $this->em = $em;
     }
 
-    public function findAll() {
-        
-    }
-
-    public function update($key, $value, $description) {
-        $id = $this->getAvailableConfiguration()->getIdByKey($key);
-        $entity = $this->getConfiguration($id);
+    public function update($key, $value, $description,$wrapperName) {
+        $entity = $this->find($key);
         if($entity === null){
             $entity = $this->createNew();
+            $entity->setEnabled(true);
         }else{
             $entity->setUpdatedAt();
         }
-        $entity->setKey($key)
-               ->setValue($value);
+        $entity->setKey($key);
+        $entity->setValue($value);
         if($description != null){
             $entity->setDescription($description);
         }
-        if($group != null){
-            $entity->setGroup($group);
-        }
-        $em = $this->getManager();
-        $em->persist($entity);
+        $entity->setNameWrapper($wrapperName);
+        $this->em->persist($entity);
+        $this->em->flush();
+        $success = true;
+        return $success;
     }
 
 }
