@@ -233,6 +233,7 @@ class ConfigurationManager {
     function warmUp()
     {
         $this->getAvailableConfiguration();
+        return $this;
     }
     
     /**
@@ -243,6 +244,8 @@ class ConfigurationManager {
         $this->configurationCacheAvailable = null;
         $cache = $this->getConfigCache();
         @unlink($cache->getPath());
+        
+        return $this;
     }
     
     /**
