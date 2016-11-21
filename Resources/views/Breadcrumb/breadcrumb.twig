@@ -1,0 +1,26 @@
+{% if breadcrumbs|length > 0 %}
+    {% set last = null %}
+    {% for breadcrumb in breadcrumbs %}
+        {% set last = breadcrumb %}
+    {% endfor %}
+    {% if last %}
+        <h2>
+            {% if main_icon %}<i class="{{ main_icon }}"></i>{% endif %}
+            &nbsp;{{ last.label }}</h2>
+    {% endif  %}
+    <ol class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %}
+            {% if loop.last == true %}
+                <li class="active">
+                    <strong>{{ breadcrumb.label }}</strong>
+                </li>
+            {% else %}
+                <li>
+                    {% if breadcrumb.link is not null %}<a href="{{ breadcrumb.link }}">{% endif %}
+                        {{ breadcrumb.label }}
+                        {%  if breadcrumb.link is not null %}</a>{% endif %}
+                </li>
+            {% endif %}
+        {% endfor %}
+    </ol>
+{% endif %}
