@@ -37,10 +37,12 @@ class BreadcrumbManager {
         $resolver->setDefaults([
            "twig_breadcrumb_template" => null,
            "prefix_icon" => null,
+           "main_icon" => null,
         ]);
         $resolver->setRequired("twig_breadcrumb_template");
         $resolver->setAllowedTypes("twig_breadcrumb_template","string");
         $this->options = $resolver->resolve($options);
+        $this->mainIcon = $this->options["main_icon"];
     }
     
     public function breadcrumb()
