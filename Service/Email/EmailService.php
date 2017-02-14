@@ -19,7 +19,7 @@ use Doctrine\ODM\PHPCR\DocumentManager;
 use Tecnoready\Common\Util\ConfigurationUtil;
 
 /**
- * Servicio para renderizar y enviar correos a partir de la base de datos con PHPCR
+ * Servicio para renderizar y enviar correos a partir de la base de datos con doctrine
  *
  * @author Carlos Mendoza <inhack20@gmail.com>
  */
