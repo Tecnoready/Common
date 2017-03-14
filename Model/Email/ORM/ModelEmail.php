@@ -24,9 +24,9 @@ abstract class ModelEmail implements \Tecnoready\Common\Model\Email\EmailInterfa
     /**
      * @var integer
      *
-     * @ORM\Column(name="id", type="integer")
+     * @ORM\Column(name="id", type="string", length=36)
      * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
+     * @ORM\GeneratedValue(strategy="UUID")
      */
     protected $id;
     /**
