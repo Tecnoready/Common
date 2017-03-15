@@ -78,4 +78,10 @@ class EmailRepository extends EntityRepository {
         $em->persist($email);
         $em->flush();
     }
+    
+    public function markExpiredToReady(array $ids) {
+        $query = $this->_em->createQuery("UPDATE ".$this->getClassName()." e SET e.status = '" . EmailInterface::STATUS_READY . "' WHERE e.id IN (:ids)");
+        $query->setParameter(':ids', $ids);
+        $query->execute();
+    }
 }

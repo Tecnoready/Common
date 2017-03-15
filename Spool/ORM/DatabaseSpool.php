@@ -134,10 +134,19 @@ class DatabaseSpool extends \Swift_ConfigurableSpool {
         $failedRecipients = (array) $failedRecipients;
         $count = 0;
         $time = time();
+        $messagesExpired = [];
+        $expired = false;
         foreach($emails as $email){
-            /*@var $message \Swift_Mime_Message */
-            $message = $email->getMessage();
+            if ($expired === true) {
+                $messagesExpired[] = $email->getId();
+                continue;
+            }
             try{
+                /*@var $message \Swift_Mime_Message */
+                $message = $email->getMessage();
+                if(!$message){
+                    throw new \Swift_SwiftException('The email was not sent, by no unserialize.');
+                }
                 $count_= $transport->send($message, $failedRecipients);
                 if($count_ > 0){
                     $this->repository->markCompleteSending($email);
@@ -147,10 +156,15 @@ class DatabaseSpool extends \Swift_ConfigurableSpool {
                 }
             }catch(\Swift_SwiftException $ex){
                 $this->repository->markFailedSending($email, $ex);
+            }catch(\Exception $ex) {
+                $this->repository->markFailedSending($email, $ex);
             }
             if ($this->getTimeLimit() && (time() - $time) >= $this->getTimeLimit()) {
-                break;
+                $expired = true;
             }
+        }
+        if(count($messagesExpired ) > 0 ){
+            $this->repository->markExpiredToReady($messagesExpired);
         }
         return $count;
     }
