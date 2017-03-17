@@ -41,7 +41,7 @@ class EmailRepository extends EntityRepository {
         $qb->where($qb->expr()->eq('e.status', ':status'))->setParameter(':status', EmailInterface::STATUS_READY);
         $qb->orWhere($qb->expr()->eq('e.status', ':status_1'))->setParameter(':status_1', EmailInterface::STATUS_FAILED);
         $qb->andWhere($qb->expr()->lt('e.retries', ':retries'))->setParameter(':retries', 10);
-//        $qb->andWhere($qb->expr()->eq('e.environment', ':environment'))->setParameter(':environment', $environment);
+        $qb->andWhere($qb->expr()->eq('e.environment', ':environment'))->setParameter(':environment', $environment);
         $qb->addOrderBy('e.retries', 'ASC');
         $qb->addOrderBy('e.createdAt', 'ASC');
         if (empty($limit) === false) {
@@ -83,5 +83,31 @@ class EmailRepository extends EntityRepository {
         $query = $this->_em->createQuery("UPDATE ".$this->getClassName()." e SET e.status = '" . EmailInterface::STATUS_READY . "' WHERE e.id IN (:ids)");
         $query->setParameter(':ids', $ids);
         $query->execute();
+    }
+    
+    public function updateTruncatedMessages($environment) {
+        $qb = $this->createQueryBuilder('e');
+        $qb->where($qb->expr()->eq('e.status', ':status'))->setParameter(':status', EmailInterface::STATUS_PROCESSING);
+        $qb->andWhere($qb->expr()->eq('e.environment', ':environment'))->setParameter(':environment', $environment);
+        
+        $emails = $qb->getQuery()->getResult();
+        if (count($emails) > 0) {
+            $now = new \DateTime();
+            $ids = [];
+            foreach ($emails as $email) {
+                $diff = $email->getUpdatedAt()->diff($now);
+                if($this->getTotalMinutes($diff) > 1){
+                    $ids[] = $email->getId();
+                }
+            }
+            $query = $this->_em->createQuery("UPDATE ".$this->getClassName()." e SET e.status = '" . EmailInterface::STATUS_FAILED . "', e.retries = (e.retries + 1) WHERE e.id IN (:ids)");
+            $query->setParameter(':ids', $ids);
+            $query->execute();
+        }
+        return $emails;
+    }
+    
+    private function getTotalMinutes(\DateInterval $int){
+        return ($int->d * 24 * 60) + ($int->h * 60) + $int->i;
     }
 }

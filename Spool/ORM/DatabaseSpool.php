@@ -126,6 +126,8 @@ class DatabaseSpool extends \Swift_ConfigurableSpool {
         $count = 0;
         $limit = $this->getMessageLimit();
         $limit = $limit > 0 ? $limit : null;
+        $this->repository->updateTruncatedMessages($this->environment);
+        
         $emails = $this->repository->getEmailQueue($this->environment,$limit);
         if (!count($emails)) {
             return 0;
