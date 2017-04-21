@@ -32,7 +32,7 @@ abstract class ModelEmail implements \Tecnoready\Common\Model\Email\EmailInterfa
     /**
      * @var string
      *
-     * @ORM\Column(name="subject", type="string", length=255)
+     * @ORM\Column(name="subject", type="text")
      */
     protected $subject;
     /**
