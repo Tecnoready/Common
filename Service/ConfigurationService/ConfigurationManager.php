@@ -157,7 +157,9 @@ class ConfigurationManager {
             $cache->write($newCacheClass);
             $data = $dumper->getData();
         }
-        require_once $cache->getPath();
+        if(!class_exists($class)){
+            require_once $cache->getPath();
+        }
         $this->configurationCacheAvailable = new $class();
         if($data !== null){
             $this->configurationCacheAvailable->setConfigurations($data);
