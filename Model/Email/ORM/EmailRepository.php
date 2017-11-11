@@ -53,16 +53,16 @@ class EmailRepository extends EntityRepository {
             $ids = [];
             foreach ($emails as $email) {
                 $ids[] = $email->getId();
-            }
+        }
             $query = $this->_em->createQuery("UPDATE ".$this->getClassName()." e SET e.status = '" . EmailInterface::STATUS_PROCESSING . "' WHERE e.id IN (:ids)");
             $query->setParameter(':ids', $ids);
             $query->execute();
         }
         return $emails;
     }
-    public function markFailedSending(EmailInterface $email, \Exception $ex)
+    public function markFailedSending(EmailInterface $email,$message)
     {
-        $email->setErrorMessage($ex->getMessage());
+        $email->setErrorMessage($message);
         $email->setStatus(EmailInterface::STATUS_FAILED);
         $email->setRetries($email->getRetries() + 1);
         $em = $this->getEntityManager();

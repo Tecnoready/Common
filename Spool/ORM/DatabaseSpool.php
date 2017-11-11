@@ -132,6 +132,8 @@ class DatabaseSpool extends \Swift_ConfigurableSpool {
         if (!count($emails)) {
             return 0;
         }
+        $logger = new \Swift_Plugins_Loggers_ArrayLogger();
+        $transport->registerPlugin(new \Swift_Plugins_LoggerPlugin($logger));
         
         $failedRecipients = (array) $failedRecipients;
         $count = 0;
@@ -156,10 +158,9 @@ class DatabaseSpool extends \Swift_ConfigurableSpool {
                 }else{
                     throw new \Swift_SwiftException('The email was not sent.');
                 }
-            }catch(\Swift_SwiftException $ex){
-                $this->repository->markFailedSending($email, $ex);
             }catch(\Exception $ex) {
-                $this->repository->markFailedSending($email, $ex);
+                $message = $ex->getMessage()." - ".$logger->dump();
+                $this->repository->markFailedSending($email, $message);
             }
             if ($this->getTimeLimit() && (time() - $time) >= $this->getTimeLimit()) {
                 $expired = true;
