@@ -2,13 +2,13 @@
 
 namespace Tecnoready\Common\Service\Email;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
 use Swift_Mailer;
 use Swift_Preferences;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Twig_Environment;
 use Tecnoready\Common\Model\Email\ORM\ModelEmailQueue;
 use Tecnoready\Common\Exception\UnsupportedException;
+use Tecnoready\Common\Service\Email\Adapter\EmailAdapterInterface;
 
 /**
  * Servicio para enviar correo con una plantilla twig (pandco.mailer.twig_swift)
@@ -30,26 +30,26 @@ class TwigSwiftMailer {
     protected $twig;
 
     /**
-     * @var Registry
+     * @var EmailAdapterInterface
      */
-    protected $doctrine;
+    protected $adapter;
+
     protected $options;
 
-    public function __construct(Swift_Mailer $mailer, Twig_Environment $twig, Registry $doctrine, array $options = []) {
+    public function __construct(Swift_Mailer $mailer, Twig_Environment $twig,EmailAdapterInterface $adapter, array $options = []) {
         $this->mailer = $mailer;
         $this->twig = $twig;
-        $this->doctrine = $doctrine;
+        $this->adapter = $adapter;
+        
         $resolver = new OptionsResolver();
         $resolver->setDefaults([
             "debug" => false,
-            "extra_params" => true,
+            "extra_params" => null,
             "skeleton_email" => "skeleton_email.html.twig",//TODO falta agregar ruta completa
         ]);
         $resolver->setRequired([
             "debug_mail", 
             "env", 
-            "email_queue_class", 
-            "email_template_class", 
             "from_email", 
             "from_name",
             "skeleton_email"]);
@@ -74,9 +74,8 @@ class TwigSwiftMailer {
         $email->setExtras($extras);
         $email->setEnvironment($this->options["env"]);
         
-        $em = $this->doctrine->getManager();
-        $em->persist($email);
-        $em->flush();
+        $this->adapter->persist($email);
+        $this->adapter->flush();
         
         return $email;
     }
@@ -87,7 +86,6 @@ class TwigSwiftMailer {
      * @return type
      */
     public function sendEmailQueue(ModelEmailQueue $emailQueue) {
-        $fromEmail = array('no-responder@mpandco.com' => "mPandco");
         $message = $this->getSwiftMessage()
             ->setSubject($emailQueue->getSubject())
             ->setFrom($emailQueue->getFromEmail())
@@ -129,7 +127,7 @@ class TwigSwiftMailer {
             $fromEmail = array($this->options["from_email"] => $this->options["from_name"]);
         }
         
-        $email = new $this->options["email_queue_class"]();
+        $email = $this->adapter->createNew();
         $email
                 ->setStatus(ModelEmailQueue::STATUS_NOT_SENT)
                 ->setSubject($subject)
@@ -149,8 +147,7 @@ class TwigSwiftMailer {
         if(count($idExp) > 0){
             $id = $idExp[count($idExp) - 1];
         }
-      
-        $document = $this->doctrine->getManager()->find($this->options["email_template_class"], $id);
+        $document = $this->adapter->find($id);
         if($document === null){
             throw new \RuntimeException(sprintf("Document '%s' not found.",$id));
 //            if($this->options["debug"] === true){
@@ -234,7 +231,4 @@ class TwigSwiftMailer {
         }
         return $message;
     }
-
-    
-
 }
