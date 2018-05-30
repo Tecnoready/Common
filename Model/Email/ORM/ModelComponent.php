@@ -26,9 +26,9 @@ class ModelComponent {
     const TYPE_COMPONENT_BASE = "base";
     
     /**
-     * @var integer
+     * @var string
      *
-     * @ORM\Column(name="id", type="string", length=255, nullable=false)
+     * @ORM\Column(name="id", type="string", length=36, nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="UUID")
      */
@@ -39,9 +39,11 @@ class ModelComponent {
     protected $typeComponent;
     
     /**
+     * Titulo del componente para ubicarlo facilmente
      * @ORM\Column(name="title",type="string",length=150,nullable=false)
      */
     protected $title;
+    
     /**
      * @ORM\Column(name="body",type="text",nullable=false)
      */
@@ -59,6 +61,10 @@ class ModelComponent {
 
     public function getTypeComponent() {
         return $this->typeComponent;
+    }
+
+    public function getTitle() {
+        return $this->title;
     }
 
     public function getBody() {
@@ -79,6 +85,11 @@ class ModelComponent {
         return $this;
     }
 
+    public function setTitle($title) {
+        $this->title = $title;
+        return $this;
+    }
+
     public function setBody($body) {
         $this->body = $body;
         return $this;
@@ -88,16 +99,7 @@ class ModelComponent {
         $this->locale = $locale;
         return $this;
     }
-    
-    public function getTitle() {
-        return $this->title;
-    }
-
-    public function setTitle($title) {
-        $this->title = $title;
-        return $this;
-    }
-    
+        
     public function __toString() {
         return $this->title?:"-";
     }

@@ -20,6 +20,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\MappedSuperclass()
  */
 class ModelEmailTemplate {
+    
     const STATUS_PUBLISHED = "published";
     const STATUS_UNPUBLISHED = "unpublished";
     
@@ -34,9 +35,16 @@ class ModelEmailTemplate {
      */
     protected $status;
     /**
+     * Titulo del correo para identificarlo apidamente
      * @ORM\Column(name="title",type="string",length=150,nullable=false)
      */
     protected $title;
+    /**
+     * Asunto del correo
+     * @ORM\Column(name="subject",type="text",nullable=false)
+     */
+    protected $subject;
+    
     /**
      * @var ModelComponent
      */
