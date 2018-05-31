@@ -7,7 +7,12 @@ namespace Tecnoready\Common\Service\Email\Adapter;
  * @author Carlos Mendoza <inhack20@gmail.com>
  */
 interface EmailAdapterInterface {
-    public function find($key);
+    
+    /**
+     * 
+     * @param \Tecnoready\Common\Model\Email\EmailTemplateInterface $id
+     */
+    public function find($id);
     
     /*
      * Guarda los cambios en la base de datos
@@ -16,5 +21,20 @@ interface EmailAdapterInterface {
     
     public function persist($entity);
     
-    public function createNew();
+    public function remove($entity);
+    
+    /**
+     * 
+     */
+    public function createEmailQueue();
+    
+    /**
+     * @return \Tecnoready\Common\Model\Email\ComponentInterface
+     */
+    public function createComponent();
+    
+    /**
+     * @return \Tecnoready\Common\Model\Email\ORM\ModelEmailTemplate
+     */
+    public function createEmailTemplate();
 }

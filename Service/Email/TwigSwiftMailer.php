@@ -6,12 +6,12 @@ use Swift_Mailer;
 use Swift_Preferences;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Twig_Environment;
-use Tecnoready\Common\Model\Email\ORM\ModelEmailQueue;
 use Tecnoready\Common\Exception\UnsupportedException;
 use Tecnoready\Common\Service\Email\Adapter\EmailAdapterInterface;
+use Tecnoready\Common\Model\Email\EmailQueueInterface;
 
 /**
- * Servicio para enviar correo con una plantilla twig (pandco.mailer.twig_swift)
+ * Servicio para enviar correo con una plantilla twig (tecnoready.swiftmailer)
  *
  * @author Carlos Mendoza <inhack20@gmail.com>
  */
@@ -66,10 +66,32 @@ class TwigSwiftMailer {
         }
     }
     
+    /**
+     * Programa la construccion de un correo y lo envia a la base de datos
+     * @param type $id
+     * @param type $context
+     * @param type $toEmail
+     * @param array $attachs
+     * @param array $extras
+     * @return EmailQueueInterface
+     */
     public function emailQueue($id,$context,$toEmail,array $attachs = [],array $extras = []) {
         $context = $this->buildDocumentContext($id, $context, $toEmail, $attachs);
         $templateName = $this->options["skeleton_email"];
-        $email = $this->buildEmail($templateName, $context, $toEmail);
+        $templateSource = <<<EOF
+                {% extends template_from_string(baseString) %}
+                
+                {% block subject %}{% include (template_from_string(subjectString)) %}{% endblock subject %}
+
+                {% block header %}{% include template_from_string(headerString) %}{% endblock %}
+
+                {% block content_html %}{% include(template_from_string(bodyString)) with _context %}{% endblock %}
+
+                {% block footer %}{% include(template_from_string(footerString)) with _context %}{% endblock %}
+EOF;
+        
+        $template =$this->twig->createTemplate($templateSource);
+        $email = $this->buildEmail($template, $context, $toEmail);
         $email->setAttachs($attachs);
         $email->setExtras($extras);
         $email->setEnvironment($this->options["env"]);
@@ -85,14 +107,14 @@ class TwigSwiftMailer {
      * @param EmailQueue $emailQueue
      * @return type
      */
-    public function sendEmailQueue(ModelEmailQueue $emailQueue) {
+    public function sendEmailQueue(EmailQueueInterface $emailQueue) {
         $message = $this->getSwiftMessage()
             ->setSubject($emailQueue->getSubject())
             ->setFrom($emailQueue->getFromEmail())
             ->setTo($emailQueue->getToEmail());
 
         $message->setBody($emailQueue->getBody(), 'text/html');
-        $attachDocuments = $emailQueue->getExtraData(ModelEmailQueue::ATTACH_DOCUMENTS);
+        $attachDocuments = $emailQueue->getExtraData(EmailQueueInterface::ATTACH_DOCUMENTS);
         $attachs = [];
         if($attachDocuments !== null && is_array($attachDocuments)){
             throw new UnsupportedException();
@@ -113,23 +135,26 @@ class TwigSwiftMailer {
      * @param type $templateName
      * @param type $context
      * @param type $toEmail
-     * @return ModelEmailQueue
+     * @return EmailQueueInterface
      */
     protected function buildEmail($templateName, $context, $toEmail,$fromEmail = null) {
         $context['toEmail'] = $toEmail;
-
-        $template = $this->twig->loadTemplate($templateName);
+        
+        if($templateName instanceof \Twig_Template){
+            $template = $templateName;
+        }else{
+            $template = $this->twig->loadTemplate($templateName);
+        }
         $subject = $template->renderBlock('subject', $context);
         $textBody = $template->renderBlock('body_text', $context);
         $htmlBody = $template->renderBlock('body_html', $context);
-        
         if ($fromEmail === null) {
             $fromEmail = array($this->options["from_email"] => $this->options["from_name"]);
         }
         
-        $email = $this->adapter->createNew();
+        $email = $this->adapter->createEmailQueue();
         $email
-                ->setStatus(ModelEmailQueue::STATUS_NOT_SENT)
+                ->setStatus(EmailQueueInterface::STATUS_NOT_SENT)
                 ->setSubject($subject)
                 ->setFromEmail($fromEmail)
                 ->setToEmail($toEmail)
@@ -160,6 +185,7 @@ class TwigSwiftMailer {
         $header = $document->getHeader();
         $base = $document->getBase();
         $footer = $document->getFooter();
+        $subject = $document->getSubject();
         $bodyDocument = $document->getBody();
         
         if($header){
@@ -174,20 +200,16 @@ class TwigSwiftMailer {
             $footerString = $footer->getBody();
         }
         $body = $bodyDocument->getBody();
-        $subject = $bodyDocument->getTitle();
-        
         $headerString = html_entity_decode($headerString);
         $baseString = html_entity_decode($baseString);
         $footerString = html_entity_decode($footerString);
-        $body = html_entity_decode($body);
-        $subject = html_entity_decode($subject);
+        $bodyString = html_entity_decode($body);
         $subject = strip_tags(html_entity_decode($subject));
-        
         $context = array_merge($context,[
             "headerString" => $headerString,
             "baseString" => $baseString,
             "footerString" => $footerString,
-            "bodyString" => $body,
+            "bodyString" => $bodyString,
             "subjectString" => $subject,
         ]);
         return $context;
@@ -230,5 +252,12 @@ class TwigSwiftMailer {
             $message->setBody($textBody);
         }
         return $message;
+    }
+    
+    /**
+     * @return EmailAdapterInterface
+     */
+    public function getAdapter() {
+        return $this->adapter;
     }
 }

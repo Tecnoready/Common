@@ -26,11 +26,12 @@ class DoctrineORMAdapter implements EmailAdapterInterface
         $resolver->setRequired([
             "email_queue_class", 
             "email_template_class", 
+            "email_component_class", 
             ]);
         $this->options = $resolver->resolve($options);
     }
     
-    public function createNew() {
+    public function createEmailQueue() {
         return new $this->options["email_queue_class"]();
     }
 
@@ -39,11 +40,25 @@ class DoctrineORMAdapter implements EmailAdapterInterface
     }
 
     public function flush() {
-        $this->doctrine->flush();
+        $this->doctrine->getManager()->flush();
     }
 
     public function persist($entity) {
         $em = $this->doctrine->getManager();
         $em->persist($entity);
     }
+
+    public function createComponent() {
+        return new $this->options["email_component_class"]();
+    }
+    
+    public function createEmailTemplate() {
+        return new $this->options["email_template_class"]();
+    }
+
+    public function remove($entity) {
+        $em = $this->doctrine->getManager();
+        $em->remove($entity);
+    }
+
 }

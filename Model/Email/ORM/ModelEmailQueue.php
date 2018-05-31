@@ -3,6 +3,7 @@
 namespace Tecnoready\Common\Model\Email\ORM;
 
 use Doctrine\ORM\Mapping as ORM;
+use Tecnoready\Common\Model\Email\EmailQueueInterface;
 
 /**
  * Modelo de email almacenado para generar el correo posteriormente y enviarlo
@@ -10,7 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @author Carlos Mendoza <inhack20@gmail.com>
  * @ORM\MappedSuperclass()
  */
-abstract class ModelEmailQueue 
+abstract class ModelEmailQueue implements EmailQueueInterface
 {
     /**
      * @var integer
@@ -21,16 +22,10 @@ abstract class ModelEmailQueue
      */
     protected $id;
     
-    const STATUS_NOT_SENT = "not_sent";
-    const STATUS_SENT = "sent";
-    const STATUS_FAIL = "fail";
-    
-    const ATTACH_DOCUMENTS = "attach_documents";
-    
     /**
      * @var string
      *
-     * @ORM\Column(name="subject", type="json_array")
+     * @ORM\Column(name="subject", type="text")
      */
     protected $subject;
     

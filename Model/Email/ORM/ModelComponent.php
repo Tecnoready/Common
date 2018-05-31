@@ -18,13 +18,8 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\MappedSuperclass()
  * @author Carlos Mendoza <inhack20@gmail.com>
  */
-class ModelComponent {
-    
-    const TYPE_COMPONENT_HEADER = "header";
-    const TYPE_COMPONENT_FOOTER = "footer";
-    const TYPE_COMPONENT_BODY = "body";
-    const TYPE_COMPONENT_BASE = "base";
-    
+class ModelComponent implements \Tecnoready\Common\Model\Email\ComponentInterface 
+{
     /**
      * @var string
      *
