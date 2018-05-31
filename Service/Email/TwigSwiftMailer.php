@@ -103,12 +103,12 @@ EOF;
     }
     
     /**
-     * Envia un correo almacenado en la base de datos
+     * Construye un correo almacenado en la base de datos (lo manda al spool para ser enviado luego)
      * @param EmailQueue $emailQueue
      * @return type
      */
     public function sendEmailQueue(EmailQueueInterface $emailQueue) {
-        $message = $this->getSwiftMessage()
+        $message = \Swift_Message::newInstance()
             ->setSubject($emailQueue->getSubject())
             ->setFrom($emailQueue->getFromEmail())
             ->setTo($emailQueue->getToEmail());
@@ -224,11 +224,6 @@ EOF;
      * @return type
      */
     public function renderMessage($templateName, $context, $toEmail, $fromEmail = null) {
-//        if($toEmail instanceof \Application\Sonata\UserBundle\Entity\User ){
-//            $toEmail = array(
-//                $toEmail->getEmail() => (string)$toEmail,
-//            );
-//        }
         $context['toEmail'] = $toEmail;
 
         $template = $this->twig->loadTemplate($templateName);
@@ -252,6 +247,18 @@ EOF;
             $message->setBody($textBody);
         }
         return $message;
+    }
+    
+    private function send(\Swift_Mime_Message $message = null) {
+        if($message === null){
+            return true;
+        }
+        if($this->options["debug"] === true){
+            $message->setTo([
+                $this->options["debug_mail"] => "Demo Debug"
+            ]);
+        }
+        return $this->mailer->send($message);
     }
     
     /**
