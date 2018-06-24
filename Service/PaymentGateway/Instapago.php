@@ -23,6 +23,12 @@ class Instapago
      */
     const STATUS_ID_PRE_AUTHORIZATION = "1";
     /**
+     * Tarjetas de prueba (Pueden indicar cualquier valor para Cédula o RIF, Fecha de
+     * Vencimiento y CVC:):
+     * Visa: 4111111111111111 
+     */
+    
+    /**
      * Estatus: Pagar (autorización).
      */
     const STATUS_ID_AUTHORIZATION = "2";
@@ -75,6 +81,8 @@ class Instapago
     private $publicKey = null;
     private $privateKey = null;
     
+    private $options;
+
     public function __construct($publicKey, $privateKey,array $options = []) {
         
         \Tecnoready\Common\Util\ConfigurationUtil::checkLib("optionsResolver");
@@ -83,17 +91,39 @@ class Instapago
         
         $this->publicKey = $publicKey;
         $this->privateKey = $privateKey;
+        $resolver = new OptionsResolver();
+        $resolver->setDefaults([
+            "class_response" => ResponseInstapago::class,
+            "timeout" => 20,
+        ]);
+        $this->options = $resolver->resolve($options);
     }
     
+    /**
+     * Realiza una autorizacion(retencion de fondos) a la tarjeta de credito
+     * @param array $options
+     * @return ResponseInstapago
+     */
     public function preAuthorization(array $options) {
-        $options["StatusId"] = self::STATUS_ID_AUTHORIZATION;
+        $options["StatusId"] = self::STATUS_ID_PRE_AUTHORIZATION;
+        return $this->executePost($options);
     }
     
+    /**
+     * Realiza un cargo a la tarjeta de credito
+     * @param array $options
+     * @return ResponseInstapago
+     */
     public function authorization(array $options) {
         $options["StatusId"] = self::STATUS_ID_AUTHORIZATION;
         return $this->executePost($options);
     }
     
+    /**
+     * Ejecuta una llamada por metodo post
+     * @param array $options
+     * @return ResponseInstapago
+     */
     private function executePost(array $options) {
         $resolver = $this->getResolver();
         $parameters = $resolver->resolve($options);
@@ -102,19 +132,14 @@ class Instapago
         $response = $client->post(self::API_CREATE_PAYMENT,[
             "form_params" => $parameters,
         ]);
-//        var_dump((string)$response->getBody());
         $responseData = null;
         if($response->getStatusCode() === 200){
             $responseArray = json_decode((string)$response->getBody(),true);
             if(is_array($responseArray)){
-                $responseData = ResponseInstapago::createFromArray($responseArray);
+                $responseData = ResponseInstapago::createFromArray($this->options["class_response"],$responseArray);
             }
         }
         
-        var_dump($responseData);
-//        (string)$response->getBody();
-//        var_dump($response->getHeaders());
-        var_dump($response->getStatusCode());
         return $responseData;
     }
 
@@ -231,7 +256,7 @@ class Instapago
     private function getClient() {
         $client = new Client([
             "base_uri" => self::BASE_URI,
-            "timeout" => 20,
+            "timeout" => $this->options["timeout"],
         ]);
         return $client;
     }

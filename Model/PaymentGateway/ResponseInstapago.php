@@ -226,9 +226,9 @@ class ResponseInstapago {
         return $this;
     }
 
-    public static function createFromArray(array $data) {
+    public static function createFromArray($className,array $data) {
         $accessor = \Symfony\Component\PropertyAccess\PropertyAccess::createPropertyAccessor();
-        $response = new self();
+        $response = new $className();
         foreach ($data as $propertyPath => $value) {
             if($accessor->isWritable($response, $propertyPath)){
                 if($propertyPath == "datetime"){
