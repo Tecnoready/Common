@@ -17,7 +17,7 @@ Tecnoready\Common\Model\PaymentGateway\ResponseInstapago:
           length: 3
         reference:
           type: string
-          length: 6
+          length: 10
         voucher:
           type: text
           nullable: true
@@ -27,15 +27,15 @@ Tecnoready\Common\Model\PaymentGateway\ResponseInstapago:
           nullable: true
         sequence:
           type: string
-          length: 16
+          length: 20
           nullable: true
         approval:
           type: string
-          length: 10
+          length: 20
           nullable: true
         lote:
           type: string
-          length: 5
+          length: 20
           nullable: true
         responseCode:
           type: integer
