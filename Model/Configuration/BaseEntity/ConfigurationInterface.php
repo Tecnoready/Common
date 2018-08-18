@@ -54,4 +54,13 @@ interface ConfigurationInterface {
     public function getNameWrapper();
 
     public function setNameWrapper($nameWrapper);
+    
+    public function getType();
+
+    public function setType($type);
+    
+    
+    public function getDataType();
+
+    public function setDataType($dataType);
 }

@@ -26,12 +26,6 @@ class ConfigurationManager {
     protected $options = array();
     
     /**
-     * Configuraciones disponibles
-     * @var \Tecnoready\Common\Model\Configuration\ConfigurationCacheAvailable
-     */
-    private $configurationCacheAvailable;
-            
-    /**
      * @var \Tecnoready\Common\Model\Configuration\Wrapper\ConfigurationWrapper
      */
     private $configurationsWrapper = null;
@@ -42,6 +36,17 @@ class ConfigurationManager {
      */
     private $adapter;
     
+    /**
+     * @var \Tecnoready\Common\Model\Configuration\CacheInterface
+     */
+    private $cache;
+    
+    /**
+     * Transformadores de data
+     * @var DataTransformerInterface
+     */
+    private $transformers;
+            
     function __construct(Adapter\ConfigurationAdapterInterface $adapter,array $options = array())
     {
         if(!class_exists("Symfony\Component\Config\ConfigCache")){
@@ -56,6 +61,15 @@ class ConfigurationManager {
         if($this->options["add_default_wrapper"] === true){
             $this->addWrapper(new \Tecnoready\Common\Model\Configuration\Wrapper\DefaultConfigurationWrapper());
         }
+        $this->transformers = [];
+    }
+    
+    /**
+     * Añade un transformador de valores
+     * @param \Tecnoready\Common\Service\ConfigurationService\DataTransformerInterface $transformer
+     */
+    public function addTransformer(DataTransformerInterface $transformer) {
+        $this->transformers[] = $transformer;
     }
     
     /**
@@ -120,62 +134,11 @@ class ConfigurationManager {
         $resolver = new OptionsResolver();
         $resolver->setDefaults([
             'debug'                  => false,
-            'configuration_dumper_class' => 'Tecnoready\\Common\\Dumper\\Configuration\\PhpConfigurationDumper',
-            'configuration_base_dumper_class' => 'Tecnoready\\Common\\Model\\Configuration\\ConfigurationCacheAvailable',
-            'configuration_cache_class'  => 'ProjectConfigurationAvailable',
             'add_default_wrapper'  => false,
         ]);
-        
-        $resolver->setRequired(["cache_dir","configuration_dumper_class","configuration_base_dumper_class","configuration_cache_class"]);
-        $resolver->addAllowedTypes("cache_dir","string");
         $resolver->addAllowedTypes("add_default_wrapper","boolean");
         
         $this->options = $resolver->resolve($options);
-    }
-    
-    /**
-     * Gets the Configuration Value instance associated with this Confurations.
-     * 
-     * @return \Tecnoready\Common\Model\Configuration\ConfigurationCacheAvailable
-     */
-    public function getAvailableConfiguration()
-    {
-        if (null !== $this->configurationCacheAvailable) {
-            return $this->configurationCacheAvailable;
-        }
-        $class = $this->options['configuration_cache_class'];
-        $cache = $this->getConfigCache();
-        $data = null;
-        if (!$cache->isFresh()) {
-            $dumper = $this->getAvailableConfigurationDumperInstance();
-
-            $options = array(
-                'class'      => $class,
-                'base_class'      => $this->options['configuration_base_dumper_class']
-            );
-            $newCacheClass = $dumper->dump($options);
-            $cache->write($newCacheClass);
-            $data = $dumper->getData();
-        }
-        if(!class_exists($class)){
-            require_once $cache->getPath();
-        }
-        $this->configurationCacheAvailable = new $class();
-        if($data !== null){
-            $this->configurationCacheAvailable->setConfigurations($data);
-        }
-        return $this->configurationCacheAvailable;
-    }
-    
-    /**
-     * Retorna la clase que maneja la cache
-     * 
-     * @return \Symfony\Component\Config\ConfigCache
-     */
-    private function getConfigCache()
-    {
-        $class = $this->options['configuration_cache_class'];
-        return new ConfigCache($this->options['cache_dir'].'/tecnoready_tools/'.$class.'.php', $this->options['debug']);
     }
     
     /**
@@ -191,7 +154,16 @@ class ConfigurationManager {
         }
         $key = strtoupper($key);
         $wrapperName = strtoupper($wrapperName);
-        return $this->getAvailableConfiguration()->get($key,$default,$wrapperName);
+        $this->cache->setAdapter($this->adapter);
+        if(!$this->cache->contains($key, $wrapperName)){
+            $this->cache->flush();
+            $this->cache->warmUp();
+        }
+        $configuration = $this->cache->getConfiguration($key, $wrapperName);
+        for ($i = \count($this->transformers) - 1; $i >= 0; --$i) {
+            $value = $this->transformers[$i]->reverseTransform($value,$configuration);
+        }
+        return $value;
     }
     
     /**
@@ -209,7 +181,35 @@ class ConfigurationManager {
         $key = strtoupper($key);
         $wrapperName = strtoupper($wrapperName);
         $this->hasWrapper($wrapperName,true);
-        $success = $this->adapter->update($key, $value, $description,$wrapperName);
+        $configuration = $this->adapter->find($key);
+        if($configuration === null){
+            $configuration = $this->adapter->createNew();
+            $configuration->setEnabled(true);
+            $configuration->setKey($key);
+            $configuration->setValue($value);
+            $configuration->setDescription($description);
+            $configuration->setNameWrapper($wrapperName);
+            $configuration->setCreatedAt(new \DateTime());
+            $type = gettype($value);
+            $configuration->setType($type);
+        }else{
+            //Actualizacion de la descripcion
+            if($description !== null){
+                $configuration->setDescription($description);
+            }
+            $configuration->setUpdatedAt();
+        }
+        foreach ($this->transformers as $transformer) {
+            $value = $transformer->transform($value, $configuration);
+        }
+        $configuration->setValue($value);
+        $this->adapter->persist($configuration);
+        $success = $this->adapter->flush();
+        
+        if(!$this->cache->contains($key, $wrapperName)){
+            $this->cache->flush();
+            $this->warmUp();
+        }
         if($success === true && $clearCache ){
             $this->clearCache();
             $this->warmUp();
@@ -234,7 +234,7 @@ class ConfigurationManager {
      */
     function warmUp()
     {
-        $this->getAvailableConfiguration();
+        $this->cache->warmUp($this->adapter->findAll());
         return $this;
     }
     
@@ -243,19 +243,7 @@ class ConfigurationManager {
      */
     function clearCache()
     {
-        $this->configurationCacheAvailable = null;
-        $cache = $this->getConfigCache();
-        @unlink($cache->getPath());
-        
+        $this->cache->flush();
         return $this;
-    }
-    
-    /**
-     * @return MatcherDumperInterface
-     */
-    protected function getAvailableConfigurationDumperInstance()
-    {
-        $entities = $this->adapter->findAll();
-        return new $this->options['configuration_dumper_class']($entities);
     }
 }

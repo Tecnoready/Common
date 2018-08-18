@@ -31,7 +31,7 @@ abstract class ConfigurationWrapper
      * @param type $description
      * @return Configuration
      */
-    protected function set($key,$value = null,$description = null)
+    public function set($key,$value = null,$description = null)
     {
         return $this->manager->set($key, $value, $description,$this->getName());
     }
@@ -43,7 +43,7 @@ abstract class ConfigurationWrapper
      * @param type $default
      * @return type
      */
-    protected function get($key,$default = null)
+    public function get($key,$default = null)
     {
         return $this->manager->get($key, $default,$this->getName());
     }
