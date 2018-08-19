@@ -208,12 +208,15 @@ class ConfigurationManager {
         $success = $this->adapter->flush();
         
         $isWarmUp = false;
+        //Sino existe el valor en la cache se debe refrescar en base la informacion actualizada
         if(!$this->cache->contains($key, $wrapperName)){
             $this->cache->flush();
             $this->warmUp();
             $isWarmUp = true;
+        }else{
+            $this->cache->save($key, $wrapperName, $value);
         }
-        if($success === true && $clearCache ){
+        if($success === true && $clearCache){
             $this->clearCache();
             if(!$isWarmUp){
                 $this->warmUp();
