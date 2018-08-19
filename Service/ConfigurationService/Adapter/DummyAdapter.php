@@ -35,9 +35,4 @@ class DummyAdapter implements ConfigurationAdapterInterface {
     public function persist(\Tecnoready\Common\Model\Configuration\BaseEntity\ConfigurationInterface $configuration) {
         
     }
-
-    public function update($key, $value, $description, $wrapperName) {
-        
-    }
-
 }

@@ -25,7 +25,7 @@ class ConfigurationUtil {
      */
     public static function generateId($nameWrapper,$key)
     {
-        return sprintf("%s___%s",strtoupper($nameWrapper),strtoupper($key));
+        return sprintf("%s___%s",strtoupper($nameWrapper),md5(strtoupper($key)));
     }
     
     static $libs = [

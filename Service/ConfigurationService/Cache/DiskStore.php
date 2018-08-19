@@ -119,7 +119,7 @@ class DiskStore extends BaseCache
             $data['data_type'] = $configuration->getDataType();
             
             $id = $this->getId($configuration->getKey(),$configuration->getNameWrapper());
-            $code .= sprintf("'%s' => '%s',", $id ,$this->encrypt(serialize($data)));
+            $code .= sprintf("'%s' => '%s',\n", $id ,$this->encrypt(serialize($data)));
         }
         
         $code = rtrim($code);

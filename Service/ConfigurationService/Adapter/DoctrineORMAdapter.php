@@ -47,47 +47,8 @@ class DoctrineORMAdapter implements ConfigurationAdapterInterface
         return $this->em->getRepository($this->className)->findAll();
     }
 
-    public function update($key, $value, $description,$wrapperName) {
-        //desuso
-        $entity = $this->find($key);
-        if($entity === null){
-            $entity = $this->createNew();
-            $entity->setEnabled(true);
-            
-            $entity->setCreatedAt(new \DateTime());
-            $type = gettype($value);
-            $entity->setType($type);
-        }else{
-            $entity->setUpdatedAt();
-        }
-        if($type == "object"){
-            $className = get_class($value);
-            $entity->setDataType($className);
-            $class = $this->em->getClassMetadata($className);
-            $propertyPath = $class->identifier[0];
-            $accessor = \Symfony\Component\PropertyAccess\PropertyAccess::createPropertyAccessor();
-            $value = $accessor->getValue($value, $propertyPath);
-            var_dump($class->identifier[0]);
-            var_dump($value);
-            die;
-        }else if($type == "array"){
-            $value = serialize($value);
-        }
-        $entity->setKey($key);
-        $entity->setValue($value);
-        if($description != null){
-            $entity->setDescription($description);
-        }
-        $entity->setNameWrapper($wrapperName);
-        $this->em->persist($entity);
-        $this->em->flush();
-        $success = true;
-        return $success;
-    }
-    
     public function persist(ConfigurationInterface $configuration) {
         $this->em->persist($configuration);
-//        $this->em->flush();
         $success = true;
         return $success;
     }

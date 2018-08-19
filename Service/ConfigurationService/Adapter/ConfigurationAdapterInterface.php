@@ -26,8 +26,6 @@ interface ConfigurationAdapterInterface {
      */
     public function flush();
     
-    public function update($key,$value,$description,$wrapperName);
-    
     /**
      * Guarda los cambios de la configuracion
      * @param ConfigurationInterface $configuration
