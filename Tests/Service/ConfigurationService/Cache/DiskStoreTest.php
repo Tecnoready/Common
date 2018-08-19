@@ -28,6 +28,7 @@ class DiskStoreTest extends BaseConfigurationServiceTest
         $tmp = $this->getTempPath("ConfigurationService");
         $this->store = new DiskStore([
             "cache_dir" => $tmp,
+            "password" => "2dd1ceb4cdf768d97484a9c89cf81a83",
         ]);
         $this->store->setAdapter(new \Tecnoready\Common\Service\ConfigurationService\Adapter\DummyAdapter());
     }

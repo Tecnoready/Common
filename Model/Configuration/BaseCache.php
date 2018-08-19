@@ -18,6 +18,8 @@ namespace Tecnoready\Common\Model\Configuration;
  */
 abstract class BaseCache implements CacheInterface 
 {
+    protected $options;
+
     /**
      * @var \Tecnoready\Common\Service\ConfigurationService\Adapter\ConfigurationAdapterInterface 
      */
@@ -30,5 +32,34 @@ abstract class BaseCache implements CacheInterface
     public function setAdapter(\Tecnoready\Common\Service\ConfigurationService\Adapter\ConfigurationAdapterInterface $adapter) {
         $this->adapter = $adapter;
         return $this;
+    }
+    
+    /**
+     * Encriptar text
+     * @see https://gist.github.com/odan/c1dc2798ef9cedb9fedd09cdfe6e8e76
+     * @param type $data
+     * @return type
+     */
+    protected function encrypt($data)
+    {
+        $ivSize = openssl_cipher_iv_length($this->options["method_encrypt"]);
+        $iv = openssl_random_pseudo_bytes($ivSize);
+
+        $encrypted = openssl_encrypt($data, $this->options["method_encrypt"], $this->options["key"], OPENSSL_RAW_DATA, $iv);
+
+        // For storage/transmission, we simply concatenate the IV and cipher text
+        $encrypted = base64_encode($iv . $encrypted);
+
+        return $encrypted;
+    }
+
+    protected function decrypt($data)
+    {
+        $data = base64_decode($data);
+        $ivSize = openssl_cipher_iv_length($this->options["method_encrypt"]);
+        $iv = substr($data, 0, $ivSize);
+        $data = openssl_decrypt(substr($data, $ivSize), $this->options["method_encrypt"], $this->options["key"], OPENSSL_RAW_DATA, $iv);
+
+        return $data;
     }
 }

@@ -27,8 +27,6 @@ class MemcachedStore extends BaseCache
      */
     private $memcached;
     
-    private $options;
-
     /**
      * Constructor.
      *
@@ -115,32 +113,5 @@ class MemcachedStore extends BaseCache
         return $this->options["prefix"].parent::getId($key, $wrapperName);
     }
     
-    /**
-     * Encriptar text
-     * @see https://gist.github.com/odan/c1dc2798ef9cedb9fedd09cdfe6e8e76
-     * @param type $data
-     * @return type
-     */
-    public function encrypt($data)
-    {
-        $ivSize = openssl_cipher_iv_length($this->options["method_encrypt"]);
-        $iv = openssl_random_pseudo_bytes($ivSize);
-
-        $encrypted = openssl_encrypt($data, $this->options["method_encrypt"], $this->options["key"], OPENSSL_RAW_DATA, $iv);
-
-        // For storage/transmission, we simply concatenate the IV and cipher text
-        $encrypted = base64_encode($iv . $encrypted);
-
-        return $encrypted;
-    }
-
-    public function decrypt($data)
-    {
-        $data = base64_decode($data);
-        $ivSize = openssl_cipher_iv_length($this->options["method_encrypt"]);
-        $iv = substr($data, 0, $ivSize);
-        $data = openssl_decrypt(substr($data, $ivSize), $this->options["method_encrypt"], $this->options["key"], OPENSSL_RAW_DATA, $iv);
-
-        return $data;
-    }
+    
 }

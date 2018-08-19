@@ -28,8 +28,6 @@ class DiskStore extends BaseCache
     protected $fs;
     protected $configurations;
     
-    protected $options = [];
-    
     private $isInit = false;
 
     public function __construct(array $options) {
@@ -38,12 +36,15 @@ class DiskStore extends BaseCache
             'debug' => false,
             'filename' => "configuration_cache.php",
             'folder' => "tecnoready_tools",
+            'method_encrypt' => "AES-256-CBC", 
         ]);
         
-        $resolver->setRequired(["cache_dir"]);
+        $resolver->setRequired(["cache_dir","password"]);
         $resolver->addAllowedTypes("cache_dir","string");
         
         $this->options = $resolver->resolve($options);
+        
+        $this->options["key"] = hash('sha256', $this->options["password"]);
         
         $this->fs = new \Symfony\Component\Filesystem\Filesystem();
         $this->init();
@@ -76,12 +77,14 @@ class DiskStore extends BaseCache
 
     public function fetch($key, $wrapperName) {
         $this->init();
-        return $this->values[$this->getId($key, $wrapperName)];
+        $data = null;
+        $data =unserialize($this->decrypt($this->values[$this->getId($key, $wrapperName)]));
+        return $data;
     }
 
     public function save($key, $wrapperName, $data, $lifeTime = 0) {
         $this->init();
-        $this->values[$this->getId($key, $wrapperName)] = $data;
+        $this->values[$this->getId($key, $wrapperName)] = $this->encrypt(serialize($data));
         $this->updateFromValues();
     }
     
@@ -116,7 +119,7 @@ class DiskStore extends BaseCache
             $data['data_type'] = $configuration->getDataType();
             
             $id = $this->getId($configuration->getKey(),$configuration->getNameWrapper());
-            $code .= sprintf("'%s' => %s,", $id ,var_export($data,true));
+            $code .= sprintf("'%s' => '%s',", $id ,$this->encrypt(serialize($data)));
         }
         
         $code = rtrim($code);
