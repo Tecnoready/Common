@@ -14,6 +14,7 @@ namespace Tecnoready\Common\Service\ConfigurationService\DataTransformer;
 use Tecnoready\Common\Service\ConfigurationService\DataTransformerInterface;
 use Tecnoready\Common\Model\Configuration\BaseEntity\ConfigurationInterface;
 use Doctrine\Common\Persistence\Mapping\MappingException;
+use Doctrine\Common\Util\ClassUtils;
 
 /**
  * Transforma los id a entidades
@@ -22,6 +23,7 @@ use Doctrine\Common\Persistence\Mapping\MappingException;
  */
 class DoctrineORMTransformer implements DataTransformerInterface
 {
+    const TYPE_DOCTRINE = "doctrine2orm";
     /**
      * Manejador de entidades
      * @var \Doctrine\ORM\EntityManager
@@ -33,7 +35,7 @@ class DoctrineORMTransformer implements DataTransformerInterface
     }
     
     public function reverseTransform($value, ConfigurationInterface $configuration) {
-        if($configuration->getType() === "object"){
+        if($configuration->getType() === self::TYPE_DOCTRINE){
             $value = $this->em->find($configuration->getDataType(), $value);
         }
         return $value;
@@ -42,10 +44,11 @@ class DoctrineORMTransformer implements DataTransformerInterface
     public function transform($value, ConfigurationInterface $configuration) {
         if($configuration->getType() === "object"){
             try {
-                 $className = get_class($value);
-                $configuration->setDataType($className);
+                $className = ClassUtils::getRealClass(get_class($value));
                 $class = $this->em->getClassMetadata($className);
                 $propertyPath = $class->identifier[0];
+                $configuration->setDataType($className);
+                $configuration->setType(self::TYPE_DOCTRINE);
                 $accessor = \Symfony\Component\PropertyAccess\PropertyAccess::createPropertyAccessor();
                 $value = $accessor->getValue($value, $propertyPath);
             } catch (MappingException $ex) {

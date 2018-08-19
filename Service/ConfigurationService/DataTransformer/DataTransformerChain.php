@@ -23,8 +23,6 @@ class DataTransformerChain implements DataTransformerInterface
 {
     protected $transformers;
     
-    protected $transformers;
-
     /**
      * Uses the given value transformers to transform values.
      *
