@@ -11,7 +11,7 @@
 
 namespace Tecnoready\Common\Service\ConfigurationService;
 
-use Symfony\Component\Config\ConfigCache;
+use Tecnoready\Common\Service\ConfigurationService\CacheInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -47,7 +47,7 @@ class ConfigurationManager {
      */
     private $transformers;
             
-    function __construct(Adapter\ConfigurationAdapterInterface $adapter,array $options = array())
+    function __construct(Adapter\ConfigurationAdapterInterface $adapter,CacheInterface $cache,array $options = array())
     {
         if(!class_exists("Symfony\Component\Config\ConfigCache")){
             throw new \Exception(sprintf("The package '%s' is required, please install https://packagist.org/packages/symfony/config",'"symfony/config": "^3.1"'));
@@ -57,6 +57,7 @@ class ConfigurationManager {
         }
         $this->setOptions($options);
         $this->adapter = $adapter;
+        $this->cache = $cache;
         $this->configurationsWrapper = [];
         if($this->options["add_default_wrapper"] === true){
             $this->addWrapper(new \Tecnoready\Common\Model\Configuration\Wrapper\DefaultConfigurationWrapper());
@@ -156,10 +157,10 @@ class ConfigurationManager {
         $wrapperName = strtoupper($wrapperName);
         $this->cache->setAdapter($this->adapter);
         if(!$this->cache->contains($key, $wrapperName)){
-            $this->cache->flush();
-            $this->cache->warmUp();
+            $this->flush();
         }
         $configuration = $this->cache->getConfiguration($key, $wrapperName);
+        $value = $configuration->getValue();
         for ($i = \count($this->transformers) - 1; $i >= 0; --$i) {
             $value = $this->transformers[$i]->reverseTransform($value,$configuration);
         }
@@ -206,13 +207,17 @@ class ConfigurationManager {
         $this->adapter->persist($configuration);
         $success = $this->adapter->flush();
         
+        $isWarmUp = false;
         if(!$this->cache->contains($key, $wrapperName)){
             $this->cache->flush();
             $this->warmUp();
+            $isWarmUp = true;
         }
         if($success === true && $clearCache ){
             $this->clearCache();
-            $this->warmUp();
+            if(!$isWarmUp){
+                $this->warmUp();
+            }
         }
         return $success;
     }

@@ -18,7 +18,7 @@ use Tecnoready\Common\Model\Configuration\BaseEntity\ConfigurationInterface;
  *
  * @author Carlos Mendoza <inhack20@gmail.com>
  */
-abstract class DoctrineORMAdapter implements ConfigurationAdapterInterface
+class DoctrineORMAdapter implements ConfigurationAdapterInterface
 {
     /**
      * Manejador de entidades
@@ -26,12 +26,29 @@ abstract class DoctrineORMAdapter implements ConfigurationAdapterInterface
      */
     protected $em;
     
-    public function __construct(\Doctrine\ORM\EntityManager $em) {
+    protected $className;
+    
+    public function __construct(\Doctrine\ORM\EntityManager $em,$className) {
         $this->em = $em;
+        $this->className = $className;
+    }
+    
+    public function createNew() {
+        return new $this->className();
+    }
+
+    public function find($key) {
+        return $this->em->getRepository($this->className)->findOneBy([
+            "key" => $key,
+        ]);
+    }
+
+    public function findAll() {
+        return $this->em->getRepository($this->className)->findAll();
     }
 
     public function update($key, $value, $description,$wrapperName) {
-        
+        //desuso
         $entity = $this->find($key);
         if($entity === null){
             $entity = $this->createNew();

@@ -41,22 +41,15 @@ class DoctrineORMTransformer implements DataTransformerInterface
 
     public function transform($value, ConfigurationInterface $configuration) {
         if($configuration->getType() === "object"){
-//            $this->em->persist($value);
-//            $this->em->flush();
             try {
                  $className = get_class($value);
                 $configuration->setDataType($className);
                 $class = $this->em->getClassMetadata($className);
-//                var_dump($class);
                 $propertyPath = $class->identifier[0];
                 $accessor = \Symfony\Component\PropertyAccess\PropertyAccess::createPropertyAccessor();
                 $value = $accessor->getValue($value, $propertyPath);
-//                var_dump($class->identifier[0]);
-//                var_dump($value);
-//                die;
             } catch (MappingException $ex) {
                 //No esta manejada la entidad por doctrine
-//                var_dump("No se maneja.");
             }
         }
         return $value;

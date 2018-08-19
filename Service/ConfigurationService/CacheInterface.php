@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Tecnoready\Common\Model\Configuration;
+namespace Tecnoready\Common\Service\ConfigurationService;
 
 /**
  * Gestor de cache de configuracion

@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Tecnoready\Common\Model\Configuration\Cache;
+namespace Tecnoready\Common\Service\ConfigurationService\Cache;
 
 use Tecnoready\Common\Model\Configuration\BaseCache;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -78,7 +78,7 @@ class DiskStore extends BaseCache
     public function fetch($key, $wrapperName) {
         $this->init();
         $data = null;
-        $data =unserialize($this->decrypt($this->values[$this->getId($key, $wrapperName)]));
+        $data = unserialize($this->decrypt($this->values[$this->getId($key, $wrapperName)]));
         return $data;
     }
 

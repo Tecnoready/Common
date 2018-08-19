@@ -11,6 +11,8 @@
 
 namespace Tecnoready\Common\Model\Configuration;
 
+use Tecnoready\Common\Service\ConfigurationService\CacheInterface;
+
 /**
  * Base para cache
  *

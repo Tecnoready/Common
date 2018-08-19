@@ -14,8 +14,9 @@ namespace Tecnoready\Common\Tests\Service\ConfigurationService;
 use Tecnoready\Common\Tests\BaseWebTestCase;
 use Tecnoready\Common\Service\ConfigurationService\ConfigurationManager;
 use Tecnoready\Common\Service\ConfigurationService\DataTransformer\DoctrineORMTransformer;
-use Tecnocreaciones\Bundle\ToolsBundle\Service\ConfigurationService\Adapter\DoctrineORMAdapter;
+use Tecnoready\Common\Service\ConfigurationService\Adapter\DoctrineORMAdapter;
 use Tecnocreaciones\Bundle\ToolsBundle\Entity\Configuration\Configuration;
+use Tecnoready\Common\Service\ConfigurationService\Cache\DiskStore;
 
 /**
  * Base de test para servicio de configuracion
@@ -30,6 +31,11 @@ abstract class BaseConfigurationServiceTest extends BaseWebTestCase
     protected $store;
     
     /**
+     * @var \Doctrine\ORM\EntityManager
+     */
+    protected $em;
+    
+    /**
      * @param ConfigurationAdapterInterface $adapter
      * @return ConfigurationManager
      * @param ConfigurationAdapterInterface $adapter
@@ -37,8 +43,16 @@ abstract class BaseConfigurationServiceTest extends BaseWebTestCase
      */
     protected function getConfigurationManager(\Tecnoready\Common\Service\ConfigurationService\Adapter\ConfigurationAdapterInterface $adapter) {
         $container = $this->client->getContainer();
-        $configurationManager = new \Tecnoready\Common\Service\ConfigurationService\ConfigurationManager($adapter,[
+        $cache = new DiskStore([
             "cache_dir" => $container->getParameter("kernel.cache_dir"),
+            "password" => "2dd1ceb4cdf768d97484a9c89cf81a83",
+        ]);
+//        $memcached = new\Memcached();
+//        $memcached->addServer("localhost","11211");
+//        $cache = new \Tecnoready\Common\Model\Configuration\Cache\MemcachedStore($memcached,[
+//            "password" => "03f4f012ef498e33a6737369f3d3afe4",
+//        ]);
+        $configurationManager = new \Tecnoready\Common\Service\ConfigurationService\ConfigurationManager($adapter,$cache,[
             "add_default_wrapper" => true,
         ]);
         return $configurationManager;
@@ -49,7 +63,7 @@ abstract class BaseConfigurationServiceTest extends BaseWebTestCase
      */
     protected function getManager() {
         $em = $this->em;
-        $adapter = new DoctrineORMAdapter($em);
+        $adapter = new DoctrineORMAdapter($em,Configuration::class);
         $configurationManager = $this->getConfigurationManager($adapter);
         $doctrineORMTransformer = new DoctrineORMTransformer($em);
         $configurationManager->addTransformer($doctrineORMTransformer);

@@ -11,10 +11,6 @@
 
 namespace Tecnoready\Common\Tests\Service\ConfigurationService\DataTransformer;
 
-use Tecnoready\Common\Service\ConfigurationService\ConfigurationManager;
-use Tecnoready\Common\Service\ConfigurationService\DataTransformer\DoctrineORMTransformer;
-use Tecnoready\Common\Service\ConfigurationService\Adapter\ConfigurationAdapterInterface;
-use Tecnocreaciones\Bundle\ToolsBundle\Service\ConfigurationService\Adapter\DoctrineORMAdapter;
 use Tecnoready\Common\Tests\Service\ConfigurationService\BaseConfigurationServiceTest;
 use Tecnoready\Common\Model\Configuration\Wrapper\DefaultConfigurationWrapper;
 use Tecnocreaciones\Bundle\ToolsBundle\Entity\Configuration\Configuration;
@@ -27,21 +23,10 @@ use Tecnoready\Common\Model\DemoClass;
  */
 class DoctrineORMTransformerTest extends BaseConfigurationServiceTest
 {
-    /**
-     * @var \Symfony\Bundle\FrameworkBundle\Client
-     */
-    protected $client;
-    
-    /**
-     * @var \Doctrine\ORM\EntityManager
-     */
-    private $em;
     
     protected function setUp()
     {
-        $this->client = static::createClient();
-        $this->em = $this->client->getContainer()->get("doctrine")->getManager();
-        
+        parent::setUp();
         $this->em->createQuery(sprintf('DELETE %s p',Configuration::class))->execute();
     }
     
@@ -60,7 +45,7 @@ class DoctrineORMTransformerTest extends BaseConfigurationServiceTest
         }
     }
     
-    public function testEntityTransformer() {
+    public function testTransformer() {
         $em = $this->em;
         
         $configuration = new Configuration();
@@ -77,8 +62,13 @@ class DoctrineORMTransformerTest extends BaseConfigurationServiceTest
         $configurationManager = $this->getManager();
         $wrapper = $configurationManager->getWrapper(DefaultConfigurationWrapper::getName());
         
-        $wrapper->set("EXAMPLE",$configuration,"Descripcion de valor");
+        $wrapper->set("EXAMPLE_ENTITY",$configuration,"Descripcion de valor");
         
         $configurationManager->flush();
+        
+        $config = $wrapper->get("EXAMPLE_ENTITY");
+        $this->assertEquals(get_class($configuration),get_class($config));
+        $this->assertEquals($configuration->getId(),$config->getId());
+        $this->assertEquals($configuration->getDescription(),$config->getDescription());
     }
 }
