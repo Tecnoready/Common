@@ -149,7 +149,7 @@ class ConfigurationManager {
      * @param mixed $default Valor que se retornara en caso de que no exista el indice
      * @return mixed
      */
-    function get($key,$default = null,$wrapperName = null) {
+    function get($key,$wrapperName = null,$default = null) {
         if($wrapperName === null){
             $wrapperName = \Tecnoready\Common\Model\Configuration\Wrapper\DefaultConfigurationWrapper::getName();
         }
@@ -174,7 +174,7 @@ class ConfigurationManager {
      * @param mixed $value valor de la configuracion
      * @param string|null $description Descripcion de la configuracion|null para actualizar solo el key
      */
-    function set($key,$value = null,$description = null,$wrapperName = null,$clearCache = false)
+    function set($key,$value = null,$wrapperName = null,$description = null,$clearCache = false)
     {
         if($wrapperName === null){
             $wrapperName = \Tecnoready\Common\Model\Configuration\Wrapper\DefaultConfigurationWrapper::getName();
