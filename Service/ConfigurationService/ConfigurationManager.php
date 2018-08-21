@@ -157,12 +157,17 @@ class ConfigurationManager {
         $wrapperName = strtoupper($wrapperName);
         $this->cache->setAdapter($this->adapter);
         if(!$this->cache->contains($key, $wrapperName)){
-            $this->flush();
+            $this->clearCache();//Pre-calencar cache
+            $this->warmUp();//Pre-calencar cache
         }
         $configuration = $this->cache->getConfiguration($key, $wrapperName);
-        $value = $configuration->getValue();
-        for ($i = \count($this->transformers) - 1; $i >= 0; --$i) {
-            $value = $this->transformers[$i]->reverseTransform($value,$configuration);
+        if($configuration !== null){
+            $value = $configuration->getValue();
+            for ($i = \count($this->transformers) - 1; $i >= 0; --$i) {
+                $value = $this->transformers[$i]->reverseTransform($value,$configuration);
+            }
+        }else{
+            $value = $default;
         }
         return $value;
     }
