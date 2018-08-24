@@ -139,7 +139,9 @@ EOF;
      */
     protected function buildEmail($templateName, $context, $toEmail,$fromEmail = null) {
         $context['toEmail'] = $toEmail;
-        
+        if(class_exists("FOS\UserBundle\Model\UserInterface" && $toEmail instanceof \FOS\UserBundle\Model\UserInterface)){
+            $toEmail = $toEmail->getEmail();
+        }
         if($templateName instanceof \Twig_Template){
             $template = $templateName;
         }else{
