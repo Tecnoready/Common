@@ -76,7 +76,7 @@ class TwigSwiftMailer {
      * @return EmailQueueInterface
      */
     public function emailQueue($id,$context,$toEmail,array $attachs = [],array $extras = []) {
-        $context = $this->buildDocumentContext($id, $context, $toEmail, $attachs);
+        $context = $this->buildDocumentContext($id, $context, $toEmail, $attachs);       
         $templateName = $this->options["skeleton_email"];
         $templateSource = <<<EOF
                 {% extends template_from_string(baseString) %}
@@ -145,11 +145,11 @@ EOF;
         if($templateName instanceof \Twig_Template){
             $template = $templateName;
         }else{
-            $template = $this->twig->loadTemplate($templateName);
+             $template = $this->twig->loadTemplate($templateName);       
         }
         $subject = $template->renderBlock('subject', $context);
-        $textBody = $template->renderBlock('body_text', $context);
-        $htmlBody = $template->renderBlock('body_html', $context);
+        $textBody = $template->renderBlock('body_text', $context);      
+        $htmlBody = $template->renderBlock('content_html', $context);
         if ($fromEmail === null) {
             $fromEmail = array($this->options["from_email"] => $this->options["from_name"]);
         }
@@ -194,9 +194,9 @@ EOF;
             $headerString = $header->getBody();
         }
         if($base){
-            $baseString = "{% block subject '' %}{% block body_text '' %}{% block body_html %}".$base->getBody()."{% endblock %}";
+            $baseString = "{% block subject '' %}{% block body_text '' %}{% block content_html %}".$base->getBody()."{% endblock %}";
         }else {
-            $baseString = "{% block subject '' %}{% block body_text '' %}{% block body_html %}{% endblock %}";
+            $baseString = "{% block subject '' %}{% block body_text '' %}{% block content_html %}{% endblock %}";
         }
         if($footer){
             $footerString = $footer->getBody();
