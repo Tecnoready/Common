@@ -233,10 +233,13 @@ class ResponseInstapago {
             if($accessor->isWritable($response, $propertyPath)){
                 if($propertyPath == "datetime"){
                     $value = \DateTime::createFromFormat("m/d/Y g:i:s A",$value);
+                    if (!$value) {
+                        $value = new \Datetime();
+                    }
                 }
                 if($propertyPath == "voucher"){
                     $value = html_entity_decode($value);
-                }
+                }                
                 $accessor->setValue($response, $propertyPath, $value);
             }
         }
