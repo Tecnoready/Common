@@ -35,6 +35,8 @@ class TwigSwiftMailer {
     protected $adapter;
 
     protected $options;
+    
+    protected $templateSource;
 
     public function __construct(Swift_Mailer $mailer, Twig_Environment $twig,EmailAdapterInterface $adapter, array $options = []) {
         $this->mailer = $mailer;
@@ -64,6 +66,18 @@ class TwigSwiftMailer {
             $preferences->setTempDir($tmpDir)->setCacheType('disk');
             putenv('TMPDIR=' . $tmpDir);
         }
+        
+                $this->templateSource = <<<EOF
+                {% extends template_from_string(baseString) %}
+                
+                {% block subject %}{% include (template_from_string(subjectString)) %}{% endblock subject %}
+
+                {% block header %}{% include template_from_string(headerString) %}{% endblock %}
+
+                {% block content_html %}{% include(template_from_string(bodyString)) with _context %}{% endblock %}
+
+                {% block footer %}{% include(template_from_string(footerString)) with _context %}{% endblock %}
+EOF;
     }
     
     /**
@@ -77,20 +91,7 @@ class TwigSwiftMailer {
      */
     public function emailQueue($id,$context,$toEmail,array $attachs = [],array $extras = []) {
         $context = $this->buildDocumentContext($id, $context, $toEmail, $attachs);       
-        $templateName = $this->options["skeleton_email"];
-        $templateSource = <<<EOF
-                {% extends template_from_string(baseString) %}
-                
-                {% block subject %}{% include (template_from_string(subjectString)) %}{% endblock subject %}
-
-                {% block header %}{% include template_from_string(headerString) %}{% endblock %}
-
-                {% block content_html %}{% include(template_from_string(bodyString)) with _context %}{% endblock %}
-
-                {% block footer %}{% include(template_from_string(footerString)) with _context %}{% endblock %}
-EOF;
-        
-        $template =$this->twig->createTemplate($templateSource);
+        $template =$this->twig->createTemplate($this->templateSource);
         $email = $this->buildEmail($template, $context, $toEmail);
         $email->setAttachs($attachs);
         $email->setExtras($extras);
@@ -128,6 +129,22 @@ EOF;
             $message->attach(\Swift_Attachment::fromPath($path)->setFilename($name));
         }
         return $this->send($message);
+    }
+    
+    /**
+     * Envia un email
+     * @param type $id
+     * @param type $context
+     * @param type $toEmail
+     * @param array $attachs
+     * @return boolean
+     */
+    public function sendDocumentMessage($id,$context,$toEmail,array $attachs = [])
+    {
+        $context = $this->buildDocumentContext($id, $context, $toEmail, $attachs);       
+        $template =$this->twig->createTemplate($this->templateSource);
+        $email = $this->buildEmail($template, $context, $toEmail);
+        return $this->sendEmailQueue($email);
     }
     
     /**
