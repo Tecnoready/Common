@@ -28,6 +28,16 @@ class MemcachedStore extends BaseCache
     private $memcached;
     
     /**
+     * Errores que puede dar al consultar un recurso
+     * @var array 
+     */
+    private $errorCodes = [
+        Memcached::RES_NOTFOUND,
+        Memcached::RES_PARTIAL_READ,
+        Memcached::RES_SOME_ERRORS,
+    ];
+
+    /**
      * Constructor.
      *
      * List of available options:
@@ -57,7 +67,12 @@ class MemcachedStore extends BaseCache
 
     public function contains($key, $wrapperName) {
         $value = $this->memcached->get($this->getId($key, $wrapperName));
-        if($value === false && $this->memcached->getResultCode() === Memcached::RES_NOTFOUND){
+        $code = $this->memcached->getResultCode();
+        if(in_array($code,$this->errorCodes)){
+            $value = $this->memcached->get($this->getId($key, $wrapperName));
+            $code = $this->memcached->getResultCode();
+        }
+        if($value === false && $code === Memcached::RES_NOTFOUND){
             return false;
         }
         return true;
@@ -69,6 +84,10 @@ class MemcachedStore extends BaseCache
 
     public function fetch($key, $wrapperName) {
         $result = $this->memcached->get($this->getId($key, $wrapperName));
+        $code = $this->memcached->getResultCode();
+        if(in_array($code,$this->errorCodes)){
+            $result = $this->memcached->get($this->getId($key, $wrapperName));
+        }
         if($result !== false){
             $result = unserialize($this->decrypt($result));
         }

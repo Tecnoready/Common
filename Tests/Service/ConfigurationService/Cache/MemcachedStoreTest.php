@@ -12,7 +12,7 @@
 namespace Tecnoready\Common\Tests\Service\ConfigurationService\Cache;
 
 use Tecnoready\Common\Tests\Service\ConfigurationService\BaseConfigurationServiceTest;
-use Tecnoready\Common\Model\Configuration\Cache\MemcachedStore;
+use Tecnoready\Common\Service\ConfigurationService\Cache\MemcachedStore;
 use Memcached;
 
 /**
