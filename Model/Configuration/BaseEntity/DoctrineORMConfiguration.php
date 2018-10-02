@@ -56,12 +56,20 @@ abstract class DoctrineORMConfiguration implements ConfigurationInterface
     protected $description;
     
     /**
-     * ¿Habilitado?
+     * Tipo de dato
      * 
-     * @var boolean
-     * @ORM\Column(name="enabled", type="boolean")
+     * @var string
+     * @ORM\Column(name="type", type="string",length=20,nullable=true)
      */
-    protected $enabled = true;
+    protected $type;
+    
+    /**
+     * Datos del tipo de dato (objeto: nombre de clase)
+     * 
+     * @var string
+     * @ORM\Column(name="data_type", type="text",nullable=true)
+     */
+    protected $dataType;
     
     /**
      * @var \DateTime
@@ -146,14 +154,32 @@ abstract class DoctrineORMConfiguration implements ConfigurationInterface
         return $this;
     }
 
-    public function getCreatedAt(): \DateTime {
+    public function getCreatedAt() {
         return $this->createdAt;
     }
 
-    public function getUpdatedAt(): \DateTime {
+    public function getUpdatedAt() {
         return $this->updatedAt;
     }
+    
+    public function getType() {
+        return $this->type;
+    }
 
+    public function setType($type) {
+        $this->type = $type;
+        return $this;
+    }
+    
+    public function getDataType() {
+        return $this->dataType;
+    }
+
+    public function setDataType($dataType) {
+        $this->dataType = $dataType;
+        return $this;
+    }
+        
     public function __toString() {
         return $this->getDescription()?: '-';
     }

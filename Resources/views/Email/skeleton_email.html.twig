@@ -1,0 +1,17 @@
+{% extends template_from_string(baseString) %}
+
+{% block subject %}
+    {% include (template_from_string(subjectString)) %}
+{% endblock subject %}
+    
+{% block header %}
+    {% include template_from_string(headerString) %}
+{% endblock %}
+
+{% block content_html %}
+    {% include(template_from_string(bodyString)) with _context %}
+{% endblock %}
+    
+{% block footer %}
+    {% include(template_from_string(footerString)) with _context %}
+{% endblock %}

@@ -25,11 +25,13 @@ class ConfigurationUtil {
      */
     public static function generateId($nameWrapper,$key)
     {
-        return sprintf("%s___%s",$nameWrapper,$key);
+        return sprintf("%s___%s",strtoupper($nameWrapper),md5(strtoupper($key)));
     }
     
     static $libs = [
-        "optionsResolver" => "checkOptionsResolver"
+        "optionsResolver" => "checkOptionsResolver",
+        "guzzleHttp" => "checkGuzzleHttp",
+        "propertyAccess" => "checkPropertyAccess",
     ];
     
     public static function checkLib($name) {
@@ -42,7 +44,17 @@ class ConfigurationUtil {
     
     private static function checkOptionsResolver() {
         if(!class_exists("Symfony\Component\OptionsResolver\OptionsResolver")){
-            throw new \Exception(sprintf("The package '%s' is required, please install https://packagist.org/packages/symfony/options-resolver",'"symfony/options-resolver": "^3.1"'));
+            throw new \Exception(sprintf("The package '%s' is required, please install https://packagist.org/packages/symfony/options-resolver",'"symfony/options-resolver": "~3.4"'));
+        }
+    }
+    private static function checkGuzzleHttp() {
+        if (!class_exists('\GuzzleHttp\Client')) {
+            throw new \Exception(sprintf("The package '%s' is required, please install https://packagist.org/packages/guzzlehttp/guzzle",'"guzzlehttp/guzzle": "~6.3"'));
+        }
+    }
+    private static function checkPropertyAccess() {
+        if (!class_exists('\Symfony\Component\PropertyAccess\PropertyAccess')) {
+            throw new \Exception(sprintf("The package '%s' is required, please install.",'"symfony/property-access": "~3.4"'));
         }
     }
     

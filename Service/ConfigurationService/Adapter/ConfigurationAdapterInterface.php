@@ -11,6 +11,8 @@
 
 namespace Tecnoready\Common\Service\ConfigurationService\Adapter;
 
+use Tecnoready\Common\Model\Configuration\BaseEntity\ConfigurationInterface;
+
 /**
  * Adaptador de las configuraciones
  * @author Carlos Mendoza <inhack20@gmail.com>
@@ -24,7 +26,11 @@ interface ConfigurationAdapterInterface {
      */
     public function flush();
     
-    public function update($key,$value,$description,$wrapperName);
+    /**
+     * Guarda los cambios de la configuracion
+     * @param ConfigurationInterface $configuration
+     */
+    public function persist(ConfigurationInterface $configuration);
     
     /**
      * @return \Tecnoready\Common\Model\Configuration\BaseEntity\ConfigurationInterface Description

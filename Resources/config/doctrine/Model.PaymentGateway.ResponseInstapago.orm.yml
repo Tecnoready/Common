@@ -1,0 +1,56 @@
+Tecnoready\Common\Model\PaymentGateway\ResponseInstapago:
+    type: mappedSuperclass
+    id:
+        id:
+          type: string
+          length: 36
+          generator:
+            strategy: UUID
+    fields:
+        success:
+          type: boolean
+        message:
+          type: string
+          length: 200
+        code:
+          type: string
+          length: 3
+        reference:
+          type: string
+          length: 10
+        voucher:
+          type: text
+          nullable: true
+        orderNumber:
+          type: string
+          length: 50
+          nullable: true
+        sequence:
+          type: string
+          length: 20
+          nullable: true
+        approval:
+          type: string
+          length: 20
+          nullable: true
+        lote:
+          type: string
+          length: 20
+          nullable: true
+        responseCode:
+          type: integer
+          nullable: true
+        deferred:
+          type: boolean
+          nullable: true
+        datetime:
+          type: datetime
+          nullable: true
+        amount:
+          type: string
+          nullable: true
+          length: 50
+        authid:
+          type: string
+          nullable: true
+          length: 50

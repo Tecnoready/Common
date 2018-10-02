@@ -19,24 +19,30 @@ use Doctrine\ORM\Mapping as ORM;
  * @author Carlos Mendoza <inhack20@gmail.com>
  * @ORM\MappedSuperclass()
  */
-class ModelEmailTemplate {
-    const STATUS_PUBLISHED = "published";
-    const STATUS_UNPUBLISHED = "unpublished";
-    
+class ModelEmailTemplate implements \Tecnoready\Common\Model\Email\EmailTemplateInterface
+{
     /**
      * @var string
      * @ORM\Column(name="id", type="string", length=255, nullable=false)
      * @ORM\Id
      */
     protected $id;
+    
     /**
      * @ORM\Column(name="status",type="string",length=30,nullable=false)
      */
     protected $status;
     /**
+     * Titulo del correo para identificarlo apidamente (no lleva parametros)
      * @ORM\Column(name="title",type="string",length=150,nullable=false)
      */
     protected $title;
+    /**
+     * Asunto del correo (esto puede llevar parametros)
+     * @ORM\Column(name="subject",type="text",nullable=false)
+     */
+    protected $subject;
+    
     /**
      * @var ModelComponent
      */
@@ -130,6 +136,15 @@ class ModelEmailTemplate {
         return $this;
     }
     
+    public function getSubject() {
+        return $this->subject;
+    }
+
+    public function setSubject($subject) {
+        $this->subject = $subject;
+        return $this;
+    }
+        
     public function __toString() {
         return $this->title?:"-";
     }

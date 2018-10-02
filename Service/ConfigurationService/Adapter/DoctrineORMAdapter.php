@@ -11,12 +11,14 @@
 
 namespace Tecnoready\Common\Service\ConfigurationService\Adapter;
 
+use Tecnoready\Common\Model\Configuration\BaseEntity\ConfigurationInterface;
+
 /**
  * Adaptador de doctrine2
  *
  * @author Carlos Mendoza <inhack20@gmail.com>
  */
-abstract class DoctrineORMAdapter implements ConfigurationAdapterInterface
+class DoctrineORMAdapter implements ConfigurationAdapterInterface
 {
     /**
      * Manejador de entidades
@@ -24,29 +26,35 @@ abstract class DoctrineORMAdapter implements ConfigurationAdapterInterface
      */
     protected $em;
     
-    public function __construct(\Doctrine\ORM\EntityManager $em) {
+    protected $className;
+    
+    public function __construct(\Doctrine\ORM\EntityManager $em,$className) {
         $this->em = $em;
+        $this->className = $className;
+    }
+    
+    public function createNew() {
+        return new $this->className();
     }
 
-    public function update($key, $value, $description,$wrapperName) {
-        $entity = $this->find($key);
-        if($entity === null){
-            $entity = $this->createNew();
-            $entity->setEnabled(true);
-            $entity->setCreatedAt(new \DateTime());
-        }else{
-            $entity->setUpdatedAt();
-        }
-        $entity->setKey($key);
-        $entity->setValue($value);
-        if($description != null){
-            $entity->setDescription($description);
-        }
-        $entity->setNameWrapper($wrapperName);
-        $this->em->persist($entity);
-        $this->em->flush();
+    public function find($key) {
+        return $this->em->getRepository($this->className)->findOneBy([
+            "key" => $key,
+        ]);
+    }
+
+    public function findAll() {
+        return $this->em->getRepository($this->className)->findAll();
+    }
+
+    public function persist(ConfigurationInterface $configuration) {
+        $this->em->persist($configuration);
         $success = true;
         return $success;
     }
 
+    public function flush() {
+        $this->em->flush();
+        return true;
+    }
 }

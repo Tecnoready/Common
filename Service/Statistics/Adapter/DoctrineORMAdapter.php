@@ -16,7 +16,7 @@ namespace Tecnoready\Common\Service\Statistics\Adapter;
  *
  * @author Carlos Mendoza <inhack20@gmail.com>
  */
-class DoctrineORMAdapter implements StatisticsAdapterInterface
+abstract class DoctrineORMAdapter implements StatisticsAdapterInterface
 {
     /**
      * Manejador de entidades
