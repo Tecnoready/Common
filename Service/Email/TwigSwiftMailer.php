@@ -108,7 +108,7 @@ EOF;
      * @param EmailQueue $emailQueue
      * @return type
      */
-    public function sendEmailQueue(EmailQueueInterface $emailQueue) {
+    public function sendEmailQueue(EmailQueueInterface $emailQueue,array $attachs = []) {
         $message = \Swift_Message::newInstance()
             ->setSubject($emailQueue->getSubject())
             ->setFrom($emailQueue->getFromEmail())
@@ -116,7 +116,6 @@ EOF;
 
         $message->setBody($emailQueue->getBody(), 'text/html');
         $attachDocuments = $emailQueue->getExtraData(EmailQueueInterface::ATTACH_DOCUMENTS);
-        $attachs = [];
         if($attachDocuments !== null && is_array($attachDocuments)){
             throw new UnsupportedException();
 //            $exporter = $this->getExporterManager();
@@ -144,7 +143,7 @@ EOF;
         $context = $this->buildDocumentContext($id, $context, $toEmail, $attachs);       
         $template =$this->twig->createTemplate($this->templateSource);
         $email = $this->buildEmail($template, $context, $toEmail);
-        return $this->sendEmailQueue($email);
+        return $this->sendEmailQueue($email,$attachs);
     }
     
     /**
