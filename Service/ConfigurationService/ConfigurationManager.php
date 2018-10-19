@@ -190,7 +190,6 @@ class ConfigurationManager {
         $configuration = $this->adapter->find($key);
         if($configuration === null){
             $configuration = $this->adapter->createNew();
-            $configuration->setEnabled(true);
             $configuration->setKey($key);
             $configuration->setValue($value);
             $configuration->setDescription($description);

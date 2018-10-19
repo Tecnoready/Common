@@ -25,14 +25,10 @@ interface ConfigurationInterface {
 
     public function setValue($value);
     
-    public function getEnabled();
-
     public function getCreatedAt();
 
     public function getUpdatedAt();
 
-    public function setEnabled($enabled);
-    
     /**
      * 
      * @param \DateTime $createdAt

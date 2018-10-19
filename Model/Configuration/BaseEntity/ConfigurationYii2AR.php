@@ -90,10 +90,6 @@ class ConfigurationYii2AR extends \yii\db\ActiveRecord implements ConfigurationI
         return $this->description;
     }
 
-    public function getEnabled() {
-        return $this->enabled;
-    }
-
     public function getKey() {
         return $this->key;
     }
@@ -117,10 +113,6 @@ class ConfigurationYii2AR extends \yii\db\ActiveRecord implements ConfigurationI
 
     public function setDescription($description) {
         $this->description = $description;
-    }
-
-    public function setEnabled($enabled) {
-        $this->enabled = (bool)$enabled;
     }
 
     public function setKey($key) {
