@@ -125,10 +125,6 @@ abstract class DoctrineORMConfiguration implements ConfigurationInterface
         return $this->description;
     }
 
-    public function getEnabled() {
-        return $this->enabled;
-    }
-
     public function setKey($key) {
         $this->key = $key;
         return $this;
@@ -146,11 +142,6 @@ abstract class DoctrineORMConfiguration implements ConfigurationInterface
 
     public function setDescription($description) {
         $this->description = $description;
-        return $this;
-    }
-
-    public function setEnabled($enabled) {
-        $this->enabled = $enabled;
         return $this;
     }
 
