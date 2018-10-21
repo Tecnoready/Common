@@ -150,17 +150,7 @@ class ConfigurationManager {
      * @return mixed
      */
     function get($key,$wrapperName = null,$default = null) {
-        if($wrapperName === null){
-            $wrapperName = \Tecnoready\Common\Model\Configuration\Wrapper\DefaultConfigurationWrapper::getName();
-        }
-        $key = strtoupper($key);
-        $wrapperName = strtoupper($wrapperName);
-        $this->cache->setAdapter($this->adapter);
-        if(!$this->cache->contains($key, $wrapperName)){
-            $this->clearCache();//Pre-calencar cache
-            $this->warmUp();//Pre-calencar cache
-        }
-        $configuration = $this->cache->getConfiguration($key, $wrapperName);
+        $configuration = $this->getConfiguration($key,$wrapperName);
         if($configuration !== null){
             $value = $configuration->getValue();
             for ($i = \count($this->transformers) - 1; $i >= 0; --$i) {
@@ -230,6 +220,22 @@ class ConfigurationManager {
     }
     
     /**
+     * Busca la descripcion de una configuracion
+     * @param type $key
+     * @param type $wrapperName
+     * @return type
+     */
+    public function getDescription($key,$wrapperName = null) {
+        $configuration = $this->getConfiguration($key,$wrapperName);
+        if($configuration !== null){
+            $value = $configuration->getDescription();
+        }else{
+            $value = null;
+        }
+        return $value;
+    }
+    
+    /**
      * Guarda los cambios en la base de datos
      */
     function flush($andClearCache = true)
@@ -257,5 +263,25 @@ class ConfigurationManager {
     {
         $this->cache->flush();
         return $this;
+    }
+    
+    /**
+     * Retorna la configuracion
+     * @param type $key
+     * @param type $wrapperName
+     * @return \Tecnoready\Common\Model\Configuration\BaseEntity\ConfigurationInterface
+     */
+    private function getConfiguration($key,$wrapperName = null) {
+        if($wrapperName === null){
+            $wrapperName = \Tecnoready\Common\Model\Configuration\Wrapper\DefaultConfigurationWrapper::getName();
+        }
+        $key = strtoupper($key);
+        $wrapperName = strtoupper($wrapperName);
+        $this->cache->setAdapter($this->adapter);
+        if(!$this->cache->contains($key, $wrapperName)){
+            $this->clearCache();//Pre-calencar cache
+            $this->warmUp();//Pre-calencar cache
+        }
+        return $this->cache->getConfiguration($key, $wrapperName);
     }
 }

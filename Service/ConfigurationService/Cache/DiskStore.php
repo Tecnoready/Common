@@ -95,19 +95,6 @@ class DiskStore extends BaseCache
         $this->fs->remove($filename);
         $this->isInit = false;
     }
-
-    function getConfiguration($key,$wrapperName)
-    {
-        if($this->contains($key, $wrapperName)){
-            $data = $this->fetch($key, $wrapperName);
-            $configuration = $this->adapter->createNew();
-            $configuration->setValue($data["value"]);
-            $configuration->setType($data["type"]);
-            $configuration->setDataType($data["data_type"]);
-            return $configuration;
-        }
-        return null;
-    }
     
     public function warmUp(array $configurations) {
         $code = '';
@@ -116,7 +103,8 @@ class DiskStore extends BaseCache
             $data = array();
             $data['value'] = $configuration->getValue();
             $data['type'] = $configuration->getType();
-            $data['data_type'] = $configuration->getDataType();
+            $data['dataType'] = $configuration->getDataType();
+            $data['description'] = $configuration->getDescription();
             
             $id = $this->getId($configuration->getKey(),$configuration->getNameWrapper());
             $code .= sprintf("'%s' => '%s',\n", $id ,$this->encrypt(serialize($data)));

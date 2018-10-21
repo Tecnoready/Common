@@ -37,6 +37,25 @@ abstract class BaseCache implements CacheInterface
     }
     
     /**
+     * @param type $key
+     * @param type $wrapperName
+     * @return BaseEntity\ConfigurationInterface
+     */
+    public function getConfiguration($key,$wrapperName)
+    {
+        if($this->contains($key, $wrapperName)){
+            $data = $this->fetch($key, $wrapperName);
+            $configuration = $this->adapter->createNew();
+            $configuration->setValue($data["value"]);
+            $configuration->setType($data["type"]);
+            $configuration->setDataType($data["dataType"]);
+            $configuration->setDescription($data["description"]);
+            return $configuration;
+        }
+        return null;
+    }
+    
+    /**
      * Encriptar text
      * @see https://gist.github.com/odan/c1dc2798ef9cedb9fedd09cdfe6e8e76
      * @param type $data
