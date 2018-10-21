@@ -42,7 +42,7 @@ class DoctrineORMTransformer implements DataTransformerInterface
     }
 
     public function transform($value, ConfigurationInterface $configuration) {
-        if($configuration->getType() === "object"){
+        if(in_array($configuration->getType(),["object",self::TYPE_DOCTRINE])){
             try {
                 $className = ClassUtils::getRealClass(get_class($value));
                 $class = $this->em->getClassMetadata($className);

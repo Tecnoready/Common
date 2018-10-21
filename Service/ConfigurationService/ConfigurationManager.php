@@ -37,7 +37,7 @@ class ConfigurationManager {
     private $adapter;
     
     /**
-     * @var \Tecnoready\Common\Model\Configuration\CacheInterface
+     * @var CacheInterface
      */
     private $cache;
     
@@ -152,10 +152,7 @@ class ConfigurationManager {
     function get($key,$wrapperName = null,$default = null) {
         $configuration = $this->getConfiguration($key,$wrapperName);
         if($configuration !== null){
-            $value = $configuration->getValue();
-            for ($i = \count($this->transformers) - 1; $i >= 0; --$i) {
-                $value = $this->transformers[$i]->reverseTransform($value,$configuration);
-            }
+            $value = $this->reverseTransform($configuration->getValue(), $configuration);
         }else{
             $value = $default;
         }
@@ -194,10 +191,7 @@ class ConfigurationManager {
             }
             $configuration->setUpdatedAt();
         }
-        foreach ($this->transformers as $transformer) {
-            $value = $transformer->transform($value, $configuration);
-        }
-        $configuration->setValue($value);
+        $configuration->setValue($this->transform($value, $configuration));
         $this->adapter->persist($configuration);
         $success = $this->adapter->flush();
         
@@ -252,7 +246,11 @@ class ConfigurationManager {
      */
     function warmUp()
     {
-        $this->cache->warmUp($this->adapter->findAll());
+        $configurations = $this->adapter->findAll();
+//        foreach ($configurations as $configuration) {
+//            $configuration->setValue($this->transform($value, $configuration));
+//        }
+        $this->cache->warmUp($configurations);
         return $this;
     }
     
@@ -283,5 +281,31 @@ class ConfigurationManager {
             $this->warmUp();//Pre-calencar cache
         }
         return $this->cache->getConfiguration($key, $wrapperName);
+    }
+    
+    /**
+     * Convierte el valor transformado a el valor original
+     * @param type $value
+     * @param type $configuration
+     * @return type
+     */
+    private function reverseTransform($value,$configuration) {
+        for ($i = \count($this->transformers) - 1; $i >= 0; --$i) {
+            $value = $this->transformers[$i]->reverseTransform($value,$configuration);
+        }
+        return $value;
+    }
+    
+    /**
+     * Transforma un valor a su valor serializable
+     * @param type $value
+     * @param type $configuration
+     * @return type
+     */
+    private function transform($value, $configuration) {
+        foreach ($this->transformers as $transformer) {
+            $value = $transformer->transform($value, $configuration);
+        }
+        return $value;
     }
 }
