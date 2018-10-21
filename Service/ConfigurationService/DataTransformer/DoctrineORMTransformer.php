@@ -35,7 +35,7 @@ class DoctrineORMTransformer implements DataTransformerInterface
     }
     
     public function reverseTransform($value, ConfigurationInterface $configuration) {
-        if($configuration->getType() === self::TYPE_DOCTRINE){
+        if($configuration->getType() === self::TYPE_DOCTRINE && !empty($value)){
             $value = $this->em->find($configuration->getDataType(), $value);
         }
         return $value;
