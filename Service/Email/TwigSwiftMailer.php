@@ -75,7 +75,7 @@ class TwigSwiftMailer {
                 {% block header %}{% include template_from_string(headerString) %}{% endblock %}
 
                 {% block content_html %}{% include(template_from_string(bodyString)) with _context %}{% endblock %}
-
+                        
                 {% block footer %}{% include(template_from_string(footerString)) with _context %}{% endblock %}
 EOF;
     }
@@ -140,10 +140,10 @@ EOF;
      */
     public function sendDocumentMessage($id,$context,$toEmail,array $attachs = [])
     {
-        $context = $this->buildDocumentContext($id, $context, $toEmail, $attachs);       
-        $template =$this->twig->createTemplate($this->templateSource);
-        $email = $this->buildEmail($template, $context, $toEmail);
-        return $this->sendEmailQueue($email,$attachs);
+        $context = $this->buildDocumentContext($id, $context, $toEmail, $attachs);           
+        $template =$this->twig->createTemplate($this->templateSource);  
+        $email = $this->buildEmail($template, $context, $toEmail); 
+        return $this->sendEmailQueue($email,$attachs);          
     }
     
     /**
@@ -154,18 +154,18 @@ EOF;
      * @return EmailQueueInterface
      */
     protected function buildEmail($templateName, $context, $toEmail,$fromEmail = null) {
-        $context['toEmail'] = $toEmail;
+        $context['toEmail'] = $toEmail;        
         if(class_exists("FOS\UserBundle\Model\UserInterface" && $toEmail instanceof \FOS\UserBundle\Model\UserInterface)){
             $toEmail = $toEmail->getEmail();
         }
         if($templateName instanceof \Twig_Template){
-            $template = $templateName;
+            $template = $templateName;            
         }else{
-             $template = $this->twig->loadTemplate($templateName);       
-        }
+             $template = $this->twig->loadTemplate($templateName);               
+        }        
         $subject = $template->renderBlock('subject', $context);
         $textBody = $template->renderBlock('body_text', $context);      
-        $htmlBody = $template->renderBlock('content_html', $context);
+        $htmlBody = $template->renderBlock('body_html', $context);
         if ($fromEmail === null) {
             $fromEmail = array($this->options["from_email"] => $this->options["from_name"]);
         }
@@ -176,7 +176,7 @@ EOF;
                 ->setSubject($subject)
                 ->setFromEmail($fromEmail)
                 ->setToEmail($toEmail)
-        ;
+        ;                
         if (!empty($htmlBody)) {
             $email->setBody($htmlBody);
         } else {
@@ -210,9 +210,9 @@ EOF;
             $headerString = $header->getBody();
         }
         if($base){
-            $baseString = "{% block subject '' %}{% block body_text '' %}{% block content_html %}".$base->getBody()."{% endblock %}";
+            $baseString = "{% block subject '' %}{% block body_text '' %}{% block body_html %}".$base->getBody()."{% endblock %}";
         }else {
-            $baseString = "{% block subject '' %}{% block body_text '' %}{% block content_html %}{% endblock %}";
+            $baseString = "{% block subject '' %}{% block body_text '' %}{% block body_html %}{% endblock %}";
         }
         if($footer){
             $footerString = $footer->getBody();
@@ -233,39 +233,6 @@ EOF;
         return $context;
     }
 
-    /**
-     * Renderizar una plantilla twig para enviarla por correo
-     * @param type $templateName
-     * @param array $context parametros a pasar a la plantilla
-     * @param type $toEmail Direccion o direcciones destino del mensaje
-     * @param type $fromEmail Direccion de origen de correo
-     * @return type
-     */
-    public function renderMessage($templateName, $context, $toEmail, $fromEmail = null) {
-        $context['toEmail'] = $toEmail;
-
-        $template = $this->twig->loadTemplate($templateName);
-        $subject = $template->renderBlock('subject', $context);
-        $textBody = $template->renderBlock('body_text', $context);
-        $htmlBody = $template->renderBlock('body_html', $context);
-
-        if ($fromEmail === null) {
-            $fromEmail = array($this->options["from_email"] => $this->options["from_name"]);
-        }
-
-        $message = $this->getSwiftMessage()
-                ->setSubject($subject)
-                ->setFrom($fromEmail)
-                ->setTo($toEmail);
-
-        if (!empty($htmlBody)) {
-            $message->setBody($htmlBody, 'text/html')
-                    ->addPart($textBody, 'text/plain');
-        } else {
-            $message->setBody($textBody);
-        }
-        return $message;
-    }
     
     private function send(\Swift_Mime_Message $message = null) {
         if($message === null){
