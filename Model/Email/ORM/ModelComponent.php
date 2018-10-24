@@ -98,4 +98,27 @@ class ModelComponent implements \Tecnoready\Common\Model\Email\ComponentInterfac
     public function __toString() {
         return $this->title?:"-";
     }
+    
+    /**
+     * Retorna los estatus del componente
+     * @return array
+     */
+    public static function getTypesLabels() {
+        return [
+            "email.component.type.base" => self::TYPE_COMPONENT_BASE,
+            "email.component.type.header" => self::TYPE_COMPONENT_HEADER,
+            "email.component.type.body" => self::TYPE_COMPONENT_BODY,
+            "email.component.type.footer" => self::TYPE_COMPONENT_FOOTER,
+        ];
+    }
+    
+    /**
+     * Retorna la etiqueta del estatus
+     * @return string
+     */
+    public function getTypeLabel() {
+        $type = $this->getTypeComponent();
+        $types = self::getTypesLabels();
+        return $types === null ? : array_search($type,$types);
+    }
 }

@@ -148,4 +148,25 @@ class ModelEmailTemplate implements \Tecnoready\Common\Model\Email\EmailTemplate
     public function __toString() {
         return $this->title?:"-";
     }
+    
+    /**
+     * Retorna los estatus del componente
+     * @return array
+     */
+    public static function getStatusLabels() {
+        return [
+            "email.status.published" => self::STATUS_PUBLISHED,
+            "email.status.unpublished" => self::STATUS_UNPUBLISHED,
+        ];
+    }
+    
+    /**
+     * Retorna la etiqueta del estatus
+     * @return string
+     */
+    public function getStatusLabel() {
+        $type = $this->getStatus();
+        $types = self::getStatusLabels();
+        return $types === null ? : array_search($type,$types);
+    }
 }
