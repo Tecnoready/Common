@@ -50,11 +50,49 @@ class PDFAdapter implements AdapterInterface
     {
         $resolver = new OptionsResolver();
         $resolver->setRequired([
-            "page-width","page-height"
+            "page-width","page-height",
         ]);
         
         //Parametros para generar el pdf
-        $resolver->setDefaults([
+        $resolver->setDefaults($this->getDefaultParameters());
+        $resolver->setDefault("force-download", false);
+        $resolver->setAllowedTypes("page-width","float");
+        $resolver->setAllowedTypes("page-width","float");
+        $resolver->setAllowedTypes("margin-left","float");
+        $resolver->setAllowedTypes("margin-top","float");
+        $resolver->setAllowedTypes("margin-right","float");
+        $resolver->setAllowedTypes("margin-bottom","float");
+        
+        $parameters = $resolver->resolve($parameters);
+        $forceDownload = (bool)$parameters["force-download"];
+        unset($parameters["force-download"]);
+        $pdf = new Pdf();
+        $pdf->tmpDir = $this->options["tmpDir"];
+        $pdf->binary = $this->options["binary"];
+        $pdf->setOptions($parameters);
+        
+        $pdf->addPage('<html>'.$string.'</html>');
+        $success = !$pdf->saveAs($filename);
+        if ($forceDownload == false && !$pdf->saveAs($filename)) {
+            $error = $pdf->getError();
+            //sh: wkhtmltopdf: command not found (Error que da cuando no encuentra el binario de wkhtmltopdf)
+            throw new RuntimeException(sprintf("Ocurrio un error generando el pdf: '%s'",$error));
+        }
+        if($forceDownload === true){
+//            $pdf->send();
+            $pdf->send(basename($filename));
+        }
+        return true;
+    }
+
+    public function getExtension()
+    {
+        return TemplateInterface::TYPE_PDF;
+    }
+
+    public function getDefaultParameters()
+    {
+        return [
             "margin-left" => 0.0,//Margen izquierdo
             "margin-top" => 0.0,//Margen superior
             "margin-right" => 0.0,//Margen derecho
@@ -69,33 +107,7 @@ class PDFAdapter implements AdapterInterface
                     'locale' => 'es_ES.utf-8',
                     'procEnv' => ['LANG' => 'es_ES.utf-8'],
             ]
-        ]);
-        $resolver->setAllowedTypes("page-width","float");
-        $resolver->setAllowedTypes("page-width","float");
-        $resolver->setAllowedTypes("margin-left","float");
-        $resolver->setAllowedTypes("margin-top","float");
-        $resolver->setAllowedTypes("margin-right","float");
-        $resolver->setAllowedTypes("margin-bottom","float");
-        
-        $parameters = $resolver->resolve($parameters);
-        
-        $pdf = new Pdf();
-        $pdf->tmpDir = $this->options["tmpDir"];
-        $pdf->binary = $this->options["binary"];
-        $pdf->setOptions($parameters);
-        
-        $pdf->addPage('<html>'.$string.'</html>');
-        
-        if (!$pdf->saveAs($filename)) {
-            $error = $pdf->getError();
-            //sh: wkhtmltopdf: command not found (Error que da cuando no encuentra el binario de wkhtmltopdf)
-            throw new RuntimeException(sprintf("Ocurrio un error generando el pdf: '%s'",$error));
-        }
-        return true;
+        ];
     }
 
-    public function getExtension()
-    {
-        return TemplateInterface::TYPE_PDF;
-    }
 }

@@ -15,4 +15,7 @@ interface AdapterInterface
     public function compile($filename,$string,array $parameters);
     
     public function getExtension();
+    
+    public function getDefaultParameters();
+
 }
