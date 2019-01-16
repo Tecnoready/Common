@@ -13,6 +13,7 @@ namespace Tecnoready\Common\Service\ConfigurationService;
 
 use Tecnoready\Common\Service\ConfigurationService\CacheInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use RuntimeException;
 
 /**
  * Manejador de configuracion
@@ -227,6 +228,34 @@ class ConfigurationManager {
             $value = null;
         }
         return $value;
+    }
+    
+    /**
+     * Busca la configuracion del formulario de edicion por un indice
+     * @param type $key
+     * @return type
+     * @throws RuntimeException
+     */
+    public function getFormEditConfig($key)
+    {
+        $config = null;
+        foreach ($this->configurationsWrapper as $wrapper) {
+            $allConfig = $wrapper->getAllFormEditConfig();
+            if(isset($allConfig[$key])){
+                if(!is_string($allConfig[$key][0])){
+                    throw new RuntimeException(sprintf("The config parameter '0' must be a string type class."));
+                }
+                if(is_callable($allConfig[$key][1])){
+                    $allConfig[$key][1] = call_user_func_array($allConfig[$key][1],[$this]);
+                    
+                }else if(!is_array($allConfig[$key][1])){
+                    throw new RuntimeException(sprintf("The config parameter '1' must be a array o callable."));
+                }
+                $config = $allConfig[$key];
+                break;
+            }
+        }
+        return $config;
     }
     
     /**

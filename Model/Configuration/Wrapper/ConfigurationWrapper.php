@@ -61,4 +61,19 @@ abstract class ConfigurationWrapper
     }
     
     public abstract static function getName();
+    
+    /**
+     * Retorna la configuracion para el formulario de edicion de una propiedad
+     * Example:
+     * return [
+            "APP_NAME" => [\Symfony\Component\Form\Extension\Core\Type\ChoiceType::class, function() {
+            return [];
+        }],
+            "APP_NAME_2" => [\Symfony\Component\Form\Extension\Core\Type\ChoiceType::class, []],
+        ];
+     * @return array
+     */
+    public function getAllFormEditConfig(){
+        return [];
+    }
 }
