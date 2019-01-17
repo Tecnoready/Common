@@ -24,6 +24,20 @@ class ObjectDataManager implements ConfigureInterface
     private $historyManager;
     
     /**
+     * Manejador de notas
+     * @var NoteManager\NoteManager
+     */
+    private $noteManager;
+    
+    public function __construct(DocumentManager\DocumentManager $documentManager, HistoryManager\HistoryManager $historyManager, NoteManager\NoteManager $noteManager)
+    {
+        $this->documentManager = $documentManager;
+        $this->historyManager = $historyManager;
+        $this->noteManager = $noteManager;
+    }
+
+    
+    /**
      * Configura el servicio para manejar un objeto y tipo en especifico
      * @param type $objectId
      * @param type $objectType
@@ -33,6 +47,7 @@ class ObjectDataManager implements ConfigureInterface
     {
         $this->documentManager->configure($objectId, $objectType);
         $this->historyManager->configure($objectId, $objectType);
+        $this->NoteManager->configure($objectId, $objectType);
         return $this;
     }
     
@@ -52,5 +67,14 @@ class ObjectDataManager implements ConfigureInterface
     public function histories()
     {
         return $this->historyManager;
+    }
+    
+    /**
+     * Retorna el manejador de notas
+     * @return NoteManager\NoteManager
+     */
+    public function notes()
+    {
+        return $this->noteManager;
     }
 }

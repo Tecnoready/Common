@@ -2,13 +2,13 @@
 
 namespace Tecnoready\Common\Model\ObjectManager\HistoryManager;
 
-use DateTime;
+use Tecnoready\Common\Model\ObjectManager\BaseInterface;
 
 /**
  * Intefaz de historial
  * @author Carlos Mendoza <inhack20@gmail.com>
  */
-interface HistoryInterface
+interface HistoryInterface extends BaseInterface
 {
     /**
      * Historial tipo por defecto
@@ -40,39 +40,7 @@ interface HistoryInterface
     
     public function getEventName();
     
-    public function setDescription($description);
-    
-    public function getDescription();
-    
-    public function setUser($user);
-    
-    public function getUser();
-    
     public function getType();
     
     public function setType($type);
-    
-    public function setCreatedFromIp($createdFromIp);
-    
-    public function getCreatedFromIp();
-    
-    public function setCreatedAt(DateTime $createdAt);
-    
-    public function getCreatedAt();
-    
-    public function getId();
-    
-    public function setId($id);
-    
-    public function getUserAgent();
-
-    public function setUserAgent($userAgent);
-    
-    public function getObjectId();
-
-    public function setObjectId($objectId);
-    
-    public function getObjectType();
-
-    public function setObjectType($objectType);
 }
