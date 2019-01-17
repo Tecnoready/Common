@@ -44,8 +44,7 @@ class DiskAdapterTest extends BaseTestCase
         ];
         $this->adapter = new DiskAdapter($options);
         $this->adapter
-            ->setType("Factura")
-            ->setId("id-unico")
+            ->configure("id-unico","Factura")
             ;
     }
     

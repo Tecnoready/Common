@@ -12,7 +12,7 @@ use Tecnoready\Common\Model\ObjectManager\HistoryManager\HistoryInterface;
  * @author Carlos Mendoza <inhack20@gmail.com>
  * @ORM\MappedSuperclass()
  */
-abstract class ModelHistory extends HistoryInterface
+abstract class ModelHistory implements HistoryInterface
 {
     /**
      * @var integer
@@ -66,6 +66,19 @@ abstract class ModelHistory extends HistoryInterface
      * @ORM\Column(name="user_agent",type="text") 
      */
     protected $userAgent;
+    
+    /**
+     * @var string
+     *
+     * @ORM\Column(type="string",length=100)
+     */
+    protected $objectId;
+    /**
+     * @var string
+     *
+     * @ORM\Column(type="string",length=30)
+     */
+    protected $objectType;
     
     public function getId()
     {
@@ -141,6 +154,28 @@ abstract class ModelHistory extends HistoryInterface
     public function setUserAgent($userAgent)
     {
         $this->userAgent = $userAgent;
+        return $this;
+    }
+    
+    public function getObjectId()
+    {
+        return $this->objectId;
+    }
+
+    public function getObjectType()
+    {
+        return $this->objectType;
+    }
+
+    public function setObjectId($objectId)
+    {
+        $this->objectId = $objectId;
+        return $this;
+    }
+
+    public function setObjectType($objectType)
+    {
+        $this->objectType = $objectType;
         return $this;
     }
 

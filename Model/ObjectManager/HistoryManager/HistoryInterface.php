@@ -62,9 +62,17 @@ interface HistoryInterface
     
     public function getId();
     
-    public function setId();
+    public function setId($id);
     
     public function getUserAgent();
 
     public function setUserAgent($userAgent);
+    
+    public function getObjectId();
+
+    public function setObjectId($objectId);
+    
+    public function getObjectType();
+
+    public function setObjectType($objectType);
 }

@@ -5,14 +5,13 @@ namespace Tecnoready\Common\Service\ObjectManager\DocumentManager;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Tecnoready\Common\Service\ObjectManager\DocumentManager\Adapter\DocumentAdapterInterface;
 use Symfony\Component\HttpFoundation\File\File;
-use Tecnoready\Common\Service\ObjectManager\DocumentManager\FilesAdapterInterface;
 
 /**
  * Administrador de documentos
  *
  * @author Carlos Mendoza <inhack20@gmail.com>
  */
-class DocumentManager implements FilesAdapterInterface
+class DocumentManager implements DocumentAdapterInterface
 {
     /**
      * Opciones de configuracion
@@ -48,8 +47,7 @@ class DocumentManager implements FilesAdapterInterface
      */
     public function configure($id,$type)
     {
-        $this->adapter->setId($id);
-        $this->adapter->setType($type);
+        $this->adapter->configure($id,$type);
     }
 
     public function delete($fileName)

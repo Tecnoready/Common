@@ -15,7 +15,8 @@ use RuntimeException;
  */
 class DiskAdapter implements DocumentAdapterInterface
 {
-
+    use \Tecnoready\Common\Service\ObjectManager\TraitConfigure;
+    
     /**
      * Opciones de configuracion
      * @var array
@@ -28,18 +29,6 @@ class DiskAdapter implements DocumentAdapterInterface
      */
     private $fs;
     
-    /**
-     * Sub carpeta donde se guardara el documento (Facturas,Presupuestos,Contratos)
-     * @var string
-     */
-    private $folder;
-    
-    /**
-     * Identificador unico del objeto dueno de los archivos (14114,DF-23454)
-     * @var string 
-     */
-    private $id;
-
     public function __construct(array $options = [])
     {
         $resolver = new OptionsResolver();
@@ -128,23 +117,10 @@ class DiskAdapter implements DocumentAdapterInterface
     private function getBasePath($fileName = null)
     {
         $ds = DIRECTORY_SEPARATOR;
-        $basePath = sprintf('%s'.$ds.'%s'.$ds.'%s'.$ds.'%s', $this->options['documents_path'], $this->options['env'],  $this->folder,$this->id);
+        $basePath = sprintf('%s'.$ds.'%s'.$ds.'%s'.$ds.'%s', $this->options['documents_path'], $this->options['env'],  $this->objectType,$this->objectId);
         if(!empty($fileName)){
             $basePath .= $ds.$fileName;
         }
         return $basePath;
     }
-    
-    public function setType($folder)
-    {
-        $this->folder = $folder;
-        return $this;
-    }
-
-    public function setId($id)
-    {
-        $this->id = $id;
-        return $this;
-    }
-
 }
