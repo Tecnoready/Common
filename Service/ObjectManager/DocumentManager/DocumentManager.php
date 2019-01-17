@@ -4,13 +4,15 @@ namespace Tecnoready\Common\Service\ObjectManager\DocumentManager;
 
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Tecnoready\Common\Service\ObjectManager\DocumentManager\Adapter\DocumentAdapterInterface;
+use Symfony\Component\HttpFoundation\File\File;
+use Tecnoready\Common\Service\ObjectManager\DocumentManager\FilesAdapterInterface;
 
 /**
  * Administrador de documentos
  *
  * @author Carlos Mendoza <inhack20@gmail.com>
  */
-class DocumentManager
+class DocumentManager implements FilesAdapterInterface
 {
     /**
      * Opciones de configuracion
@@ -24,7 +26,11 @@ class DocumentManager
      */
     private $adapter;
     
-    public function __construct(array $options = [])
+    /**
+     * @param DocumentAdapterInterface $adapter adaptador a usar para consultas
+     * @param array $options
+     */
+    public function __construct(DocumentAdapterInterface $adapter,array $options = [])
     {
         $resolver = new OptionsResolver();
         $resolver->setDefaults([
@@ -32,17 +38,37 @@ class DocumentManager
             "allowed_extensions" => ["txt","zip","rar","docx","doc","xls","xlsx","png","jpeg","jpg"],
         ]);
         $this->options = $resolver->resolve($options);
+        $this->adapter = $adapter;
     }
     
     /**
-     * Establece el adaptador a usar para consultas
-     * @param ExporterAdapterInterface $adapter
-     * @return $this
-     * @required
+     * Configura el servicio para manejar un objeto y tipo en especifico
+     * @param type $id
+     * @param type $type
      */
-    public function setAdapter(DocumentAdapterInterface $adapter) 
+    public function configure($id,$type)
     {
-        $this->adapter = $adapter;
-        return $this;
+        $this->adapter->setId($id);
+        $this->adapter->setType($type);
+    }
+
+    public function delete($fileName)
+    {
+        return $this->adapter->delete($fileName);
+    }
+
+    public function get($fileName)
+    {
+        return $this->adapter->get($fileName);
+    }
+
+    public function getAll()
+    {
+        return $this->adapter->getAll();
+    }
+
+    public function upload(File $file)
+    {
+        return $this->adapter->upload($file);
     }
 }

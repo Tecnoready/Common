@@ -6,6 +6,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Finder\Finder;
+use RuntimeException;
 
 /**
  * Adaptador para guardar los documentos en el disco
@@ -54,6 +55,11 @@ class DiskAdapter implements DocumentAdapterInterface
         $this->fs = new Filesystem();
     }
 
+    /**
+     * Elimina un archivo
+     * @param type $fileName
+     * @return type
+     */
     public function delete($fileName)
     {
         $fullPath = $this->getBasePath($fileName);
@@ -61,51 +67,75 @@ class DiskAdapter implements DocumentAdapterInterface
         $this->fs->remove($file);
         return !$this->fs->exists($fullPath);
     }
-
+    
+    /**
+     * Obtiene un archivo
+     * @param type $fileName
+     * @return type
+     * @throws RuntimeException
+     */
     public function get($fileName)
     {
         $fullPath = $this->getBasePath($fileName);
-        $file = new File($fullPath);
+        $file = new File($fullPath,false);
+        
         if(!$this->fs->exists($fullPath)){
             $file = null;
+        }else if(!$file->isReadable()){
+            throw new RuntimeException(sprintf("The file '%s' is not readable",$file->getPathname()));
         }
         return $file;
     }
 
+    /**
+     * Obtiene todos los archivos de la carpeta.
+     * @return Finder
+     */
     public function getAll()
     {
         $finder = new Finder();
-        $finder->in($this->getBasePath())->depth(1)->files();
-        var_dump($finder);
-        die;
+        $finder->in($this->getBasePath())->depth(0)->files();
+        return $finder;
     }
 
+    /**
+     * Sube un archivo
+     * @param File $file
+     * @return boolean
+     * @throws RuntimeException
+     */
     public function upload(File $file)
     {
-        
-        $ext = $file->guessExtension();
-        $basePath = $this->getBasePath();
-        $name = $file->getBasename();
-        if(!empty($ext)){
-            $name = sprintf('%s.%s',$file->getBasename(), $ext);
+        $fileExist = $this->get($file->getFilename());
+        if($fileExist !== null){//El archivo ya existe
+            return false;
         }
-        $r = $file->move($basePath,$name);
-        var_dump($r);
-        die;
-        return true;
+        $basePath = $this->getBasePath();
+        $name = $file->getFilename();
+        
+        $file = $file->move($basePath,$name);
+        if(!$file->isReadable()){
+            throw new RuntimeException(sprintf("The file '%s' is not readable",$file->getPathname()));
+        }
+        return $file;
     }
     
+    /**
+     * Retorna el base path donde se guardara los archivos
+     * @param type $fileName
+     * @return string
+     */
     private function getBasePath($fileName = null)
     {
         $ds = DIRECTORY_SEPARATOR;
         $basePath = sprintf('%s'.$ds.'%s'.$ds.'%s'.$ds.'%s', $this->options['documents_path'], $this->options['env'],  $this->folder,$this->id);
         if(!empty($fileName)){
-            $basePath.$ds.$fileName;
+            $basePath .= $ds.$fileName;
         }
         return $basePath;
     }
     
-    public function setFolder($folder)
+    public function setType($folder)
     {
         $this->folder = $folder;
         return $this;

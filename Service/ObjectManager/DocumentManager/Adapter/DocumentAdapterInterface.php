@@ -2,20 +2,16 @@
 
 namespace Tecnoready\Common\Service\ObjectManager\DocumentManager\Adapter;
 
-use Symfony\Component\HttpFoundation\File\File;
+use Tecnoready\Common\Service\ObjectManager\DocumentManager\FilesAdapterInterface;
+
 
 /**
  * Intefaz de manejador de documentos
  * @author Carlos Mendoza <inhack20@gmail.com>
  */
-interface DocumentAdapterInterface
+interface DocumentAdapterInterface extends FilesAdapterInterface
 {
-    public function get($fileName);
-    public function delete($fileName);
-    public function upload(File $file);
-    public function getAll();
-    
-    public function setFolder($folder);
+    public function setType($folder);
     
     public function setId($id);
 }

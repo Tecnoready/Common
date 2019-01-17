@@ -12,7 +12,25 @@ class ObjectDataManager
     /**
      * @var DocumentManager\DocumentManager
      */
-    private $document;
+    private $documentManager;
     
+    /**
+     * Configura el servicio para manejar un objeto y tipo en especifico
+     * @param type $id
+     * @param type $type
+     */
+    public function configure($id,$type)
+    {
+        $this->documentManager->configure($id, $type);
+        return $this;
+    }
     
+    /**
+     * Retorna el manejador de documentos
+     * @return DocumentManager\DocumentManager
+     */
+    public function documents()
+    {
+        return $this->documentManager;
+    }
 }
