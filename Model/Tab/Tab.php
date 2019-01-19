@@ -15,6 +15,8 @@ class Tab
 {
     const NAME_CURRENT_TAB = "_tabst82a";
     const LAST_CURRENT_TABS = "_tabs471";
+    const SORT_PROPERTY = "_f3fe5b35e8ec8";
+    const SORT_ORDER = "_e7c860cda";
     
     private $id;
     private $name;

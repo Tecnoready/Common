@@ -3,6 +3,7 @@
 namespace Tecnoready\Common\Service\ObjectManager\DocumentManager\Adapter;
 
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Finder\Finder;
@@ -28,6 +29,12 @@ class DiskAdapter implements DocumentAdapterInterface
      * @var Filesystem 
      */
     private $fs;
+    
+    /**
+     * Sub carpeta a trabajar (si es null se trabaja en la raiz)
+     * @var string 
+     */
+    private $folder = null;
     
     public function __construct(array $options = [])
     {
@@ -93,14 +100,14 @@ class DiskAdapter implements DocumentAdapterInterface
      * @return boolean
      * @throws RuntimeException
      */
-    public function upload(File $file)
+    public function upload(UploadedFile $file)
     {
-        $fileExist = $this->get($file->getFilename());
+        $name = $file->getClientOriginalName();
+        $fileExist = $this->get($name);
         if($fileExist !== null){//El archivo ya existe
             return false;
         }
         $basePath = $this->getBasePath();
-        $name = $file->getFilename();
         
         $file = $file->move($basePath,$name);
         if(!$file->isReadable()){
@@ -118,6 +125,9 @@ class DiskAdapter implements DocumentAdapterInterface
     {
         $ds = DIRECTORY_SEPARATOR;
         $basePath = sprintf('%s'.$ds.'%s'.$ds.'%s'.$ds.'%s', $this->options['documents_path'], $this->options['env'],  $this->objectType,$this->objectId);
+        if(!empty($this->folder)){
+            $basePath .= $ds.$this->folder;
+        }
         if(!$this->fs->exists($basePath)){
             $this->fs->mkdir($basePath);
         }
@@ -125,5 +135,11 @@ class DiskAdapter implements DocumentAdapterInterface
             $basePath .= $ds.$fileName;
         }
         return $basePath;
+    }
+    
+    public function folder($subPath)
+    {
+        $this->folder = $subPath;
+        return $this;
     }
 }

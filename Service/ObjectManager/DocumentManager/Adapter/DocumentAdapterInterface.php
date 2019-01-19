@@ -3,7 +3,7 @@
 namespace Tecnoready\Common\Service\ObjectManager\DocumentManager\Adapter;
 
 use Tecnoready\Common\Service\ObjectManager\ConfigureInterface;
-use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
  * Intefaz de manejador de documentos
@@ -32,11 +32,16 @@ interface DocumentAdapterInterface extends ConfigureInterface
      * @return boolean
      * @throws RuntimeException
      */
-    public function upload(File $file);
+    public function upload(UploadedFile $file);
     
     /**
      * Obtiene todos los archivos de la carpeta.
      * @return Finder
      */
     public function getAll();
+    
+    /**
+     * Establece la sub carpeta a leeer
+     */
+    public function folder($subPath);
 }

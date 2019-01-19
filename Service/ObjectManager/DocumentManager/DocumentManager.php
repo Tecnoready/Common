@@ -4,7 +4,7 @@ namespace Tecnoready\Common\Service\ObjectManager\DocumentManager;
 
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Tecnoready\Common\Service\ObjectManager\DocumentManager\Adapter\DocumentAdapterInterface;
-use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
  * Administrador de documentos
@@ -48,6 +48,7 @@ class DocumentManager implements DocumentAdapterInterface
     public function configure($id,$type)
     {
         $this->adapter->configure($id,$type);
+        $this->adapter->folder(null);
     }
 
     public function delete($fileName)
@@ -65,8 +66,13 @@ class DocumentManager implements DocumentAdapterInterface
         return $this->adapter->getAll();
     }
 
-    public function upload(File $file)
+    public function upload(UploadedFile $file)
     {
         return $this->adapter->upload($file);
+    }
+    
+    public function folder($subPath)
+    {
+        return $this->adapter->folder($subPath);
     }
 }
