@@ -5,6 +5,7 @@ namespace Tecnoready\Common\Service\ObjectManager\DocumentManager;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Tecnoready\Common\Service\ObjectManager\DocumentManager\Adapter\DocumentAdapterInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use RuntimeException;
 
 /**
  * Administrador de documentos
@@ -35,7 +36,9 @@ class DocumentManager implements DocumentAdapterInterface
         $resolver->setDefaults([
             "debug" => false,
             "allowed_extensions" => ["txt","zip","rar","docx","doc","xls","xlsx","png","jpeg","jpg"],
+            "allow_folders" => ["uploaded","generated"],
         ]);
+        $resolver->addAllowedTypes("allow_folders", "array");
         $this->options = $resolver->resolve($options);
         $this->adapter = $adapter;
     }
@@ -73,6 +76,9 @@ class DocumentManager implements DocumentAdapterInterface
     
     public function folder($subPath)
     {
+        if(!in_array($subPath,$this->options["allow_folders"])){
+            throw new RuntimeException(sprintf("The sub folder '%s' is not allowed. Olny are '%s'",$subPath,implode(",",$this->options["allow_folders"])));
+        }
         return $this->adapter->folder($subPath);
     }
 }
