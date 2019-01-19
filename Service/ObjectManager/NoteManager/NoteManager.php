@@ -3,6 +3,7 @@
 namespace Tecnoready\Common\Service\ObjectManager\NoteManager;
 
 use Tecnoready\Common\Service\ObjectManager\NoteManager\Adapter\NoteAdapterInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Administrador de notas publicas y privadas
@@ -25,7 +26,7 @@ class NoteManager implements NoteAdapterInterface
      */
     private $options;
     
-    public function __construct(NoteAdapterInterface $adapter, $options)
+    public function __construct(NoteAdapterInterface $adapter,array $options = [])
     {
         $this->adapter = $adapter;
         $resolver = new OptionsResolver();

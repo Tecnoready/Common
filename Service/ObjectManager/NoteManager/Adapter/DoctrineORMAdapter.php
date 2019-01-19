@@ -4,7 +4,7 @@ namespace Tecnoready\Common\Service\ObjectManager\NoteManager\Adapter;
 
 use Doctrine\ORM\EntityManager;
 use Pagerfanta\Pagerfanta as Paginator;
-use Pagerfanta\Adapter\DoctrineORMAdapter;
+use Pagerfanta\Adapter\DoctrineORMAdapter as Adapter;
 
 /**
  * Adaptador de doctrine2 para las notas
@@ -60,7 +60,7 @@ class DoctrineORMAdapter implements NoteAdapterInterface
             ->setParameter("type",$type)
             ->orderBy("e.createdAt","DESC")
             ;
-        $pagerfanta = new Paginator(new DoctrineORMAdapter($qb));
+        $pagerfanta = new Paginator(new Adapter($qb));
         return $pagerfanta;
     }
 }

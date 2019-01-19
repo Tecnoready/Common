@@ -14,8 +14,6 @@ class TabContent
     const TAB = "_tbx";
     
     private $id;
-    private $icon;
-    private $title;
     private $order;
     private $options;
     private $active = false;
@@ -41,6 +39,8 @@ class TabContent
         $resolver->setDefaults([
             "add_content_div" => true,
             "url" => null,
+            "title" => null,
+            "icon" => null,
         ]);
         $resolver->setRequired(["url","template"]);
         $this->options = $resolver->resolve($options);
@@ -134,7 +134,7 @@ class TabContent
      */
     public function setIcon($icon) 
     {
-        $this->icon = $icon;
+        $this->options["icon"] = $icon;
 
         return $this;
     }
@@ -145,15 +145,15 @@ class TabContent
      */
     public function getIcon() 
     {
-        return $this->icon;
+        return $this->options["icon"];
     }
     
     public function getTitle() {
-        return $this->title;
+        return $this->options["title"];
     }
 
     public function setTitle($title) {
-        $this->title = $title;
+        $this->options["title"] = $title;
         return $this;
     }
     
@@ -171,9 +171,9 @@ class TabContent
     {
         $data = [
             "id" => $this->id,
-            "title" => $this->title,
+            "title" => $this->options["title"],
             "active" => $this->active,
-            "icon" => $this->icon,
+            "icon" => $this->options["icon"],
             "options" => $this->options,
         ];
 

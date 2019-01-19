@@ -4,6 +4,7 @@ namespace Tecnoready\Common\Model\Tab;
 
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\HttpFoundation\Request;
+use RuntimeException;
 
 /**
  * Tab para construir fichas
@@ -40,7 +41,12 @@ class Tab
      * @var TabContent
      */
     private $currentTabContent;
-
+    
+    /**
+     * Parametros de la tab
+     * @var array 
+     */
+    private $parameters = [];
 
     public function __construct(array $options = []) 
     {
@@ -139,7 +145,7 @@ class Tab
     {
         $id = "tc-".md5($tabContent->getTitle());
         if (isset($this->tabsContent[$id])) {
-            throw new \RuntimeException(sprintf("The tab content name '%s' is already added.", $tabContent->getName()));
+            throw new \RuntimeException(sprintf("The tab content name '%s' is already added.", $tabContent->getTitle()));
         }
         $this->tabsContent[$id] = $tabContent;
         $tabContent->setId($id);
@@ -287,6 +293,25 @@ class Tab
     public function setRootUrl($rootUrl)
     {
         $this->rootUrl = $rootUrl;
+        return $this;
+    }
+    
+    /**
+     * Busca un parametro
+     * @param type $key
+     * @return type
+     */
+    public function getParameter($key)
+    {
+        if(!isset($this->parameters[$key])){
+            throw new RuntimeException(sprintf("The parameter '%s' is not exists.",$key));
+        }
+        return $this->parameters[$key];
+    }
+
+    public function setParameters(array $parameters = [])
+    {
+        $this->parameters = $parameters;
         return $this;
     }
 }

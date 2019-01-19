@@ -13,8 +13,6 @@ interface HistoryAdapterInterface extends ConfigureInterface
 {
     public function create(HistoryInterface $entity);
     
-    public function save(HistoryInterface $entity);
-    
     public function delete(HistoryInterface $entity);
     
     public function find($id);

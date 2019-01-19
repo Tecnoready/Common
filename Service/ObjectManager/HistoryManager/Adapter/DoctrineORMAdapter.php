@@ -5,7 +5,7 @@ namespace Tecnoready\Common\Service\ObjectManager\HistoryManager\Adapter;
 use Tecnoready\Common\Model\ObjectManager\HistoryManager\HistoryInterface;
 use Doctrine\ORM\EntityManager;
 use Pagerfanta\Pagerfanta as Paginator;
-use Pagerfanta\Adapter\DoctrineORMAdapter;
+use Pagerfanta\Adapter\DoctrineORMAdapter as Adapter;
 
 /**
  * Adaptador de doctrine2
@@ -32,12 +32,6 @@ class DoctrineORMAdapter implements HistoryAdapterInterface
     }
     
     public function create(HistoryInterface $entity)
-    {
-        $this->em->persist($entity);
-        return $this->em->flush();
-    }
-    
-    public function save(HistoryInterface $entity)
     {
         $this->em->persist($entity);
         return $this->em->flush();
@@ -70,7 +64,7 @@ class DoctrineORMAdapter implements HistoryAdapterInterface
             ->setParameter("objectType",$this->objectType)
             ->orderBy("e.createdAt","DESC")
             ;
-        $pagerfanta = new Paginator(new DoctrineORMAdapter($qb));
+        $pagerfanta = new Paginator(new Adapter($qb));
         return $pagerfanta;
     }
 }

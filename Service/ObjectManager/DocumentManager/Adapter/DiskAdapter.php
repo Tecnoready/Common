@@ -118,6 +118,9 @@ class DiskAdapter implements DocumentAdapterInterface
     {
         $ds = DIRECTORY_SEPARATOR;
         $basePath = sprintf('%s'.$ds.'%s'.$ds.'%s'.$ds.'%s', $this->options['documents_path'], $this->options['env'],  $this->objectType,$this->objectId);
+        if(!$this->fs->exists($basePath)){
+            $this->fs->mkdir($basePath);
+        }
         if(!empty($fileName)){
             $basePath .= $ds.$fileName;
         }

@@ -47,7 +47,7 @@ class ObjectDataManager implements ConfigureInterface
     {
         $this->documentManager->configure($objectId, $objectType);
         $this->historyManager->configure($objectId, $objectType);
-        $this->NoteManager->configure($objectId, $objectType);
+        $this->noteManager->configure($objectId, $objectType);
         return $this;
     }
     
