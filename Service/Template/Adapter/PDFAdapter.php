@@ -50,7 +50,11 @@ class PDFAdapter implements AdapterInterface
     {
         $resolver = new OptionsResolver();
         $resolver->setRequired([
-            "page-width","page-height",
+//            "page-width","page-height",
+        ]);
+        $resolver->setDefaults([
+            "page-width" => 0.0,
+            "page-height" => 0.0,
         ]);
         
         //Parametros para generar el pdf
@@ -66,6 +70,11 @@ class PDFAdapter implements AdapterInterface
         $parameters = $resolver->resolve($parameters);
         $forceDownload = (bool)$parameters["force-download"];
         unset($parameters["force-download"]);
+        foreach ($parameters as $key => $value) {
+            if($value === 0.0){
+                unset($parameters[$key]);
+            }
+        }
         $pdf = new Pdf();
         $pdf->tmpDir = $this->options["tmpDir"];
         $pdf->binary = $this->options["binary"];
@@ -79,7 +88,6 @@ class PDFAdapter implements AdapterInterface
             throw new RuntimeException(sprintf("Ocurrio un error generando el pdf: '%s'",$error));
         }
         if($forceDownload === true){
-//            $pdf->send();
             $pdf->send(basename($filename));
         }
         return true;
@@ -97,11 +105,12 @@ class PDFAdapter implements AdapterInterface
             "margin-top" => 0.0,//Margen superior
             "margin-right" => 0.0,//Margen derecho
             "margin-bottom" => 0.0,//Margen inferior
+            "page-height" => 0.0,
+            "page-width" => 0.0,
             'encoding' => 'UTF-8',  // option with argument
             'no-outline',           // option without argument
-            "page-width" => 100.0,
-            "page-height" => 100.0,
             'disable-smart-shrinking',
+            "page-size" => "Letter",
             'lowquality',
             'commandOptions' => [
                     'locale' => 'es_ES.utf-8',
