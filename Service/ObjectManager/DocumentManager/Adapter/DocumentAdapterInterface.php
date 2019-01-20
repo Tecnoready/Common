@@ -3,7 +3,7 @@
 namespace Tecnoready\Common\Service\ObjectManager\DocumentManager\Adapter;
 
 use Tecnoready\Common\Service\ObjectManager\ConfigureInterface;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\File\File;
 
 /**
  * Intefaz de manejador de documentos
@@ -29,10 +29,12 @@ interface DocumentAdapterInterface extends ConfigureInterface
     /**
      * Sube un archivo
      * @param File $file
+     * @param string $name Nombre opcional para reemplazar el nombre original
+     * @param boolean overwrite ¿Sobrescribir archivo si existe?
      * @return boolean
      * @throws RuntimeException
      */
-    public function upload(UploadedFile $file);
+    public function upload(File $file,$name = null,$overwrite = false);
     
     /**
      * Obtiene todos los archivos de la carpeta.

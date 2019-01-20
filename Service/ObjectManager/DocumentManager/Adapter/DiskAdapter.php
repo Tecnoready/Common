@@ -100,11 +100,13 @@ class DiskAdapter implements DocumentAdapterInterface
      * @return boolean
      * @throws RuntimeException
      */
-    public function upload(UploadedFile $file)
+    public function upload(File $file,$name = null,$overwrite = false)
     {
-        $name = $file->getClientOriginalName();
+        if($name === null && $file instanceof UploadedFile){
+            $name = $file->getClientOriginalName();
+        }
         $fileExist = $this->get($name);
-        if($fileExist !== null){//El archivo ya existe
+        if($overwrite === false && $fileExist !== null){//El archivo ya existe
             return false;
         }
         $basePath = $this->getBasePath();

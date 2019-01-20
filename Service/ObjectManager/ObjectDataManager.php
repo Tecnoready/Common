@@ -3,6 +3,7 @@
 namespace Tecnoready\Common\Service\ObjectManager;
 
 use Tecnoready\Common\Service\ObjectManager\ConfigureInterface;
+use Tecnoready\Common\Service\ObjectManager\DocumentManager\ExporterManager\ExporterManager;
 
 /**
  * Administrador de datos de un objeto (documentos,notas,historial)
@@ -29,11 +30,18 @@ class ObjectDataManager implements ConfigureInterface
      */
     private $noteManager;
     
-    public function __construct(DocumentManager\DocumentManager $documentManager, HistoryManager\HistoryManager $historyManager, NoteManager\NoteManager $noteManager)
+    /**
+     * Exportador de documentos
+     * @var ExporterManager
+     */
+    private $exporterManager;
+    
+    public function __construct(DocumentManager\DocumentManager $documentManager, HistoryManager\HistoryManager $historyManager, NoteManager\NoteManager $noteManager,ExporterManager $exporterManager)
     {
         $this->documentManager = $documentManager;
         $this->historyManager = $historyManager;
         $this->noteManager = $noteManager;
+        $this->exporterManager = $exporterManager;
     }
 
     
@@ -48,6 +56,7 @@ class ObjectDataManager implements ConfigureInterface
         $this->documentManager->configure($objectId, $objectType);
         $this->historyManager->configure($objectId, $objectType);
         $this->noteManager->configure($objectId, $objectType);
+        $this->exporterManager->configure($objectId, $objectType);
         return $this;
     }
     
@@ -76,5 +85,14 @@ class ObjectDataManager implements ConfigureInterface
     public function notes()
     {
         return $this->noteManager;
+    }
+    
+    /**
+     * Retorn ael exportaror de documentos
+     * @return ExporterManager
+     */
+    public function exporter()
+    {
+        return $this->exporterManager;
     }
 }

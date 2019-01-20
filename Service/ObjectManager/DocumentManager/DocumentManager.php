@@ -4,7 +4,7 @@ namespace Tecnoready\Common\Service\ObjectManager\DocumentManager;
 
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Tecnoready\Common\Service\ObjectManager\DocumentManager\Adapter\DocumentAdapterInterface;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\File\File;
 use RuntimeException;
 
 /**
@@ -48,9 +48,9 @@ class DocumentManager implements DocumentAdapterInterface
      * @param type $id
      * @param type $type
      */
-    public function configure($id,$type)
+    public function configure($objectId, $objectType)
     {
-        $this->adapter->configure($id,$type);
+        $this->adapter->configure($objectId, $objectType);
         $this->adapter->folder(null);
     }
 
@@ -69,9 +69,9 @@ class DocumentManager implements DocumentAdapterInterface
         return $this->adapter->getAll();
     }
 
-    public function upload(UploadedFile $file)
+    public function upload(File $file,$name = null,$overwrite = false)
     {
-        return $this->adapter->upload($file);
+        return $this->adapter->upload($file,$name,$overwrite);
     }
     
     public function folder($subPath)
