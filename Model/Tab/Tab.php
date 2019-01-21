@@ -132,7 +132,7 @@ class Tab
             foreach ($this->tabsContent as $tabContent) {
                 $id .= $tabContent->getId();
             }
-            $this->id = "tab-" .md5($id."-".$this->options["object_id"]);
+            $this->id = "tab_" .md5($id."_".$this->options["object_id"]);
         }
         return $this->id;
     }
@@ -145,7 +145,7 @@ class Tab
      */
     public function addTabContent(TabContent $tabContent) 
     {
-        $id = "tc-".md5($tabContent->getTitle());
+        $id = "tc_".md5($tabContent->getTitle());
         if (isset($this->tabsContent[$id])) {
             throw new \RuntimeException(sprintf("The tab content name '%s' is already added.", $tabContent->getTitle()));
         }
