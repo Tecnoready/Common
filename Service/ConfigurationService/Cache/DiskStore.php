@@ -56,8 +56,12 @@ class DiskStore extends BaseCache
         if($this->isInit){
             return;
         }
+        $folder = $this->getCacheFolder();
+        if(!$this->fs->exists($folder)){
+            return;
+        }
         $finder = new Finder();
-        $finder->in($this->getCacheFolder())->files()->depth(0)->sortByName();
+        $finder->in($folder)->files()->depth(0)->sortByName();
         $last = null;
         foreach ($finder as $file) {
             $last = $file;
