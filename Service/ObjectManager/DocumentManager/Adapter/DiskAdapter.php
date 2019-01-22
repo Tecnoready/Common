@@ -127,9 +127,10 @@ class DiskAdapter implements DocumentAdapterInterface
     {
         $ds = DIRECTORY_SEPARATOR;
         $basePath = sprintf('%s'.$ds.'%s'.$ds.'%s'.$ds.'%s', $this->options['documents_path'], $this->options['env'],  $this->objectType,$this->objectId);
-        if(!empty($this->folder)){
-            $basePath .= $ds.$this->folder;
+        if(empty($this->folder)){
+            throw new \RuntimeException(sprintf("The 'folder' is not set in Document Manager."));
         }
+        $basePath .= $ds.$this->folder;
         if(!$this->fs->exists($basePath)){
             $this->fs->mkdir($basePath);
         }
