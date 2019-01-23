@@ -14,7 +14,7 @@ class ModelXML extends ModelTXT
 {
    public function getFormat() {
         return "xml";
-    }
+   }
     
     /**
      * Formatea el xml a formato pretty manteniendo los saltos de linea

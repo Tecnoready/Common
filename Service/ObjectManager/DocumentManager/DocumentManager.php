@@ -69,6 +69,13 @@ class DocumentManager implements DocumentAdapterInterface
         return $this->adapter->getAll();
     }
 
+    /**
+     * Sube un documento
+     * @param File $file
+     * @param type $name
+     * @param type $overwrite
+     * @return File
+     */
     public function upload(File $file,$name = null,$overwrite = false)
     {
         return $this->adapter->upload($file,$name,$overwrite);

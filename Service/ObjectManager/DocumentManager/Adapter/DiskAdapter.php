@@ -67,7 +67,7 @@ class DiskAdapter implements DocumentAdapterInterface
     /**
      * Obtiene un archivo
      * @param type $fileName
-     * @return type
+     * @return File
      * @throws RuntimeException
      */
     public function get($fileName)
@@ -77,8 +77,13 @@ class DiskAdapter implements DocumentAdapterInterface
         
         if(!$this->fs->exists($fullPath)){
             $file = null;
-        }else if(!$file->isReadable()){
-            throw new RuntimeException(sprintf("The file '%s' is not readable",$file->getPathname()));
+        }else{
+            if(!$file->isReadable()){
+                throw new RuntimeException(sprintf("The file '%s' is not readable",$file->getPathname()));
+            }
+            if($file->isDir()){
+                throw new RuntimeException(sprintf("The file pass '%s' is a dir",$file->getPathname()));
+            }
         }
         return $file;
     }
@@ -106,6 +111,7 @@ class DiskAdapter implements DocumentAdapterInterface
             $name = $file->getClientOriginalName();
         }
         $fileExist = $this->get($name);
+//        var_dump("fileExist $overwrite: ".$fileExist);
         if($overwrite === false && $fileExist !== null){//El archivo ya existe
             return false;
         }
