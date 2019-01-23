@@ -26,7 +26,7 @@ class HistoryManager implements HistoryAdapterInterface
      */
     private $options;
     
-    public function __construct(HistoryAdapterInterface $adapter,array $options = [])
+    public function __construct(HistoryAdapterInterface $adapter = null,array $options = [])
     {
         $this->adapter = $adapter;
         $resolver = new OptionsResolver();
