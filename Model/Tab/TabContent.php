@@ -118,6 +118,11 @@ class TabContent
         return $this->active;
     }
     
+    public function isActive() 
+    {
+        return $this->active;
+    }
+    
     /**
      * setActive
      * @param  [type]
