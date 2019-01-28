@@ -59,6 +59,7 @@ class ExporterManager implements ConfigureInterface
         $this->objectId = $objectId;
         $this->objectType = $objectType;
         $this->documentManager->configure($objectId, $objectType);
+        return $this;
     }
     
     /**
@@ -127,10 +128,10 @@ class ExporterManager implements ConfigureInterface
      * @param type $objectType
      * @param string $name Nombre del documento pre-definido
      * @param array $options
-     * @return string La ruta del archivo generado
+     * @return File El archivo generado
      * @throws RuntimeException
      */
-    public function generate($name,array $options = []) {
+    public function generate($name,array $options = [],$overwrite = false) {
         $chainModel = $this->resolveChainModel($options);
         
         $modelDocument = $chainModel->getModel($name);
@@ -142,16 +143,20 @@ class ExporterManager implements ConfigureInterface
             throw new RuntimeException(sprintf("Failed to generate document '%s' with name '%s'",$this->objectType,$name));
         }
         $fileName = $modelDocument->getFileName();
-//        if(isset($options["fileName"]) && !empty($options["fileName"])){
-//            $fileName = $options["fileName"];
-//            unset($options["fileName"]);
-//        }
+        if(isset($options["fileName"]) && !empty($options["fileName"])){
+            $fileName = $options["fileName"];
+            $fileName .= ".".$modelDocument->getFormat();
+            unset($options["fileName"]);
+        }
+        if(empty($fileName)){
+            throw new RuntimeException(sprintf("The fileName can not be empty."));
+        }
         if(!is_readable($pathFileOut)){
             throw new RuntimeException(sprintf("Failed to generate document '%s' with name '%s'. File '%s' is not readable.",$this->objectType,$name,$pathFileOut));
         }
         $file = new File($pathFileOut);
-        $this->documentManager->upload($file,$fileName);
-        return $pathFileOut;
+        $file = $this->documentManager->upload($file,$fileName,$overwrite);
+        return $file;
     }
     
     /**
@@ -160,10 +165,10 @@ class ExporterManager implements ConfigureInterface
      * @param type $objectType
      * @param type $name
      * @param array $options
-     * @return string La ruta del archivo generado
+     * @return File La ruta del archivo generado
      * @throws RuntimeException
      */
-    public function generateWithSource($name,array $options = []) {
+    public function generateWithSource($name,array $options = [],$overwrite = false) {
         if(!$this->adapter){
             throw new RuntimeException(sprintf("The adapter must be set for enable this feature."));
         }
@@ -174,7 +179,7 @@ class ExporterManager implements ConfigureInterface
             throw new RuntimeException(sprintf("The source '%s' with '%s' not found.",$className,$this->objectId));
         }
         $options["data"]["entity"] = $entity;
-        return $this->generate($name,$options);
+        return $this->generate($name,$options,$overwrite);
     }
     
     /**

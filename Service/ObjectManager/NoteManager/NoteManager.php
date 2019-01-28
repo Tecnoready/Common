@@ -26,7 +26,7 @@ class NoteManager implements NoteAdapterInterface
      */
     private $options;
     
-    public function __construct(NoteAdapterInterface $adapter,array $options = [])
+    public function __construct(NoteAdapterInterface $adapter = null,array $options = [])
     {
         $this->adapter = $adapter;
         $resolver = new OptionsResolver();

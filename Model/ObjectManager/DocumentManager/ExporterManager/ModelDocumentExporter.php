@@ -62,11 +62,7 @@ abstract class ModelDocumentExporter
         if($this->filePathContent === null){
             throw new InvalidArgumentException(sprintf("The filePathContent must be setter."));
         }
-        $path = $this->filePathContent;
-        if(!$this->chainModel->getExporterManager()->getFs()->exists($path)){
-            throw new InvalidArgumentException(sprintf("The filePathContent '%s' does not exist.",$path));
-        }
-        return $path;
+        return $this->filePathContent;
     }
     
     /**
@@ -78,11 +74,7 @@ abstract class ModelDocumentExporter
         if($this->filePathHeader === null){
             throw new InvalidArgumentException(sprintf("The filePathContent must be setter."));
         }
-        $path = $this->filePathHeader;
-        if(!$this->chainModel->getExporterManager()->getFs()->exists($path)){
-            throw new InvalidArgumentException(sprintf("The filePathHeader '%s' does not exist.",$path));
-        }
-        return $path;
+        return $this->filePathHeader;
     }
     
     /**
