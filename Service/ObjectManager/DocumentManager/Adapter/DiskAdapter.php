@@ -63,6 +63,11 @@ class DiskAdapter implements DocumentAdapterInterface
         $fullPath = $this->getBasePath($fileName);
         $file = new File($fullPath);
         $this->fs->remove($file);
+        $filenameMetadata = $this->getFilenameMetadata($fileName);
+        if($this->fs->exists($filenameMetadata)){
+            //Eliminar el archivo meta si existe
+            $this->fs->remove($filenameMetadata);
+        }
         return !$this->fs->exists($fullPath);
     }
     
