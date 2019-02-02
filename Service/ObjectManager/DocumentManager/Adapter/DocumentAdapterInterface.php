@@ -4,6 +4,7 @@ namespace Tecnoready\Common\Service\ObjectManager\DocumentManager\Adapter;
 
 use Tecnoready\Common\Service\ObjectManager\ConfigureInterface;
 use Symfony\Component\HttpFoundation\File\File;
+use SplFileInfo;
 
 /**
  * Intefaz de manejador de documentos
@@ -34,7 +35,7 @@ interface DocumentAdapterInterface extends ConfigureInterface
      * @return boolean
      * @throws RuntimeException
      */
-    public function upload(File $file,$name = null,$overwrite = false);
+    public function upload(File $file,array $options = []);
     
     /**
      * Obtiene todos los archivos de la carpeta.
@@ -46,4 +47,6 @@ interface DocumentAdapterInterface extends ConfigureInterface
      * Establece la sub carpeta a leeer
      */
     public function folder($subPath);
+    
+    public function getMetadata(SplFileInfo $file);
 }

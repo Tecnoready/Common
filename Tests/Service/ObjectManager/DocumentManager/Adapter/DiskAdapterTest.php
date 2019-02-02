@@ -46,6 +46,7 @@ class DiskAdapterTest extends BaseTestCase
         $this->adapter
             ->configure("id-unico","Factura")
             ;
+        $this->adapter->folder("uploads");
     }
     
     private function initFiles($andClear = true){
@@ -62,8 +63,13 @@ class DiskAdapterTest extends BaseTestCase
      * @return File
      */
     public function testUpload($andClear = true,$filePos = 0) {
-         $file = $this->adapter->upload($this->files[$filePos]);
+        $comments = "Comentario ok";
+         $file = $this->adapter->upload($this->files[$filePos],[
+             "comments" => $comments,
+         ]);
          $this->assertFileExists($file->getPathname());
+         $metadata = $this->adapter->getMetadata($file);
+         $this->assertEquals($comments,$metadata["comments"]);
          $this->initFiles(false);
          $this->assertFalse($this->adapter->upload($this->files[$filePos]));
          if($andClear){

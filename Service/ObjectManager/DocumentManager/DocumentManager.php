@@ -6,6 +6,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Tecnoready\Common\Service\ObjectManager\DocumentManager\Adapter\DocumentAdapterInterface;
 use Symfony\Component\HttpFoundation\File\File;
 use RuntimeException;
+use SplFileInfo;
 
 /**
  * Administrador de documentos
@@ -72,13 +73,21 @@ class DocumentManager implements DocumentAdapterInterface
     /**
      * Sube un documento
      * @param File $file
-     * @param type $name
-     * @param type $overwrite
+     * @param array $options
      * @return File
      */
-    public function upload(File $file,$name = null,$overwrite = false)
+    public function upload(File $file,array $options = [])
     {
-        return $this->adapter->upload($file,$name,$overwrite);
+        return $this->adapter->upload($file,$options);
+    }
+    
+    /**
+     * Retorna la meta indormacion de un archivo
+     * @param File $file
+     * @return array
+     */
+    public function getMetadata(SplFileInfo $file){
+        return $this->adapter->getMetadata($file);
     }
     
     public function folder($subPath)

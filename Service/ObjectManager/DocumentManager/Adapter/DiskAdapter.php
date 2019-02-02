@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Finder\Finder;
 use RuntimeException;
+use SplFileInfo;
 
 /**
  * Adaptador para guardar los documentos en el disco
@@ -41,6 +42,7 @@ class DiskAdapter implements DocumentAdapterInterface
         $resolver = new OptionsResolver();
         $resolver->setDefaults([
             "debug" => false,
+            "metadata_folder" => ".metadata",
         ]);
         $resolver->setDefined(["documents_path", "env"]);
         $resolver->addAllowedTypes("documents_path", "string");
@@ -105,14 +107,24 @@ class DiskAdapter implements DocumentAdapterInterface
      * @return boolean
      * @throws RuntimeException
      */
-    public function upload(File $file,$name = null,$overwrite = false)
+    public function upload(File $file,array $options = [])
     {
+        $resolver = new OptionsResolver();
+        $resolver->setDefaults([
+            "overwrite" => false,
+            "name" => null,
+            "comments" => null,
+        ]);
+        $options = $resolver->resolve($options);
+        $name = $options["name"];
         if($name === null && $file instanceof UploadedFile){
             $name = $file->getClientOriginalName();
         }
+        if(empty($name)){
+            $name = $file->getFilename();
+        }
         $fileExist = $this->get($name);
-//        var_dump("fileExist $overwrite: ".$fileExist);
-        if($overwrite === false && $fileExist !== null){//El archivo ya existe
+        if($options["overwrite"] === false && $fileExist !== null){//El archivo ya existe
             return false;
         }
         $basePath = $this->getBasePath();
@@ -121,9 +133,77 @@ class DiskAdapter implements DocumentAdapterInterface
         if(!$file->isReadable()){
             throw new RuntimeException(sprintf("The file '%s' is not readable",$file->getPathname()));
         }
+        if(!empty($options["comments"])){
+            $this->saveMetadata($file,[
+                "comments" => $options["comments"],
+            ]);
+        }
         return $file;
     }
     
+    /**
+     * Guarda los meteda datos del archivo
+     * @param File $file
+     * @param array $metadata
+     */
+    private function saveMetadata(File $file,array $metadata = [])
+    {
+        $metadata = $this->getDefaultMetadata($metadata);
+        $name = $file->getFilename();
+        $filenameMetadata = $this->getFilenameMetadata($name);
+        $this->fs->dumpFile($filenameMetadata,serialize($metadata));
+        return $filenameMetadata;
+    }
+    
+    /**
+     * Obtiene los metadatos
+     * @param SplFileInfo $file
+     * @return array
+     */
+    public function getMetadata(SplFileInfo $file)
+    {
+        $metadata = null;
+        $name = $file->getFilename();
+        $filenameMetadata = $this->getFilenameMetadata($name);
+        if($this->fs->exists($filenameMetadata)){
+            $content = file_get_contents($filenameMetadata);
+            if(!empty($content)){
+                $metadata = @unserialize($content);
+            }
+        }
+        if(!is_array($metadata)){
+            $metadata = [];
+        }
+        $metadata = $this->getDefaultMetadata($metadata);
+        return $metadata;
+    }
+    
+    private function getDefaultMetadata(array $metadata = [])
+    {
+        $resolver = new OptionsResolver();
+        $resolver->setDefaults([
+            "comments" => null,
+        ]);
+        return $resolver->resolve($metadata);
+    }
+
+    /**
+     * Obtiene el nombre del archivo del meta data correspondiente
+     * @param type $name
+     * @return type
+     */
+    private function getFilenameMetadata($name)
+    {
+        $basePath = $this->getBasePath();
+        $ds = DIRECTORY_SEPARATOR;
+        $metadataFolder = $basePath.$ds.$this->options["metadata_folder"];
+        if(!$this->fs->exists($metadataFolder)){
+            $this->fs->mkdir($metadataFolder);
+        }
+        return $metadataFolder.$ds.$name.".meta";
+    }
+
+
     /**
      * Retorna el base path donde se guardara los archivos
      * @param type $fileName
