@@ -138,6 +138,9 @@ class DiskAdapter implements DocumentAdapterInterface
         if(!$file->isReadable()){
             throw new RuntimeException(sprintf("The file '%s' is not readable",$file->getPathname()));
         }
+        $now = new \DateTime();
+        $now->setTimezone(new \DateTimeZone('UTC'));
+        touch($file->getRealPath(),$now->getTimestamp());
         if(!empty($options["comments"])){
             $this->saveMetadata($file,[
                 "comments" => $options["comments"],
