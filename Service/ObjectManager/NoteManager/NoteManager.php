@@ -35,10 +35,10 @@ class NoteManager implements NoteAdapterInterface
         ]);
         $this->options = $resolver->resolve($options);
     }
-
-    public function create(\Tecnoready\Common\Model\ObjectManager\NoteManager\NoteInterface $entity)
+    
+    public function configure($objectId, $objectType)
     {
-        return $this->adapter->create($entity);
+        $this->adapter->configure($objectId, $objectType);
     }
 
     public function delete(\Tecnoready\Common\Model\ObjectManager\NoteManager\NoteInterface $entity)
@@ -56,4 +56,13 @@ class NoteManager implements NoteAdapterInterface
         return $this->adapter->getPaginator($type,$criteria,$sortBy);
     }
 
+    public function addPrivate($note,array $options = [])
+    {
+        return $this->adapter->addPrivate($note,$options);
+    }
+
+    public function addPublic($note,array $options = [])
+    {
+        return $this->adapter->addPublic($note,$options);
+    }
 }

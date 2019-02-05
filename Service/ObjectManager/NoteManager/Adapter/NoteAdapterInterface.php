@@ -20,11 +20,14 @@ use Tecnoready\Common\Service\ObjectManager\ConfigureInterface;
  */
 interface NoteAdapterInterface extends ConfigureInterface
 {
+    public function addPublic($note,array $options = []);
+    public function addPrivate($note,array $options = []);
+    
     /**
      * Crea una nota
      * @param NoteInterface $entity
      */
-    public function create(NoteInterface $entity);
+//    public function create(NoteInterface $entity);
     
     /**
      * Elimina una nota

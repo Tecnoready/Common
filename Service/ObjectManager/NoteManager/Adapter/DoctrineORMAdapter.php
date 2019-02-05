@@ -5,6 +5,8 @@ namespace Tecnoready\Common\Service\ObjectManager\NoteManager\Adapter;
 use Doctrine\ORM\EntityManager;
 use Pagerfanta\Pagerfanta as Paginator;
 use Pagerfanta\Adapter\DoctrineORMAdapter as Adapter;
+use Tecnoready\Common\Model\ObjectManager\NoteManager\NoteInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Adaptador de doctrine2 para las notas
@@ -30,13 +32,13 @@ class DoctrineORMAdapter implements NoteAdapterInterface
         $this->em = $em;
     }
     
-    public function create(\Tecnoready\Common\Model\ObjectManager\NoteManager\NoteInterface $entity)
+    private function create(NoteInterface $entity)
     {
         $this->em->persist($entity);
         return $this->em->flush();
     }
 
-    public function delete(\Tecnoready\Common\Model\ObjectManager\NoteManager\NoteInterface $entity)
+    public function delete(NoteInterface $entity)
     {
         $this->em->remove($entity);
         return $this->em->flush();
@@ -63,4 +65,40 @@ class DoctrineORMAdapter implements NoteAdapterInterface
         $pagerfanta = new Paginator(new Adapter($qb));
         return $pagerfanta;
     }
+
+    public function addPrivate($note,array $options = [])
+    {
+        $entity = $this->createNew($note,NoteInterface::TYPE_PRIVATE,$options);
+        $this->create($entity);
+        return $entity;
+    }
+
+    public function addPublic($note,array $options = [])
+    {
+        $entity = $this->createNew($note,NoteInterface::TYPE_PUBLIC,$options);
+        $this->create($entity);
+        return $entity;
+    }
+    
+    /**
+     * @return \Tecnoready\Common\Model\ObjectManager\NoteManager\NoteInterface
+     */
+    private function createNew($note,$type,array $options = [])
+    {
+        $resolve = new OptionsResolver();
+        $resolve->setRequired("user");
+        $options = $resolve->resolve($options);
+        $entity = new $this->className();
+        $entity
+            ->setUserAgent($_SERVER['HTTP_USER_AGENT'])
+            ->setCreatedAt(new \DateTime())
+            ->setObjectType($this->objectType)
+            ->setObjectId($this->objectId)
+            ->setDescription($note)
+            ->setType($type)
+            ->setUser($options["user"])
+            ;
+        return $entity;
+    }
+
 }
