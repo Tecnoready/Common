@@ -44,7 +44,16 @@ class DoctrineORMAdapter implements ConfigurationAdapterInterface
     }
 
     public function findAll() {
-        return $this->em->getRepository($this->className)->findAll();
+        $r = [];
+        try {
+            $r = $this->em->getRepository($this->className)->findAll();
+        } catch (\Doctrine\DBAL\Exception\TableNotFoundException $ex) {
+            //Validar si la tabla no existe, se devuelve los resultados vacios.
+            if($ex->getErrorCode() !== 1146){
+                throw $ex;
+            }
+        }
+        return $r;
     }
 
     public function persist(ConfigurationInterface $configuration) {
