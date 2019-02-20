@@ -53,10 +53,18 @@ class ObjectDataManager implements ConfigureInterface
      */
     public function configure($objectId, $objectType)
     {
-        $this->documentManager->configure($objectId, $objectType);
-        $this->historyManager->configure($objectId, $objectType);
-        $this->noteManager->configure($objectId, $objectType);
-        $this->exporterManager->configure($objectId, $objectType);
+        if($this->documentManager){
+            $this->documentManager->configure($objectId, $objectType);
+        }
+        if($this->historyManager){
+            $this->historyManager->configure($objectId, $objectType);
+        }
+        if($this->noteManager){
+            $this->noteManager->configure($objectId, $objectType);
+        }
+        if($this->exporterManager){
+            $this->exporterManager->configure($objectId, $objectType);
+        }
         return $this;
     }
     
