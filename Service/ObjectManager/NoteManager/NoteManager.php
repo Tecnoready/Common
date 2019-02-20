@@ -38,7 +38,9 @@ class NoteManager implements NoteAdapterInterface
     
     public function configure($objectId, $objectType)
     {
-        $this->adapter->configure($objectId, $objectType);
+        if($this->adapter){
+            $this->adapter->configure($objectId, $objectType);
+        }
     }
 
     public function delete(\Tecnoready\Common\Model\ObjectManager\NoteManager\NoteInterface $entity)
