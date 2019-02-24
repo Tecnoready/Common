@@ -123,6 +123,7 @@ class ModelEmailTemplate implements \Tecnoready\Common\Model\Email\EmailTemplate
 
     public function setBody(ModelComponent $body) {
         $this->body = $body;
+        $this->body->setTitle($this->title);
         return $this;
     }
 
@@ -133,6 +134,9 @@ class ModelEmailTemplate implements \Tecnoready\Common\Model\Email\EmailTemplate
 
     public function setLocale($locale) {
         $this->locale = $locale;
+        if($this->body){
+            $this->body->setLocale($this->locale);
+        }
         return $this;
     }
     
