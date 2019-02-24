@@ -273,9 +273,9 @@ abstract class ModelEmail implements \Tecnoready\Common\Model\Email\EmailInterfa
         return unserialize(base64_decode($this->message));
     }
     /**
-     * @param \Swift_Mime_Message $message
+     * @param $message
      */
-    public function setMessage(\Swift_Mime_Message $message)
+    public function setMessage($message)
     {
         $this->message = base64_encode(serialize($message));
     }

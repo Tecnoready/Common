@@ -96,7 +96,7 @@ interface EmailInterface {
     /**
      * @param \Swift_Mime_Message $message
      */
-    public function setMessage(\Swift_Mime_Message $message);
+    public function setMessage($message);
     /**
      * @return \DateTime
      */

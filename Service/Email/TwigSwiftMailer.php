@@ -109,7 +109,14 @@ EOF;
      * @return type
      */
     public function sendEmailQueue(EmailQueueInterface $emailQueue,array $attachs = []) {
-        $message = \Swift_Message::newInstance()
+        $v = \Swift::VERSION;
+        $r = version_compare("6.0.0", $v);
+        if ($r === -1 || $r === 0) {
+            $message = new \Swift_Message();
+        } else {
+            $message = \Swift_Message::newInstance();
+        }
+        $message
             ->setSubject($emailQueue->getSubject())
             ->setFrom($emailQueue->getFromEmail())
             ->setTo($emailQueue->getToEmail());
@@ -234,7 +241,7 @@ EOF;
     }
 
     
-    private function send(\Swift_Mime_Message $message = null) {
+    private function send($message = null) {
         if($message === null){
             return true;
         }
