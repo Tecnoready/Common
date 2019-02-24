@@ -95,9 +95,11 @@ class EmailRepository extends EntityRepository {
             $now = new \DateTime();
             $ids = [];
             foreach ($emails as $email) {
-                $diff = $email->getUpdatedAt()->diff($now);
-                if($this->getTotalMinutes($diff) > 1){
-                    $ids[] = $email->getId();
+                if($email->getUpdatedAt() !== null){
+                    $diff = $email->getUpdatedAt()->diff($now);
+                    if($this->getTotalMinutes($diff) > 1){
+                        $ids[] = $email->getId();
+                    }
                 }
             }
             $query = $this->_em->createQuery("UPDATE ".$this->getClassName()." e SET e.status = '" . EmailInterface::STATUS_FAILED . "', e.retries = (e.retries + 1) WHERE e.id IN (:ids)");
