@@ -48,7 +48,7 @@ abstract class BaseCache implements CacheInterface
             $configuration = $this->adapter->createNew();
             $configuration->setValue($data["value"]);
             $configuration->setType($data["type"]);
-            $configuration->setDataType($data["dataType"]);
+            $configuration->setDataType(isset($data["dataType"]) ? $data["dataType"] : null);
             $configuration->setDescription($data["description"]);
             return $configuration;
         }
