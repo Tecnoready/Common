@@ -4,13 +4,14 @@ namespace Tecnoready\Common\Model\Statistics;
 
 use Tecnoready\Common\Model\Statistics\StatisticsMonthInterface;
 use Tecnoready\Common\Model\Statistics\StatisticsYearInterface;
-use Tecnoready\Common\Model\TraceableInterface;
+use Tecnoready\Common\Model\ObjectManager\BaseInterface;
 
 /**
- *
+ * StatisticsYearInterface
+ * 
  * @author Carlos Mendoza <inhack20@gmail.com>
  */
-interface StatisticsYearInterface extends TraceableInterface
+interface StatisticsYearInterface extends BaseInterface
 {
     /**
      * Set year

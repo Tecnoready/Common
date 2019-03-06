@@ -3,13 +3,15 @@
 namespace Tecnoready\Common\Model\Statistics\DoctrineORM;
 
 use Doctrine\ORM\Mapping as ORM;
+use Tecnoready\Common\Model\Statistics\StatisticsMonthInterface;
+use Tecnoready\Common\Model\Statistics\StatisticsYearInterface;
 
 /**
  * Estadistica de un año
  *
  * @author Carlos Mendoza <inhack20@gmail.com>
  */
-class StatisticsYear implements \Tecnoready\Common\Model\Statistics\StatisticsYearInterface
+class StatisticsYear implements StatisticsYearInterface
 {
     /**
      * @var integer
@@ -107,50 +109,11 @@ class StatisticsYear implements \Tecnoready\Common\Model\Statistics\StatisticsYe
      * @ORM\Column(name="total_month_12",type="decimal", precision=50, scale=18, nullable=false)
      */
     protected $totalMonth12 = 0;
-    
-    /**
-     * Meses
-     * @var StatisticsMonth
-     * @ORM\OneToMany(targetEntity="Pandco\Bundle\AppBundle\Entity\Core\Statistics\StatisticsMonth",cascade={"persist","remove"},mappedBy="yearEntity")
-     */
-    protected $months;
-    
-    /**
-     * @var \DateTime $created
-     *
-     * @ORM\Column(name="created_at",type="datetime")
-     */
-    protected $createdAt;
 
-    /**
-     * @var \DateTime $updated
-     *
-     * @ORM\Column(name="updated_at",type="datetime")
-     */
-    protected $updatedAt;
-    
-    /**
-     * @ORM\Column(name="deleted_at", type="datetime", nullable=true)
-     */
-    protected $deletedAt;
-    
-    /**
-     * @var string $createdFromIp
-     *
-     * @ORM\Column(type="string", name="created_from_ip",length=45, nullable=true)
-     */
-    protected $createdFromIp;
-    
-    /**
-     * @var string $updatedFromIp
-     *
-     * @ORM\Column(type="string", name="updated_from_ip",length=45, nullable=true)
-     */
-    protected $updatedFromIp;
-    
-    use \Tecnoready\Common\Model\TraceableTrait;
-    
-    public function __construct() {
+    use \Tecnoready\Common\Model\ObjectManager\Base\TraitBaseORM;
+
+    public function __construct() 
+    {
         $this->months = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
@@ -493,62 +456,31 @@ class StatisticsYear implements \Tecnoready\Common\Model\Statistics\StatisticsYe
     /**
      * Add month
      *
-     * @param \Pandco\Bundle\AppBundle\Entity\Core\Statistics\StatisticsMonth $month
+     * @param StatisticsMonthInterface $month
      *
-     * @return StatisticsYear
+     * @return StatisticsYearInterface
      */
-    public function addMonth(\Pandco\Bundle\AppBundle\Entity\Core\Statistics\StatisticsMonth $month)
-    {
-        $this->months->set($month->getMonth(),$month);
-
-        return $this;
-    }
+    public function addMonth(StatisticsMonthInterface $month){}
 
     /**
      * Remove month
      *
-     * @param \Pandco\Bundle\AppBundle\Entity\Core\Statistics\StatisticsMonth $month
+     * @param StatisticsMonthInterface $month
      */
-    public function removeMonth(\Pandco\Bundle\AppBundle\Entity\Core\Statistics\StatisticsMonth $month)
-    {
-        $this->months->removeElement($month);
-    }
+    public function removeMonth(StatisticsMonthInterface $month){}
 
     /**
      * Get months
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getMonths()
-    {
-        return $this->months;
-    }
+    public function getMonths(){}
     
-    public function getMonth($month)
-    {
-        $month = (int)$month;
-        $found = null;
-        foreach ($this->getMonths() as $value) {
-            if($value->getMonth() === $month){
-                $found = $value;
-                break;
-            }
-        }
-        return $found;
-    }
+    public function getMonth($month){}
     
-    public function totalize() {
-        $total = 0.0;
-        foreach ($this->getMonths() as $month) {
-                $month->totalize();
-                $totalMonth = $month->getTotal();
-                $setTotalMonth = sprintf("setTotalMonth%s",$month->getMonth());
-                $this->$setTotalMonth($totalMonth);
-//                var_dump("setTotalMonth ".$totalMonth);
-                $total = $total + $totalMonth;
-        }
-        $this->total = $total;
-//        var_dump($total);
-//        die;
-    }
+    public function totalize(){}
+
+    public function setUser($user){}
+    
+    public function getUser(){}
 }
