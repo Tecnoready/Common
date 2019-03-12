@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Tecnoready\Common\Service\Statistics\Adapter;
+namespace Tecnoready\Common\Service\ObjectManager\StatisticManager\Adapter;
 
 /**
  *
@@ -23,9 +23,9 @@ interface StatisticsAdapterInterface
     /**
      * @return \Tecnoready\Common\Model\Configuration\Statistics\StatisticsYearInterface Description
      */
-    public function newYearStatistics(\Tecnoready\Common\Service\Statistics\StatisticsManager $statisticsManager);
+    public function newYearStatistics(\Tecnoready\Common\Service\ObjectManager\StatisticManager\StatisticsManager $statisticsManager);
     /**
      * @return \Tecnoready\Common\Model\Configuration\Statistics\StatisticsMonthInterface Description
      */
-    public function newStatisticsMonth(\Tecnoready\Common\Service\Statistics\StatisticsManager $statisticsManager);
+    public function newStatisticsMonth(\Tecnoready\Common\Service\ObjectManager\StatisticManager\StatisticsManager $statisticsManager);
 }

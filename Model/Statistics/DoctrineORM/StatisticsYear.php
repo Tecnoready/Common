@@ -110,6 +110,13 @@ class StatisticsYear implements StatisticsYearInterface
      */
     protected $totalMonth12 = 0;
 
+    /**
+     * @var string
+     *
+     * @ORM\Column(type="string",length=100)
+     */
+    protected $object;
+
     use \Tecnoready\Common\Model\ObjectManager\Base\TraitBaseORM;
 
     public function __construct() 
@@ -451,6 +458,17 @@ class StatisticsYear implements StatisticsYearInterface
     public function getTotalMonth12()
     {
         return $this->totalMonth12;
+    }
+
+    public function getObject()
+    {
+        return $this->object;
+    }
+    
+    public function setObject($object)
+    {
+        $this->object = $object;
+        return $this;
     }
 
     /**

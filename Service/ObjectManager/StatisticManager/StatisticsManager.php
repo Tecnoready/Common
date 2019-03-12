@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Tecnoready\Common\Service\Statistics;
+namespace Tecnoready\Common\Service\ObjectManager\StatisticManager;
 
 /**
  * Manejador de estadisticas
@@ -33,7 +33,7 @@ class StatisticsManager
      */
     protected $options = array();
     
-    public function __construct(Adapter\StatisticsAdapterInterface $adapter,array $options) 
+    public function __construct(Adapter\StatisticsAdapterInterface $adapter,array $options = []) 
     {
         if(!class_exists("Symfony\Component\PropertyAccess\PropertyAccess")){
             throw new \Exception(sprintf("The package '%s' is required, please install https://packagist.org/packages/symfony/property-access",'"symfony/property-access": "^3.1"'));
@@ -57,9 +57,9 @@ class StatisticsManager
             'date_format' => 'Y-m-d H:i:s',
         ]);
         
-        $resolver->setRequired(["current_ip","date_format"]);
-        $resolver->addAllowedTypes("current_ip","string");
-        $resolver->addAllowedTypes("date_format","string");
+        // $resolver->setRequired(["current_ip","date_format"]);
+        // $resolver->addAllowedTypes("current_ip","string");
+        // $resolver->addAllowedTypes("date_format","string");
         
         $this->options = $resolver->resolve($options);
     }
@@ -145,17 +145,20 @@ class StatisticsManager
      * @param type $month
      * @return type
      */
-    public function findStatisticsYear($object,$propertyPath,$year) 
+    public function findStatisticsYear($object,$year) 
     {
         $year = (int)$year;
-        $statistics = $this->propertyAccess->getValue($object, $propertyPath);
-        $foundStatistics = null;
-        foreach ($statistics as $statistic) {
-            if($statistic->getYear() === $year){
-                $foundStatistics = $statistic;
-                break;
-            }
+        $foundStatistics = $this->adapter->getEntityManager()->getRepository(\Pandco\Bundle\OMBundle\Entity\Statistics\StatisticsYear::class)->findOneBy(["object" => $object, "year" => $year]);
+        // $statistics = $this->propertyAccess->getValue($object, $propertyPath);
+        if (!$foundStatistics) {
+            $foundStatistics = null;
         }
+        // foreach ($statistics as $statistic) {
+        //     if($statistic->getYear() === $year){
+        //         $foundStatistics = $statistic;
+        //         break;
+        //     }
+        // }
         return $foundStatistics;
     }
 
@@ -181,13 +184,12 @@ class StatisticsManager
             $day = (int)$now->format("d");
         }
         
-        $foundStatisticsYear = $this->findStatisticsYear($object, $propertyPath, $year);
+        $foundStatisticsYear = $this->findStatisticsYear($object, $year);
+        // var_dump($foundStatisticsYear);
+        // die();
         if($foundStatisticsYear === null){
-            $foundStatisticsYear = $this->newYearStatistics($year);
-            $singulars = (array) \Symfony\Component\PropertyAccess\StringUtil::singularify($propertyPath);
-            $addProperty = sprintf("add%s",ucfirst($singulars[0]));
-            $object->$addProperty($foundStatisticsYear);
-            $this->adapter->persist($object);
+            $foundStatisticsYear = $this->newYearStatistics($object,$year);
+            $this->adapter->persist($foundStatisticsYear);
         }
         $foundStatisticsMonth = $foundStatisticsYear->getMonth($month);
         
@@ -252,20 +254,22 @@ class StatisticsManager
     /**
      * Crea una nueva estadistica
      */
-    private function newYearStatistics($year = null)
+    private function newYearStatistics($object, $year = null)
     {
         $now = new \DateTime();
         if($year === null){
             $year = $now->format("Y");
         }
-        
-        $nowString = $now->format($this->options["date_format"]);
+
+        // $nowString = $now->format($this->options["date_format"]);
+        $nowString = $now;
         $yearStatistics = $this->adapter->newYearStatistics($this);
         $yearStatistics->setYear($year);
         $yearStatistics->setCreatedAt($nowString);
-        $yearStatistics->setUpdatedAt($nowString);
-        $yearStatistics->setCreatedFromIp($this->options["current_ip"]);
-        $yearStatistics->setUpdatedFromIp($this->options["current_ip"]);
+        $yearStatistics->setObject($object);
+        $yearStatistics->setObjectId("test");
+        $yearStatistics->setObjectType("test");
+        // $yearStatistics->setCreatedFromIp($this->options["current_ip"]);
         
         $this->adapter->persist($yearStatistics);
         
@@ -275,9 +279,10 @@ class StatisticsManager
             $statisticsMonth->setYear($year);
             $statisticsMonth->setYearEntity($yearStatistics);
             $statisticsMonth->setCreatedAt($nowString);
-            $statisticsMonth->setUpdatedAt($nowString);
-            $statisticsMonth->setCreatedFromIp($this->options["current_ip"]);
-            $statisticsMonth->setUpdatedFromIp($this->options["current_ip"]);
+            $statisticsMonth->setObject($object);
+            $statisticsMonth->setObjectId("test");
+            $statisticsMonth->setObjectType("test");
+            // $statisticsMonth->setCreatedFromIp($this->options["current_ip"]);
             
             $yearStatistics->addMonth($statisticsMonth);
             $this->adapter->persist($statisticsMonth);

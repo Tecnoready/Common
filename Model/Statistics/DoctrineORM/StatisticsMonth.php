@@ -214,6 +214,13 @@ class StatisticsMonth implements \Tecnoready\Common\Model\Statistics\StatisticsM
      */
     protected $day31 = 0;
     
+    /**
+     * @var string
+     *
+     * @ORM\Column(type="string",length=100)
+     */
+    protected $object;
+    
     use \Tecnoready\Common\Model\ObjectManager\Base\TraitBaseORM;
 
     public function getYear() {
@@ -526,6 +533,17 @@ class StatisticsMonth implements \Tecnoready\Common\Model\Statistics\StatisticsM
     public function setYearEntity(StatisticsYearInterface $yearEntity)
     {
         $this->yearEntity = $yearEntity;
+        return $this;
+    }
+
+    public function getObject()
+    {
+        return $this->object;
+    }
+    
+    public function setObject($object)
+    {
+        $this->object = $object;
         return $this;
     }
 
