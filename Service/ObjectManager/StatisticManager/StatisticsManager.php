@@ -89,7 +89,8 @@ class StatisticsManager
         return (int)$this->getValueDay($day,$foundStatistics);
     }
     
-    public function getStatisticsMonthTotal($object,$propertyPath,$year = null,$month = null) {
+    public function getStatisticsMonthTotal($object,$propertyPath,$year = null,$month = null) 
+    {
         $now = new \DateTime();
         if($year === null){
             $year = (int)$now->format("Y");
@@ -237,6 +238,7 @@ class StatisticsManager
         }
         $statisticsPropertyPath = "day".$day;
         $value = $this->propertyAccess->getValue($foundStatistics, $statisticsPropertyPath);
+
         return $value;
     }
     /**
@@ -305,6 +307,7 @@ class StatisticsManager
         for($month=1;$month<=12;$month++){
             $summary[$month] = $this->getStatisticsMonthTotal($object, $propertyPath, $year, $month);
         }
+        
         return $summary;
     }
     
