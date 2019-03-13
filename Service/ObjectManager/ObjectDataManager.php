@@ -65,6 +65,10 @@ class ObjectDataManager implements ConfigureInterface
         if($this->exporterManager){
             $this->exporterManager->configure($objectId, $objectType);
         }
+        if($this->statisticManager){
+            $this->statisticManager->configure($objectId, $objectType);
+        }
+
         return $this;
     }
     

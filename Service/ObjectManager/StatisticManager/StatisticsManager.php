@@ -11,12 +11,14 @@
 
 namespace Tecnoready\Common\Service\ObjectManager\StatisticManager;
 
+use Tecnoready\Common\Service\ObjectManager\ConfigureInterface;
+
 /**
  * Manejador de estadisticas
  *
  * @author Carlos Mendoza <inhack20@gmail.com>
  */
-class StatisticsManager
+class StatisticsManager implements ConfigureInterface
 {
     /**
      * @var \Symfony\Component\PropertyAccess\PropertyAccessor 
@@ -47,16 +49,24 @@ class StatisticsManager
         $this->propertyAccess = $builder->getPropertyAccessor();
         $this->adapter = $adapter;
         
-        $this->setOptions($options);
+        // $this->setOptions($options);
+    }
+
+    public function configure($objectId, $objectType)
+    {
+        $this->objectId = $objectId;
+        $this->objectType = $objectType;
     }
     
-    public function setOptions(array $options)
+    public function setOptions(array $options = [])
     {
         $resolver = new \Symfony\Component\OptionsResolver\OptionsResolver();
         $resolver->setDefaults([
             'date_format' => 'Y-m-d H:i:s',
         ]);
         
+        $resolver->setRequired(["object"]);
+        $resolver->addAllowedTypes("object","string");
         // $resolver->setRequired(["current_ip","date_format"]);
         // $resolver->addAllowedTypes("current_ip","string");
         // $resolver->addAllowedTypes("date_format","string");
@@ -66,14 +76,12 @@ class StatisticsManager
     
     /**
      * Retorna las estadisticas de un mes especifico por año y dia
-     * @param type $object
-     * @param type $propertyPath
      * @param type $year
      * @param type $month
      * @param type $day
-     * @return type
+     * @return StatisticsMonthValue
      */
-    public function getStatisticsMonthValue($object,$propertyPath,$year = null,$month = null,$day= null)
+    public function getStatisticsMonthValue($year = null,$month = null,$day= null)
     {
         $now = new \DateTime();
         if($year === null){
@@ -85,11 +93,12 @@ class StatisticsManager
         if($day === null){
             $day = (int)$now->format("d");
         }
-        $foundStatistics = $this->findStatisticsMonth($object, $propertyPath, $year, $month);
+        $foundStatistics = $this->findStatisticsMonth($year, $month);
+
         return (int)$this->getValueDay($day,$foundStatistics);
     }
     
-    public function getStatisticsMonthTotal($object,$propertyPath,$year = null,$month = null) 
+    public function getStatisticsMonthTotal($year = null,$month = null) 
     {
         $now = new \DateTime();
         if($year === null){
@@ -98,81 +107,73 @@ class StatisticsManager
         if($month === null){
             $month = (int)$now->format("m");
         }
-        $foundStatistics = $this->findStatisticsMonth($object, $propertyPath, $year, $month);
+        $foundStatistics = $this->findStatisticsMonth($year, $month);
         $total = 0;
         if($foundStatistics !== null){
             $total = $foundStatistics->getTotal();
         }
+
         return $total;
     }
     
-    public function getStatisticsYearValue($object,$propertyPath,$year = null)
+    public function getStatisticsYearValue($year = null)
     {
         $now = new \DateTime();
         if($year === null){
             $year = (int)$now->format("Y");
         }
-        $foundStatistics = $this->findStatisticsYear($object, $propertyPath, $year);
+        $foundStatistics = $this->findStatisticsYear($year);
         $total = 0;
         if($foundStatistics){
             $total = $foundStatistics->getTotal();
         }
+
         return $total;
     }
     
     /**
      * Retorna las estadisticas de un mes por el año
-     * @param type $object
-     * @param type $propertyPath
      * @param type $year
      * @param type $month
      * @return type
      */
-    public function findStatisticsMonth($object,$propertyPath,$year,$month) 
+    public function findStatisticsMonth($year,$month) 
     {
-        $foundStatisticsYear = $this->findStatisticsYear($object, $propertyPath, $year);
+        $foundStatisticsYear = $this->findStatisticsYear($year);
         $foundStatistics = null;
         if($foundStatisticsYear !== null){
             $foundStatistics = $foundStatisticsYear->getMonth($month);
         }
+
         return $foundStatistics;
     }
     
     /**
      * Retorna las estadisticas de un año
-     * @param type $object
-     * @param type $propertyPath
      * @param type $year
      * @param type $month
      * @return type
      */
-    public function findStatisticsYear($object,$year) 
+    public function findStatisticsYear($year) 
     {
         $year = (int)$year;
-        $foundStatistics = $this->adapter->getEntityManager()->getRepository(\Pandco\Bundle\OMBundle\Entity\Statistics\StatisticsYear::class)->findOneBy(["object" => $object, "year" => $year]);
-        // $statistics = $this->propertyAccess->getValue($object, $propertyPath);
+        $repository = $this->adapter->getEntityManager()->getRepository(\Pandco\Bundle\OMBundle\Entity\Statistics\StatisticsYear::class);
+        $foundStatistics = $repository->findOneBy(["objectType" => $this->objectType, "object" => $this->options["object"], "year" => $year]);        
         if (!$foundStatistics) {
             $foundStatistics = null;
         }
-        // foreach ($statistics as $statistic) {
-        //     if($statistic->getYear() === $year){
-        //         $foundStatistics = $statistic;
-        //         break;
-        //     }
-        // }
+        
         return $foundStatistics;
     }
 
     /**
      * Cuenta uno a las estadisticas de un objeto por el año, mes y dia
-     * @param type $object
-     * @param type $propertyPath
      * @param type $year
      * @param type $month
      * @param type $day
      * @return type
      */
-    public function countStatisticsMonth($object,$propertyPath,$year = null,$month = null,$day= null)
+    public function countStatisticsMonth($year = null,$month = null,$day= null, $value = null)
     {
         $now = new \DateTime();
         if($year === null){
@@ -185,17 +186,17 @@ class StatisticsManager
             $day = (int)$now->format("d");
         }
         
-        $foundStatisticsYear = $this->findStatisticsYear($object, $year);
-        // var_dump($foundStatisticsYear);
-        // die();
+        // Consulta de estadistica año
+        $foundStatisticsYear = $this->findStatisticsYear($year);
         if($foundStatisticsYear === null){
-            $foundStatisticsYear = $this->newYearStatistics($object,$year);
+            $foundStatisticsYear = $this->newYearStatistics($year);
             $this->adapter->persist($foundStatisticsYear);
         }
         $foundStatisticsMonth = $foundStatisticsYear->getMonth($month);
         
         $value = (int)$this->getValueDay($day,$foundStatisticsMonth);
         $value++;
+
         $this->setValueDay($foundStatisticsMonth, $day, $value);
         $foundStatisticsMonth->totalize();
         //Guardo cambios en el mes (totales)
@@ -222,6 +223,7 @@ class StatisticsManager
         }
         $statisticsPropertyPath = "day".$day;
         $value = $this->propertyAccess->getValue($foundStatistics, $statisticsPropertyPath);
+
         return $value;
     }
     
@@ -254,9 +256,13 @@ class StatisticsManager
     }
 
     /**
-     * Crea una nueva estadistica
+     * Registra una nueva estadistica
+     *  
+     * @author Máximo Sojo <maxsojo13@gmail.com>
+     * @param  String $year
+     * @return YearStatistics
      */
-    private function newYearStatistics($object, $year = null)
+    private function newYearStatistics($year = null)
     {
         $now = new \DateTime();
         if($year === null){
@@ -268,9 +274,10 @@ class StatisticsManager
         $yearStatistics = $this->adapter->newYearStatistics($this);
         $yearStatistics->setYear($year);
         $yearStatistics->setCreatedAt($nowString);
-        $yearStatistics->setObject($object);
-        $yearStatistics->setObjectId("test");
-        $yearStatistics->setObjectType("test");
+
+        $yearStatistics->setObject($this->options["object"]);
+        $yearStatistics->setObjectId($this->objectId);
+        $yearStatistics->setObjectType($this->objectType);
         // $yearStatistics->setCreatedFromIp($this->options["current_ip"]);
         
         $this->adapter->persist($yearStatistics);
@@ -281,9 +288,10 @@ class StatisticsManager
             $statisticsMonth->setYear($year);
             $statisticsMonth->setYearEntity($yearStatistics);
             $statisticsMonth->setCreatedAt($nowString);
-            $statisticsMonth->setObject($object);
-            $statisticsMonth->setObjectId("test");
-            $statisticsMonth->setObjectType("test");
+
+            $statisticsMonth->setObject($this->options["object"]);
+            $statisticsMonth->setObjectId($this->objectId);
+            $statisticsMonth->setObjectType($this->objectType);
             // $statisticsMonth->setCreatedFromIp($this->options["current_ip"]);
             
             $yearStatistics->addMonth($statisticsMonth);
@@ -296,23 +304,16 @@ class StatisticsManager
     
     /**
      * Retorna el resumen de las estadisticas del anio en un array
-     * @param type $object
-     * @param type $propertyPath
      * @param type $year
-     * @return type
+     * @return YearStatistics
      */
-    public function getSummaryYear($object,$propertyPath,$year = null)
+    public function getSummaryYear($year = null)
     {
         $summary = [];
         for($month=1;$month<=12;$month++){
-            $summary[$month] = $this->getStatisticsMonthTotal($object, $propertyPath, $year, $month);
+            $summary[$month] = $this->getStatisticsMonthTotal($year, $month);
         }
         
         return $summary;
-    }
-    
-    public function getOptions()
-    {
-        return $this->options;
     }
 }
