@@ -61,7 +61,7 @@ class DoctrineORMAdapter implements StatisticsAdapterInterface
     {
         $entity = new $this->classYearName;
         $entity
-            ->setUserAgent("dd")
+            ->setUserAgent($this->getUserAgent())
             ->setCreatedAt(new \DateTime());
 
         return $entity;
@@ -74,7 +74,7 @@ class DoctrineORMAdapter implements StatisticsAdapterInterface
     {
         $entity = new $this->classMonthName;
         $entity
-            ->setUserAgent("s")
+            ->setUserAgent($this->getUserAgent())
             ->setCreatedAt(new \DateTime());
 
         return $entity;
@@ -118,5 +118,26 @@ class DoctrineORMAdapter implements StatisticsAdapterInterface
     public function getEntityManager()
     {
         return $this->em;
+    }
+
+    /**
+     * Obtener el UserAgent
+     *  
+     * @author Máximo Sojo <maxsojo13@gmail.com>
+     * @return UserAgent
+     */
+    public function getUserAgent()
+    {
+        if (isset($_SERVER['HTTP_USER_AGENT'])) {
+            $userAgent = $_SERVER['HTTP_USER_AGENT'];
+        } elseif (\Tecnoready\Common\Util\AppUtil::isCommandLineInterface()) {
+            $userAgent = "cli-user-agent";
+        }
+
+        if (empty($userAgent)) {
+            $userAgent = "unknown";
+        }
+
+        return $userAgent;
     }
 }
