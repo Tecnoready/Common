@@ -12,6 +12,7 @@
 namespace Tecnoready\Common\Service\ObjectManager\StatisticManager;
 
 use Tecnoready\Common\Service\ObjectManager\ConfigureInterface;
+use InvalidArgumentException;
 
 /**
  * Manejador de estadisticas
@@ -24,8 +25,8 @@ class StatisticsManager implements ConfigureInterface
      * @var \Symfony\Component\PropertyAccess\PropertyAccessor 
      */
     private $propertyAccess;
+    
     /**
-     *
      * @var Adapter\StatisticsAdapterInterface
      */
     private $adapter;
@@ -34,8 +35,32 @@ class StatisticsManager implements ConfigureInterface
      * @var array
      */
     protected $options = array();
+
+    /**
+     * Adaptadores disponibles
+     * @var Adapters
+     */
+    private $adapters;
+
+    /**
+     * Adaptador por defecto
+     * @var Adapter\StatisticsAdapterInterface
+     */
+    private $defaultAdapter;
+
+    /**
+     * Objetos validos
+     * @var objectValids
+     */
+    private $objectValids;
+
+    /**
+     * $object
+     * @var Object
+     */
+    private $object;
     
-    public function __construct(Adapter\StatisticsAdapterInterface $adapter,array $options = []) 
+    public function __construct(Adapter\StatisticsAdapterInterface $adapter) 
     {
         if(!class_exists("Symfony\Component\PropertyAccess\PropertyAccess")){
             throw new \Exception(sprintf("The package '%s' is required, please install https://packagist.org/packages/symfony/property-access",'"symfony/property-access": "^3.1"'));
@@ -47,23 +72,32 @@ class StatisticsManager implements ConfigureInterface
         $builder->enableMagicCall();
         
         $this->propertyAccess = $builder->getPropertyAccessor();
-        $this->adapter = $adapter;
-        
-        // $this->setOptions($options);
+        $this->defaultAdapter = $adapter;
     }
-
+    
+    /**
+     * Registro de configuraciones
+     * @author Máximo Sojo <maxsojo13@gmail.com>
+     * @param  $objectId
+     * @param  $objectType
+     */
     public function configure($objectId, $objectType)
     {
+        $this->adapter = $this->defaultAdapter;
+        if (isset($this->adapters[$objectType])) {
+            $this->adapter = $this->adapters[$objectType];
+        }
+        
         $this->objectId = $objectId;
         $this->objectType = $objectType;
     }
-    
+
     public function setOptions(array $options = [])
     {
         $resolver = new \Symfony\Component\OptionsResolver\OptionsResolver();
-        $resolver->setDefaults([
-            'date_format' => 'Y-m-d H:i:s',
-        ]);
+        // $resolver->setDefaults([
+        //     'date_format' => 'Y-m-d H:i:s',
+        // ]);
         
         $resolver->setRequired(["object"]);
         $resolver->addAllowedTypes("object","string");
@@ -157,8 +191,8 @@ class StatisticsManager implements ConfigureInterface
     public function findStatisticsYear($year) 
     {
         $year = (int)$year;
-        $repository = $this->adapter->getEntityManager()->getRepository(\Pandco\Bundle\OMBundle\Entity\Statistics\StatisticsYear::class);
-        $foundStatistics = $repository->findOneBy(["objectType" => $this->objectType, "object" => $this->options["object"], "year" => $year]);        
+        $repository = $this->adapter->getEntityManager()->getRepository($this->adapter->getClassYear());
+        $foundStatistics = $repository->findOneBy(["objectType" => $this->objectType, "object" => $this->object, "year" => $year]);        
         if (!$foundStatistics) {
             $foundStatistics = null;
         }
@@ -173,8 +207,13 @@ class StatisticsManager implements ConfigureInterface
      * @param type $day
      * @return type
      */
-    public function countStatisticsMonth($year = null,$month = null,$day= null, $value = null)
+    public function countStatisticsMonth($object,$year = null,$month = null,$day= null, $value = null)
     {
+        if (!in_array($object,$this->objectValids[$this->objectType])) {
+            throw new InvalidArgumentException(sprintf("The object '%s' not add in object type '%s', please add",$object,$this->objectType));
+        }
+        $this->object = $object;
+
         $now = new \DateTime();
         if($year === null){
             $year = (int)$now->format("Y");
@@ -193,15 +232,18 @@ class StatisticsManager implements ConfigureInterface
             $this->adapter->persist($foundStatisticsYear);
         }
         $foundStatisticsMonth = $foundStatisticsYear->getMonth($month);
-        
-        $value = (int)$this->getValueDay($day,$foundStatisticsMonth);
-        $value++;
 
-        $this->setValueDay($foundStatisticsMonth, $day, $value);
+        if (!$value) {
+            $value = $this->getValueDay($day,$foundStatisticsMonth);
+            $value++;
+        }
+
+        $this->setValueDay($foundStatisticsMonth, $day, $value);            
         $foundStatisticsMonth->totalize();
+
         //Guardo cambios en el mes (totales)
-        $this->adapter->persist($foundStatisticsMonth);
-        
+        $this->adapter->persist($foundStatisticsMonth);        
+
         //Totalizo el valor del anio con los valores actualizados del mes.
         $foundStatisticsYear->totalize();
         $this->adapter->persist($foundStatisticsYear);
@@ -257,8 +299,7 @@ class StatisticsManager implements ConfigureInterface
 
     /**
      * Registra una nueva estadistica
-     *  
-     * @author Máximo Sojo <maxsojo13@gmail.com>
+     * 
      * @param  String $year
      * @return YearStatistics
      */
@@ -269,31 +310,24 @@ class StatisticsManager implements ConfigureInterface
             $year = $now->format("Y");
         }
 
-        // $nowString = $now->format($this->options["date_format"]);
-        $nowString = $now;
         $yearStatistics = $this->adapter->newYearStatistics($this);
         $yearStatistics->setYear($year);
-        $yearStatistics->setCreatedAt($nowString);
-
-        $yearStatistics->setObject($this->options["object"]);
+        $yearStatistics->setCreatedAt($now);
+        $yearStatistics->setObject($this->object);
         $yearStatistics->setObjectId($this->objectId);
         $yearStatistics->setObjectType($this->objectType);
-        // $yearStatistics->setCreatedFromIp($this->options["current_ip"]);
-        
-        $this->adapter->persist($yearStatistics);
-        
+        // $yearStatistics->setCreatedFromIp($this->options["current_ip"]);        
+        $this->adapter->persist($yearStatistics);        
         for($month = 1; $month <= 12; $month++){
             $statisticsMonth = $this->adapter->newStatisticsMonth($this);
             $statisticsMonth->setMonth($month);
             $statisticsMonth->setYear($year);
             $statisticsMonth->setYearEntity($yearStatistics);
-            $statisticsMonth->setCreatedAt($nowString);
-
-            $statisticsMonth->setObject($this->options["object"]);
+            $statisticsMonth->setCreatedAt($now);
+            $statisticsMonth->setObject($this->object);
             $statisticsMonth->setObjectId($this->objectId);
             $statisticsMonth->setObjectType($this->objectType);
-            // $statisticsMonth->setCreatedFromIp($this->options["current_ip"]);
-            
+            // $statisticsMonth->setCreatedFromIp($this->options["current_ip"]);            
             $yearStatistics->addMonth($statisticsMonth);
             $this->adapter->persist($statisticsMonth);
         }
@@ -315,5 +349,26 @@ class StatisticsManager implements ConfigureInterface
         }
         
         return $summary;
+    }
+
+    /**
+     * Agrega un adaptador
+     * @param StatisticsAdapterInterface $adapter
+     */
+    public function addAdapter(Adapter\StatisticsAdapterInterface $adapter,$objectType)
+    {
+        $this->adapters[$objectType] = $adapter;
+    }
+
+    /**
+     * Agrega objetos validos por tipo de objeto
+     *  
+     * @author Máximo Sojo <maxsojo13@gmail.com>
+     * @param  $objectType
+     * @param  array  $objectValids
+     */
+    public function addObjectValids($objectType,array $objectValids = array())
+    {
+        $this->objectValids[$objectType] = $objectValids;
     }
 }

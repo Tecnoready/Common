@@ -19,13 +19,25 @@ namespace Tecnoready\Common\Service\ObjectManager\StatisticManager\Adapter;
 class DoctrineORMAdapter implements StatisticsAdapterInterface
 {
     /**
+     * @var string
+     */
+    public $classYearName;
+
+    /**
+     * @var string
+     */
+    private $classMonthName;
+
+    /**
      * Manejador de entidades
      * @var \Doctrine\ORM\EntityManager
      */
     private $em;
     
-    public function __construct(\Doctrine\ORM\EntityManager $em) 
+    public function __construct($classYearName,$classMonthName,\Doctrine\ORM\EntityManager $em) 
     {
+        $this->classYearName = $classYearName;
+        $this->classMonthName = $classMonthName;
         $this->em = $em;
     }
 
@@ -34,7 +46,7 @@ class DoctrineORMAdapter implements StatisticsAdapterInterface
      */
     public function newYearStatistics(\Tecnoready\Common\Service\ObjectManager\StatisticManager\StatisticsManager $statisticsManager)
     {
-        $entity = new \Pandco\Bundle\OMBundle\Entity\Statistics\StatisticsYear();
+        $entity = new $this->classYearName;
         $entity
             ->setUserAgent("dd")
             ->setCreatedAt(new \DateTime());
@@ -47,7 +59,7 @@ class DoctrineORMAdapter implements StatisticsAdapterInterface
      */
     public function newStatisticsMonth(\Tecnoready\Common\Service\ObjectManager\StatisticManager\StatisticsManager $statisticsManager)
     {
-        $entity = new \Pandco\Bundle\OMBundle\Entity\Statistics\StatisticsMonth();
+        $entity = new $this->classMonthName;
         $entity
             ->setUserAgent("s")
             ->setCreatedAt(new \DateTime());
@@ -74,5 +86,10 @@ class DoctrineORMAdapter implements StatisticsAdapterInterface
     public function getEntityManager()
     {
         return $this->em;
+    }
+
+    public function getClassYear()
+    {
+        return $this->classYearName;
     }
 }
