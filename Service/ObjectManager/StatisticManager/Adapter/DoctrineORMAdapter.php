@@ -11,6 +11,8 @@
 
 namespace Tecnoready\Common\Service\ObjectManager\StatisticManager\Adapter;
 
+use Tecnoready\Common\Service\ObjectManager\ConfigureInterface;
+
 /**
  * Adaptador de doctrine 2
  *
@@ -41,6 +43,17 @@ class DoctrineORMAdapter implements StatisticsAdapterInterface
         $this->em = $em;
     }
 
+    /**
+     * @author Máximo Sojo <maxsojo13@gmail.com>
+     * @param  $objectId
+     * @param  $objectType
+     */
+    public function configure($objectId, $objectType)
+    {   
+        $this->objectId = $objectId;
+        $this->objectType = $objectType;
+    }
+
 	/**
      * @return \Tecnoready\Common\Model\Configuration\Statistics\StatisticsYearInterface Description
      */
@@ -67,6 +80,13 @@ class DoctrineORMAdapter implements StatisticsAdapterInterface
         return $entity;
     }
 
+    /**
+     * Registra cambios en entidad
+     *  
+     * @author Máximo Sojo <maxsojo13@gmail.com>
+     * @param  $entity
+     * @return EntityManager
+     */
     public function persist($entity)
     {
         return $this->em->persist($entity);
@@ -77,9 +97,16 @@ class DoctrineORMAdapter implements StatisticsAdapterInterface
         return $this->em->flush();
     }
 
+    /**
+     * Consulta de año
+     *  
+     * @author Máximo Sojo <maxsojo13@gmail.com>
+     * @param  array  $params
+     * @return StatisticYear
+     */
     public function findStatisticsYear(array $params = array())
     {
-        return $this->getEntityManager()->getRepository($this->getClassYear())->findOneBy($params);
+        return $this->getEntityManager()->getRepository($this->classYearName)->findOneBy(array_merge(["objectType" => $this->objectType],$params));
     }
 
     /**
@@ -91,10 +118,5 @@ class DoctrineORMAdapter implements StatisticsAdapterInterface
     public function getEntityManager()
     {
         return $this->em;
-    }
-
-    public function getClassYear()
-    {
-        return $this->classYearName;
     }
 }

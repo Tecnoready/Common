@@ -90,22 +90,7 @@ class StatisticsManager implements ConfigureInterface
         
         $this->objectId = $objectId;
         $this->objectType = $objectType;
-    }
-
-    public function setOptions(array $options = [])
-    {
-        $resolver = new \Symfony\Component\OptionsResolver\OptionsResolver();
-        // $resolver->setDefaults([
-        //     'date_format' => 'Y-m-d H:i:s',
-        // ]);
-        
-        $resolver->setRequired(["object"]);
-        $resolver->addAllowedTypes("object","string");
-        // $resolver->setRequired(["current_ip","date_format"]);
-        // $resolver->addAllowedTypes("current_ip","string");
-        // $resolver->addAllowedTypes("date_format","string");
-        
-        $this->options = $resolver->resolve($options);
+        $this->adapter->configure($objectId, $objectType);
     }
     
     /**
@@ -191,7 +176,7 @@ class StatisticsManager implements ConfigureInterface
     public function findStatisticsYear($year) 
     {
         $year = (int)$year;
-        $foundStatistics = $this->adapter->findStatisticsYear(["objectType" => $this->objectType, "object" => $this->object, "year" => $year]);
+        $foundStatistics = $this->adapter->findStatisticsYear(["object" => $this->object, "year" => $year]);
         if (!$foundStatistics) {
             $foundStatistics = null;
         }
