@@ -217,9 +217,9 @@ class StatisticsManager implements ConfigureInterface
         }
         $foundStatisticsMonth = $foundStatisticsYear->getMonth($month);
 
-        if (!$value && is_string($value)) {
-            var_dump($value);
-            die();
+        if ($value && is_string($value)) {
+            $value = $this->getValueDay($day,$foundStatisticsMonth) + intval($value);
+        } elseif (!$value) {
             $value = $this->getValueDay($day,$foundStatisticsMonth);
             $value++;
         }
