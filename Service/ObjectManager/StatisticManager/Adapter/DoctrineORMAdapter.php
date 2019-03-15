@@ -106,18 +106,7 @@ class DoctrineORMAdapter implements StatisticsAdapterInterface
      */
     public function findStatisticsYear(array $params = array())
     {
-        return $this->getEntityManager()->getRepository($this->classYearName)->findOneBy(array_merge(["objectType" => $this->objectType],$params));
-    }
-
-    /**
-     * Retorna manejador de entidades
-     *  
-     * @author Máximo Sojo <maxsojo13@gmail.com>
-     * @return EntityManager
-     */
-    public function getEntityManager()
-    {
-        return $this->em;
+        return $this->em->getRepository($this->classYearName)->findOneBy(array_merge(["objectType" => $this->objectType],$params));
     }
 
     /**
