@@ -36,6 +36,11 @@ class ObjectDataManager implements ConfigureInterface
      */
     private $exporterManager;
     
+    /**
+     * @var StatisticManager\StatisticsManager
+     */
+    private $statisticsManager;
+    
     public function __construct(DocumentManager\DocumentManager $documentManager, HistoryManager\HistoryManager $historyManager, NoteManager\NoteManager $noteManager,ExporterManager $exporterManager)
     {
         $this->documentManager = $documentManager;
@@ -65,8 +70,8 @@ class ObjectDataManager implements ConfigureInterface
         if($this->exporterManager){
             $this->exporterManager->configure($objectId, $objectType);
         }
-        if($this->statisticManager){
-            $this->statisticManager->configure($objectId, $objectType);
+        if($this->statisticsManager){
+            $this->statisticsManager->configure($objectId, $objectType);
         }
 
         return $this;

@@ -70,8 +70,6 @@ class TwigSwiftMailer {
                 $this->templateSource = <<<EOF
                 {% extends template_from_string(baseString) %}
                 
-                {% block subject %}{% include (template_from_string(subjectString)) %}{% endblock subject %}
-
                 {% block header %}{% include template_from_string(headerString) %}{% endblock %}
 
                 {% block content_html %}{% include(template_from_string(bodyString)) with _context %}{% endblock %}
@@ -90,7 +88,7 @@ EOF;
      * @return EmailQueueInterface
      */
     public function emailQueue($id,$context,$toEmail,array $attachs = [],array $extras = []) {
-        $context = $this->buildDocumentContext($id, $context, $toEmail, $attachs);       
+        $context = $this->buildDocumentContext($id, $context, $toEmail, $attachs);
         $template =$this->twig->createTemplate($this->templateSource);
         $email = $this->buildEmail($template, $context, $toEmail);
         $email->setAttachs($attachs);
@@ -167,12 +165,16 @@ EOF;
         }
         if($templateName instanceof \Twig_Template){
             $template = $templateName;            
+        }elseif((class_exists("Twig\TemplateWrapper") && $templateName instanceof \Twig\TemplateWrapper) ||
+                 (class_exists("Twig_TemplateWrapper") && $templateName instanceof \Twig_TemplateWrapper)){
+            $template = $templateName;            
         }else{
              $template = $this->twig->loadTemplate($templateName);               
-        }        
-        $subject = $template->renderBlock('subject', $context);
-        $textBody = $template->renderBlock('body_text', $context);      
-        $htmlBody = $template->renderBlock('body_html', $context);
+        }
+        $tplSubjet = $this->twig->createTemplate("{% block subject %}{% include (template_from_string(subjectString)) %}{% endblock subject %}");
+        $subject = $tplSubjet->renderBlock('subject', $context);
+        $htmlBody = $template->render($context);
+
         if ($fromEmail === null) {
             $fromEmail = array($this->options["from_email"] => $this->options["from_name"]);
         }
@@ -184,11 +186,7 @@ EOF;
                 ->setFromEmail($fromEmail)
                 ->setToEmail($toEmail)
         ;                
-        if (!empty($htmlBody)) {
-            $email->setBody($htmlBody);
-        } else {
-            $email->setBody($textBody);
-        }
+        $email->setBody($htmlBody);
         return $email;
     }
     
@@ -217,9 +215,9 @@ EOF;
             $headerString = $header->getBody();
         }
         if($base){
-            $baseString = "{% block subject '' %}{% block body_text '' %}{% block body_html %}".$base->getBody()."{% endblock %}";
+            $baseString = "{% block body_html %}".$base->getBody()."{% endblock body_html %}";
         }else {
-            $baseString = "{% block subject '' %}{% block body_text '' %}{% block body_html %}{% endblock %}";
+            $baseString = "{% block body_html %}{% endblock body_html %}";
         }
         if($footer){
             $footerString = $footer->getBody();
