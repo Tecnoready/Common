@@ -13,6 +13,7 @@ namespace Tecnoready\Common\Service\ConfigurationService;
 
 use Tecnoready\Common\Service\ConfigurationService\CacheInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use RuntimeException;
 
 /**
  * Manejador de configuracion
@@ -37,7 +38,7 @@ class ConfigurationManager {
     private $adapter;
     
     /**
-     * @var \Tecnoready\Common\Model\Configuration\CacheInterface
+     * @var CacheInterface
      */
     private $cache;
     
@@ -150,22 +151,9 @@ class ConfigurationManager {
      * @return mixed
      */
     function get($key,$wrapperName = null,$default = null) {
-        if($wrapperName === null){
-            $wrapperName = \Tecnoready\Common\Model\Configuration\Wrapper\DefaultConfigurationWrapper::getName();
-        }
-        $key = strtoupper($key);
-        $wrapperName = strtoupper($wrapperName);
-        $this->cache->setAdapter($this->adapter);
-        if(!$this->cache->contains($key, $wrapperName)){
-            $this->clearCache();//Pre-calencar cache
-            $this->warmUp();//Pre-calencar cache
-        }
-        $configuration = $this->cache->getConfiguration($key, $wrapperName);
+        $configuration = $this->getConfiguration($key,$wrapperName);
         if($configuration !== null){
-            $value = $configuration->getValue();
-            for ($i = \count($this->transformers) - 1; $i >= 0; --$i) {
-                $value = $this->transformers[$i]->reverseTransform($value,$configuration);
-            }
+            $value = $this->reverseTransform($configuration->getValue(), $configuration);
         }else{
             $value = $default;
         }
@@ -204,10 +192,7 @@ class ConfigurationManager {
             }
             $configuration->setUpdatedAt();
         }
-        foreach ($this->transformers as $transformer) {
-            $value = $transformer->transform($value, $configuration);
-        }
-        $configuration->setValue($value);
+        $configuration->setValue($this->transform($value, $configuration));
         $this->adapter->persist($configuration);
         $success = $this->adapter->flush();
         
@@ -230,6 +215,50 @@ class ConfigurationManager {
     }
     
     /**
+     * Busca la descripcion de una configuracion
+     * @param type $key
+     * @param type $wrapperName
+     * @return type
+     */
+    public function getDescription($key,$wrapperName = null) {
+        $configuration = $this->getConfiguration($key,$wrapperName);
+        if($configuration !== null){
+            $value = $configuration->getDescription();
+        }else{
+            $value = null;
+        }
+        return $value;
+    }
+    
+    /**
+     * Busca la configuracion del formulario de edicion por un indice
+     * @param type $key
+     * @return type
+     * @throws RuntimeException
+     */
+    public function getFormEditConfig($key)
+    {
+        $config = null;
+        foreach ($this->configurationsWrapper as $wrapper) {
+            $allConfig = $wrapper->getAllFormEditConfig();
+            if(isset($allConfig[$key])){
+                if(!is_string($allConfig[$key][0])){
+                    throw new RuntimeException(sprintf("The config parameter '0' must be a string type class."));
+                }
+                if(is_callable($allConfig[$key][1])){
+                    $allConfig[$key][1] = call_user_func_array($allConfig[$key][1],[$this]);
+                    
+                }else if(!is_array($allConfig[$key][1])){
+                    throw new RuntimeException(sprintf("The config parameter '1' must be a array o callable."));
+                }
+                $config = $allConfig[$key];
+                break;
+            }
+        }
+        return $config;
+    }
+    
+    /**
      * Guarda los cambios en la base de datos
      */
     function flush($andClearCache = true)
@@ -246,7 +275,11 @@ class ConfigurationManager {
      */
     function warmUp()
     {
-        $this->cache->warmUp($this->adapter->findAll());
+        $configurations = $this->adapter->findAll();
+//        foreach ($configurations as $configuration) {
+//            $configuration->setValue($this->transform($value, $configuration));
+//        }
+        $this->cache->warmUp($configurations);
         return $this;
     }
     
@@ -257,5 +290,51 @@ class ConfigurationManager {
     {
         $this->cache->flush();
         return $this;
+    }
+    
+    /**
+     * Retorna la configuracion
+     * @param type $key
+     * @param type $wrapperName
+     * @return \Tecnoready\Common\Model\Configuration\BaseEntity\ConfigurationInterface
+     */
+    private function getConfiguration($key,$wrapperName = null) {
+        if($wrapperName === null){
+            $wrapperName = \Tecnoready\Common\Model\Configuration\Wrapper\DefaultConfigurationWrapper::getName();
+        }
+        $key = strtoupper($key);
+        $wrapperName = strtoupper($wrapperName);
+        $this->cache->setAdapter($this->adapter);
+        if(!$this->cache->contains($key, $wrapperName)){
+            $this->clearCache();//Pre-calencar cache
+            $this->warmUp();//Pre-calencar cache
+        }
+        return $this->cache->getConfiguration($key, $wrapperName);
+    }
+    
+    /**
+     * Convierte el valor transformado a el valor original
+     * @param type $value
+     * @param type $configuration
+     * @return type
+     */
+    private function reverseTransform($value,$configuration) {
+        for ($i = \count($this->transformers) - 1; $i >= 0; --$i) {
+            $value = $this->transformers[$i]->reverseTransform($value,$configuration);
+        }
+        return $value;
+    }
+    
+    /**
+     * Transforma un valor a su valor serializable
+     * @param type $value
+     * @param type $configuration
+     * @return type
+     */
+    private function transform($value, $configuration) {
+        foreach ($this->transformers as $transformer) {
+            $value = $transformer->transform($value, $configuration);
+        }
+        return $value;
     }
 }

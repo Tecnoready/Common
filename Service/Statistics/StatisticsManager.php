@@ -33,7 +33,8 @@ class StatisticsManager
      */
     protected $options = array();
     
-    public function __construct(Adapter\StatisticsAdapterInterface $adapter,array $options) {
+    public function __construct(Adapter\StatisticsAdapterInterface $adapter,array $options) 
+    {
         if(!class_exists("Symfony\Component\PropertyAccess\PropertyAccess")){
             throw new \Exception(sprintf("The package '%s' is required, please install https://packagist.org/packages/symfony/property-access",'"symfony/property-access": "^3.1"'));
         }
@@ -204,6 +205,7 @@ class StatisticsManager
         
         return $foundStatisticsMonth;
     }
+
     /**
      * Retorna el valor de un dia
      * @param type $day
@@ -250,7 +252,8 @@ class StatisticsManager
     /**
      * Crea una nueva estadistica
      */
-    private function newYearStatistics($year = null){
+    private function newYearStatistics($year = null)
+    {
         $now = new \DateTime();
         if($year === null){
             $year = $now->format("Y");
@@ -291,7 +294,8 @@ class StatisticsManager
      * @param type $year
      * @return type
      */
-    public function getSummaryYear($object,$propertyPath,$year = null) {
+    public function getSummaryYear($object,$propertyPath,$year = null)
+    {
         $summary = [];
         for($month=1;$month<=12;$month++){
             $summary[$month] = $this->getStatisticsMonthTotal($object, $propertyPath, $year, $month);
@@ -299,7 +303,8 @@ class StatisticsManager
         return $summary;
     }
     
-    public function getOptions() {
+    public function getOptions()
+    {
         return $this->options;
     }
 }

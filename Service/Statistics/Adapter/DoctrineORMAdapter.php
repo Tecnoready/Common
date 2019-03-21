@@ -24,7 +24,8 @@ abstract class DoctrineORMAdapter implements StatisticsAdapterInterface
      */
     private $em;
     
-    public function __construct(\Doctrine\ORM\EntityManager $em) {
+    public function __construct(\Doctrine\ORM\EntityManager $em) 
+    {
         $this->em = $em;
     }
 }

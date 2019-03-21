@@ -14,6 +14,7 @@ namespace Tecnoready\Common\Service\ConfigurationService\Cache;
 use Tecnoready\Common\Model\Configuration\BaseCache;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Finder\Finder;
 
 /**
  * Cache de disco
@@ -29,6 +30,7 @@ class DiskStore extends BaseCache
     protected $configurations;
     
     private $isInit = false;
+    private $dumpedAt = null;
 
     public function __construct(array $options) {
         $resolver = new OptionsResolver();
@@ -54,9 +56,23 @@ class DiskStore extends BaseCache
         if($this->isInit){
             return;
         }
-        $filename = $this->getCacheFileName();
+        $folder = $this->getCacheFolder();
+        if(!$this->fs->exists($folder)){
+            return;
+        }
+        $finder = new Finder();
+        $finder->in($folder)->files()->depth(0)->sortByName();
+        $last = null;
+        foreach ($finder as $file) {
+            $last = $file;
+        }
+        if($last === null){
+            return;
+        }
+        $filename = $last->getPathName();
         if($this->fs->exists($filename)){
             $configurations = include $filename;
+            $this->dumpedAt = $configurations["dumped_at"];
             $this->values = $configurations["values"];
             $this->isInit = true;
         }
@@ -91,22 +107,8 @@ class DiskStore extends BaseCache
     public function flush() {
         //eliminar cache
         $this->values = [];
-        $filename = $this->getCacheFileName();
-        $this->fs->remove($filename);
+        $this->clearCacheFolder();
         $this->isInit = false;
-    }
-
-    function getConfiguration($key,$wrapperName)
-    {
-        if($this->contains($key, $wrapperName)){
-            $data = $this->fetch($key, $wrapperName);
-            $configuration = $this->adapter->createNew();
-            $configuration->setValue($data["value"]);
-            $configuration->setType($data["type"]);
-            $configuration->setDataType($data["data_type"]);
-            return $configuration;
-        }
-        return null;
     }
     
     public function warmUp(array $configurations) {
@@ -116,12 +118,12 @@ class DiskStore extends BaseCache
             $data = array();
             $data['value'] = $configuration->getValue();
             $data['type'] = $configuration->getType();
-            $data['data_type'] = $configuration->getDataType();
+            $data['dataType'] = $configuration->getDataType();
+            $data['description'] = $configuration->getDescription();
             
             $id = $this->getId($configuration->getKey(),$configuration->getNameWrapper());
             $code .= sprintf("'%s' => '%s',\n", $id ,$this->encrypt(serialize($data)));
         }
-        
         $code = rtrim($code);
         
         $success = $this->saveToDisk($code);
@@ -131,7 +133,18 @@ class DiskStore extends BaseCache
 
     private function getCacheFileName() {
         $ds = DIRECTORY_SEPARATOR;
-        return $this->options["cache_dir"].$ds.$this->options["folder"].$ds.$this->options["filename"];
+        return $this->getCacheFolder().$ds.$this->options["filename"];
+    }
+    
+    private function getCacheFolder()
+    {
+        $ds = DIRECTORY_SEPARATOR;
+        return $this->options["cache_dir"].$ds.$this->options["folder"].$ds."params";
+    }
+    
+    private function clearCacheFolder()
+    {
+        $this->fs->remove($this->getCacheFolder());
     }
 
     private function updateFromValues() {
@@ -155,8 +168,9 @@ return array(
     )
 );
 EOF;
-        $filename = $this->getCacheFileName();
-        $this->fs->remove($filename);
+        
+        $filename = $this->getCacheFileName().".".time();
+        $this->clearCacheFolder();
         $this->fs->dumpFile($filename, $content);
         return true;
     }

@@ -98,18 +98,6 @@ class MemcachedStore extends BaseCache
         return $this->memcached->flush();
     }
 
-    public function getConfiguration($key, $wrapperName) {
-         if($this->contains($key, $wrapperName)){
-            $data = $this->fetch($key, $wrapperName);
-            $configuration = $this->adapter->createNew();
-            $configuration->setValue($data["value"]);
-            $configuration->setType($data["type"]);
-            $configuration->setDataType($data["data_type"]);
-            return $configuration;
-        }
-        return null;
-    }
-
     public function save($key, $wrapperName, $data, $lifeTime = 0) {
         $data = $this->encrypt(serialize($data));
         return $this->memcached->set($this->getId($key, $wrapperName),$data);
@@ -122,9 +110,8 @@ class MemcachedStore extends BaseCache
             $data['value'] = $configuration->getValue();
             $data['type'] = $configuration->getType();
             $data['data_type'] = $configuration->getDataType();
-//            var_dump($configuration->getKey());
+            $data['description'] = $configuration->getDescription();
             $this->save($configuration->getKey(), $configuration->getNameWrapper(),$data);
-//            $this->save($configuration->getKey(), $configuration->getNameWrapper(), var_export($data,true));
         }
     }
     

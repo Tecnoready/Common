@@ -35,7 +35,7 @@ abstract class DoctrineORMConfiguration implements ConfigurationInterface
      * Valor de configuracion
      * 
      * @var string
-     * @ORM\Column(name="item_value", type="text")
+     * @ORM\Column(name="item_value", type="text",nullable=true)
      */
     protected $value;
     
