@@ -159,10 +159,18 @@ EOF;
      * @return EmailQueueInterface
      */
     protected function buildEmail($templateName, $context, $toEmail,$fromEmail = null) {
-        $context['toEmail'] = $toEmail;        
-        if(class_exists("FOS\UserBundle\Model\UserInterface" && $toEmail instanceof \FOS\UserBundle\Model\UserInterface)){
+        $context['toEmail'] = $toEmail;   
+        $context['appName'] = $this->options["from_name"];
+        
+        if(class_exists("FOS\UserBundle\Model\UserInterface") && $toEmail instanceof \FOS\UserBundle\Model\UserInterface){
             $toEmail = $toEmail->getEmail();
         }
+        if(is_object($toEmail) && method_exists($toEmail,"getEmail")){
+            $toEmail = $toEmail->getEmail();
+        }
+
+//        var_dump(get_class($toEmail));
+//        die;
         if($templateName instanceof \Twig_Template){
             $template = $templateName;            
         }elseif((class_exists("Twig\TemplateWrapper") && $templateName instanceof \Twig\TemplateWrapper) ||
@@ -178,7 +186,7 @@ EOF;
         if ($fromEmail === null) {
             $fromEmail = array($this->options["from_email"] => $this->options["from_name"]);
         }
-        
+        $toEmail = (array)$toEmail;
         $email = $this->adapter->createEmailQueue();
         $email
                 ->setStatus(EmailQueueInterface::STATUS_NOT_SENT)
