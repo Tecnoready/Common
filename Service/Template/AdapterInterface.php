@@ -12,7 +12,7 @@ interface AdapterInterface
 {
     public function render(TemplateInterface $template,array $variables);
     
-    public function compile($filename,$element,array $parameters);
+    public function compile($filename,$string,array $parameters);
     
     public function getExtension();
     

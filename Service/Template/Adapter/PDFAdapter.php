@@ -17,6 +17,9 @@ use RuntimeException;
  */
 class PDFAdapter implements AdapterInterface
 {
+    /**
+     * @var Twig_Environment 
+     */
     private $twig;
     
     /**

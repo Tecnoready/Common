@@ -33,6 +33,7 @@ class ConfigurationUtil {
         "guzzleHttp" => "checkGuzzleHttp",
         "propertyAccess" => "checkPropertyAccess",
         "phpoffice/phpspreadsheet" => "checkPhpspreadsheet",
+        "tecnickcom/tcpdf" => "checkTCPDF",
     ];
     
     public static function checkLib($name) {
@@ -61,6 +62,11 @@ class ConfigurationUtil {
     private static function checkPhpspreadsheet() {
         if (!class_exists('\PhpOffice\PhpSpreadsheet\IOFactory')) {
             throw new \Exception(sprintf("The package '%s' is required, please install.",'"phpoffice/phpspreadsheet": "^1.6"'));
+        }
+    }
+    private static function checkTCPDF() {
+        if (!class_exists('\TCPDF')) {
+            throw new \Exception(sprintf("The package '%s' is required, please install.",'"tecnickcom/tcpdf": "^6.2"'));
         }
     }
     
