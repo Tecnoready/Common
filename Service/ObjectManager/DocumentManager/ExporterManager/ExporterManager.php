@@ -154,6 +154,7 @@ class ExporterManager implements ConfigureInterface
         if(!is_readable($pathFileOut)){
             throw new RuntimeException(sprintf("Failed to generate document '%s' with name '%s'. File '%s' is not readable.",$this->objectType,$name,$pathFileOut));
         }
+        $this->documentManager->folder("generated");
         $file = new File($pathFileOut);
         $file = $this->documentManager->upload($file,[
             "overwrite" => $overwrite,

@@ -115,7 +115,7 @@ abstract class ModelEmailQueue implements EmailQueueInterface
         return $this;
     }
 
-    public function setToEmail($toEmail) {
+    public function setToEmail(array $toEmail) {
         $this->toEmail = $toEmail;
         return $this;
     }

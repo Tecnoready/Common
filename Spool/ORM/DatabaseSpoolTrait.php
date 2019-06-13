@@ -11,10 +11,10 @@
 
 namespace Tecnoready\Common\Spool\ORM;
 
-use Tecnoready\Common\Model\Email\ORM\Email;
 use Tecnoready\Common\Model\Email\ORM\EmailRepository;
 use Swift_Transport;
 use Tecnoready\Common\Model\Email\EmailInterface;
+use Doctrine\ORM\EntityManagerInterface;
 
 /**
  * Trait de spool de base de datos
@@ -25,9 +25,9 @@ trait DatabaseSpoolTrait
 {
 
     /**
-     * @var EmailRepository
+     * @var EntityManagerInterface
      */
-    protected $repository;
+    protected $em;
 
     /**
      * @var string
@@ -44,10 +44,10 @@ trait DatabaseSpoolTrait
      */
     private $environment;
 
-    public function __construct(EmailRepository $repository, $entityClass, $environment, $keepSentMessages = false)
+    public function __construct(EntityManagerInterface $em,$entityClass, $environment, $keepSentMessages = false)
     {
-        $this->repository = $repository;
-
+        $this->em = $em;
+        
         $this->keepSentMessages = $keepSentMessages;
         $obj = new $entityClass;
         if (!$obj instanceof EmailInterface) {
@@ -99,9 +99,9 @@ trait DatabaseSpoolTrait
         $count = 0;
         $limit = $this->getMessageLimit();
         $limit = $limit > 0 ? $limit : null;
-        $this->repository->updateTruncatedMessages($this->environment);
+        $this->em->getRepository($this->entityClass)->updateTruncatedMessages($this->environment);
 
-        $emails = $this->repository->getEmailQueue($this->environment, $limit);
+        $emails = $this->em->getRepository($this->entityClass)->getEmailQueue($this->environment, $limit);
         if (!count($emails)) {
             return 0;
         }
@@ -126,21 +126,21 @@ trait DatabaseSpoolTrait
                 }
                 $count_ = $transport->send($message, $failedRecipients);
                 if ($count_ > 0) {
-                    $this->repository->markCompleteSending($email);
+                    $this->em->getRepository($this->entityClass)->markCompleteSending($email);
                     $count += $count_;
                 } else {
                     throw new \Swift_SwiftException('The email was not sent.');
                 }
             } catch (\Exception $ex) {
                 $message = $ex->getMessage() . " - " . $logger->dump();
-                $this->repository->markFailedSending($email, $message);
+                $this->em->getRepository($this->entityClass)->markFailedSending($email, $message);
             }
             if ($this->getTimeLimit() && (time() - $time) >= $this->getTimeLimit()) {
                 $expired = true;
             }
         }
         if (count($messagesExpired) > 0) {
-            $this->repository->markExpiredToReady($messagesExpired);
+            $this->em->getRepository($this->entityClass)->markExpiredToReady($messagesExpired);
         }
         return $count;
     }
@@ -166,7 +166,7 @@ trait DatabaseSpoolTrait
         $email->setMessage($message);
         $email->setEnvironment($this->environment);
 
-        $this->repository->addEmail($email);
+        $this->em->getRepository($this->entityClass)->addEmail($email);
 
         return true;
     }

@@ -13,14 +13,17 @@ namespace Tecnoready\Common\Model\Email\ORM;
 
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Tecnoready\Common\Model\Email\EmailInterface;
 
 /**
- * Description of Email
+ * Modelo ORM base de doctrine
  *
  * @author Carlos Mendoza <inhack20@gmail.com>
+ * @ORM\MappedSuperclass()
  */
-abstract class ModelEmail implements \Tecnoready\Common\Model\Email\EmailInterface {
-    
+abstract class ModelEmail implements EmailInterface
+{
+
     /**
      * @var integer
      *
@@ -29,66 +32,77 @@ abstract class ModelEmail implements \Tecnoready\Common\Model\Email\EmailInterfa
      * @ORM\GeneratedValue(strategy="UUID")
      */
     protected $id;
+
     /**
      * @var string
      *
      * @ORM\Column(name="subject", type="text")
      */
     protected $subject;
+
     /**
      * @var string
      *
      * @ORM\Column(name="from_email", type="string", length=255)
      */
     protected $fromEmail;
+
     /**
      * @var string
      *
      * @ORM\Column(name="to_email", type="string", length=255, nullable=true)
      */
     protected $toEmail;
+
     /**
      * @var string
      *
      * @ORM\Column(name="cc_email", type="string", length=255, nullable=true)
      */
     protected $ccEmail;
+
     /**
      * @var string
      *
      * @ORM\Column(name="bcc_email", type="string", length=255, nullable=true)
      */
     protected $bccEmail;
+
     /**
      * @var string
      *
      * @ORM\Column(name="reply_to_email", type="string", length=255, nullable=true)
      */
     protected $replyToEmail;
+
     /**
      * @var string
      *
      * @ORM\Column(name="body", type="text")
      */
     protected $body;
+
     /**
      * @var string
      *
      * @ORM\Column(name="message", type="text")
      */
     protected $message;
+
     /**
      * @var string
      *
      * @ORM\Column(name="status", type="string", length=255)
      */
     protected $status;
+
     /**
      * @var string
      *
      * @ORM\Column(name="retries", type="integer")
      */
     protected $retries;
+
     /**
      * @var \DateTime $created
      *
@@ -96,6 +110,7 @@ abstract class ModelEmail implements \Tecnoready\Common\Model\Email\EmailInterfa
      * @ORM\Column(name="created_at", type="datetime", nullable=true)
      */
     protected $createdAt;
+
     /**
      * @var \DateTime $updated
      *
@@ -103,6 +118,7 @@ abstract class ModelEmail implements \Tecnoready\Common\Model\Email\EmailInterfa
      * @ORM\Column(name="updated_at", type="datetime", nullable=true)
      */
     protected $updatedAt;
+
     /**
      * @var string $createdBy
      *
@@ -110,6 +126,7 @@ abstract class ModelEmail implements \Tecnoready\Common\Model\Email\EmailInterfa
      * @ORM\Column(name="created_by", type="string", nullable=true)
      */
     protected $createdBy;
+
     /**
      * @var string $updatedBy
      *
@@ -117,27 +134,28 @@ abstract class ModelEmail implements \Tecnoready\Common\Model\Email\EmailInterfa
      * @ORM\Column(name="updated_by", type="string", nullable=true)
      */
     protected $updatedBy;
-    
+
     /**
      * @var \DateTime $sentAt
      *
      * @ORM\Column(name="sent_at", type="datetime", nullable=true)
      */
     protected $sentAt;
+
     /**
      * @var \Swift_Message
      *
      * @ORM\Column(name="error_message", type="text", nullable=true)
      */
     protected $errorMessage;
-    
+
     /**
      * @var string $environment
      *
      * @ORM\Column(name="environment", type="string", nullable=true)
      */
     protected $environment;
-    
+
     /**
      * Get id
      *
@@ -147,6 +165,7 @@ abstract class ModelEmail implements \Tecnoready\Common\Model\Email\EmailInterfa
     {
         return $this->id;
     }
+
     /**
      * Set subject
      *
@@ -158,6 +177,7 @@ abstract class ModelEmail implements \Tecnoready\Common\Model\Email\EmailInterfa
         $this->subject = $subject;
         return $this;
     }
+
     /**
      * Get subject
      *
@@ -167,6 +187,7 @@ abstract class ModelEmail implements \Tecnoready\Common\Model\Email\EmailInterfa
     {
         return $this->subject;
     }
+
     /**
      * Set fromEmail
      *
@@ -178,6 +199,7 @@ abstract class ModelEmail implements \Tecnoready\Common\Model\Email\EmailInterfa
         $this->fromEmail = $fromEmail;
         return $this;
     }
+
     /**
      * Get fromEmail
      *
@@ -187,6 +209,7 @@ abstract class ModelEmail implements \Tecnoready\Common\Model\Email\EmailInterfa
     {
         return $this->fromEmail;
     }
+
     /**
      * Set toEmail
      *
@@ -198,6 +221,7 @@ abstract class ModelEmail implements \Tecnoready\Common\Model\Email\EmailInterfa
         $this->toEmail = $toEmail;
         return $this;
     }
+
     /**
      * Get toEmail
      *
@@ -207,6 +231,7 @@ abstract class ModelEmail implements \Tecnoready\Common\Model\Email\EmailInterfa
     {
         return $this->toEmail;
     }
+
     /**
      * @return string
      */
@@ -214,6 +239,7 @@ abstract class ModelEmail implements \Tecnoready\Common\Model\Email\EmailInterfa
     {
         return $this->ccEmail;
     }
+
     /**
      * @param string $ccEmail
      */
@@ -221,6 +247,7 @@ abstract class ModelEmail implements \Tecnoready\Common\Model\Email\EmailInterfa
     {
         $this->ccEmail = $ccEmail;
     }
+
     /**
      * @return string
      */
@@ -228,6 +255,7 @@ abstract class ModelEmail implements \Tecnoready\Common\Model\Email\EmailInterfa
     {
         return $this->bccEmail;
     }
+
     /**
      * @param string $bccEmail
      */
@@ -235,6 +263,7 @@ abstract class ModelEmail implements \Tecnoready\Common\Model\Email\EmailInterfa
     {
         $this->bccEmail = $bccEmail;
     }
+
     /**
      * @return string
      */
@@ -242,6 +271,7 @@ abstract class ModelEmail implements \Tecnoready\Common\Model\Email\EmailInterfa
     {
         return $this->replyToEmail;
     }
+
     /**
      * @param string $replyToEmail
      * @return Email
@@ -251,6 +281,7 @@ abstract class ModelEmail implements \Tecnoready\Common\Model\Email\EmailInterfa
         $this->replyToEmail = $replyToEmail;
         return $this;
     }
+
     /**
      * @return string
      */
@@ -258,6 +289,7 @@ abstract class ModelEmail implements \Tecnoready\Common\Model\Email\EmailInterfa
     {
         return $this->body;
     }
+
     /**
      * @param string $body
      */
@@ -265,6 +297,7 @@ abstract class ModelEmail implements \Tecnoready\Common\Model\Email\EmailInterfa
     {
         $this->body = $body;
     }
+
     /**
      * @return \Swift_Mime_Message
      */
@@ -272,6 +305,7 @@ abstract class ModelEmail implements \Tecnoready\Common\Model\Email\EmailInterfa
     {
         return unserialize(base64_decode($this->message));
     }
+
     /**
      * @param $message
      */
@@ -279,6 +313,7 @@ abstract class ModelEmail implements \Tecnoready\Common\Model\Email\EmailInterfa
     {
         $this->message = base64_encode(serialize($message));
     }
+
     /**
      * @return \DateTime
      */
@@ -286,6 +321,7 @@ abstract class ModelEmail implements \Tecnoready\Common\Model\Email\EmailInterfa
     {
         return $this->createdAt;
     }
+
     /**
      * @param \DateTime $createdAt
      */
@@ -293,6 +329,7 @@ abstract class ModelEmail implements \Tecnoready\Common\Model\Email\EmailInterfa
     {
         $this->createdAt = $createdAt;
     }
+
     /**
      * @return \DateTime
      */
@@ -300,6 +337,7 @@ abstract class ModelEmail implements \Tecnoready\Common\Model\Email\EmailInterfa
     {
         return $this->updatedAt;
     }
+
     /**
      * @param \DateTime $updatedAt
      */
@@ -307,6 +345,7 @@ abstract class ModelEmail implements \Tecnoready\Common\Model\Email\EmailInterfa
     {
         $this->updatedAt = $updatedAt;
     }
+
     /**
      * @return \DateTime
      */
@@ -314,6 +353,7 @@ abstract class ModelEmail implements \Tecnoready\Common\Model\Email\EmailInterfa
     {
         return $this->sentAt;
     }
+
     /**
      * @param \DateTime $sentAt
      */
@@ -321,6 +361,7 @@ abstract class ModelEmail implements \Tecnoready\Common\Model\Email\EmailInterfa
     {
         $this->sentAt = $sentAt;
     }
+
     /**
      * @return string
      */
@@ -328,6 +369,7 @@ abstract class ModelEmail implements \Tecnoready\Common\Model\Email\EmailInterfa
     {
         return $this->createdBy;
     }
+
     /**
      * @param string $createdBy
      */
@@ -335,6 +377,7 @@ abstract class ModelEmail implements \Tecnoready\Common\Model\Email\EmailInterfa
     {
         $this->createdBy = $createdBy;
     }
+
     /**
      * @return string
      */
@@ -342,6 +385,7 @@ abstract class ModelEmail implements \Tecnoready\Common\Model\Email\EmailInterfa
     {
         return $this->updatedBy;
     }
+
     /**
      * @param string $updatedBy
      */
@@ -349,6 +393,7 @@ abstract class ModelEmail implements \Tecnoready\Common\Model\Email\EmailInterfa
     {
         $this->updatedBy = $updatedBy;
     }
+
     /**
      * @return \Swift_Message
      */
@@ -356,6 +401,7 @@ abstract class ModelEmail implements \Tecnoready\Common\Model\Email\EmailInterfa
     {
         return $this->errorMessage;
     }
+
     /**
      * @param \Swift_Message $errorMessage
      */
@@ -363,6 +409,7 @@ abstract class ModelEmail implements \Tecnoready\Common\Model\Email\EmailInterfa
     {
         $this->errorMessage = $errorMessage;
     }
+
     /**
      * @return string
      */
@@ -370,6 +417,7 @@ abstract class ModelEmail implements \Tecnoready\Common\Model\Email\EmailInterfa
     {
         return $this->status;
     }
+
     /**
      * @param string $status
      */
@@ -377,6 +425,7 @@ abstract class ModelEmail implements \Tecnoready\Common\Model\Email\EmailInterfa
     {
         $this->status = $status;
     }
+
     /**
      * @return string
      */
@@ -384,6 +433,7 @@ abstract class ModelEmail implements \Tecnoready\Common\Model\Email\EmailInterfa
     {
         return $this->retries;
     }
+
     /**
      * @param string $retries
      */
@@ -391,13 +441,16 @@ abstract class ModelEmail implements \Tecnoready\Common\Model\Email\EmailInterfa
     {
         $this->retries = $retries;
     }
-    
-    public function getEnvironment() {
+
+    public function getEnvironment()
+    {
         return $this->environment;
     }
 
-    public function setEnvironment($environment) {
+    public function setEnvironment($environment)
+    {
         $this->environment = $environment;
         return $this;
     }
+
 }
