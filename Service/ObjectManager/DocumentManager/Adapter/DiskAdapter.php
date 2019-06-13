@@ -225,7 +225,7 @@ class DiskAdapter implements DocumentAdapterInterface
         }
         $basePath = sprintf('%s'.$ds.'%s'.$ds.'%s'.$ds.'%s', $this->options['documents_path'], $this->options['env'],$this->objectType,$this->objectId);
         if(empty($this->folder)){
-            throw new \RuntimeException(sprintf("The 'folder' is not set in Document Manager."));
+            throw new \RuntimeException(sprintf("The property 'folder' is not set in Document Manager."));
         }
         $basePath .= $ds.$this->folder;
         if(!$this->fs->exists($basePath)){

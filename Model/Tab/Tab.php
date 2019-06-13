@@ -253,7 +253,7 @@ class Tab
     public function getTemplate($default)
     {
         $template = $default;
-        if($this->request->isXmlHttpRequest()){
+        if($this->request->isXmlHttpRequest() && $this->request->get("ajax")){
             $current = $this->resolveCurrentTab();
             if($current !== null){
                 $template = $current->getOption("template");

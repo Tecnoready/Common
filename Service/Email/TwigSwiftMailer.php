@@ -9,6 +9,7 @@ use Twig_Environment;
 use Tecnoready\Common\Exception\UnsupportedException;
 use Tecnoready\Common\Service\Email\Adapter\EmailAdapterInterface;
 use Tecnoready\Common\Model\Email\EmailQueueInterface;
+use Tecnoready\Common\Service\ObjectManager\ObjectDataManager;
 
 /**
  * Servicio para enviar correo con una plantilla twig (tecnoready.swiftmailer)
@@ -37,6 +38,11 @@ class TwigSwiftMailer {
     protected $options;
     
     protected $templateSource;
+    
+    /**
+     * @var ObjectDataManager 
+     */
+    protected $objectDataManager;
 
     public function __construct(Swift_Mailer $mailer, Twig_Environment $twig,EmailAdapterInterface $adapter, array $options = []) {
         $this->mailer = $mailer;
@@ -122,12 +128,22 @@ EOF;
         $message->setBody($emailQueue->getBody(), 'text/html');
         $attachDocuments = $emailQueue->getExtraData(EmailQueueInterface::ATTACH_DOCUMENTS);
         if($attachDocuments !== null && is_array($attachDocuments)){
-            throw new UnsupportedException();
-//            $exporter = $this->getExporterManager();
-//            foreach ($attachDocuments as $attachDocument) {
-//                $path = $exporter->generateWithSource($attachDocument["id"],$attachDocument["chain"],$attachDocument["name"]);
-//                $attachs[basename($path)] = $path;
-//            }
+            if(!$this->container->has(ObjectDataManager::class)){
+                throw new UnsupportedException(sprintf("El servicio para exportar con '%s' no esta configurado.",ObjectDataManager::class));
+            }
+            $objectDataManager = $this->container->get(ObjectDataManager::class);
+            if(false){
+                $objectDataManager = new ObjectDataManager();
+            }
+            
+            foreach ($attachDocuments as $attachDocument) {
+                $objectDataManager->configure($attachDocument["id"],$attachDocument["chain"]);
+                
+                $file = $objectDataManager->exporter()->generateWithSource($attachDocument["name"],[
+                ],true);
+                $path = $file->getPathname();
+                $attachs[basename($path)] = $path;
+            }
         }
         foreach ($attachs as $name => $path) {
             $message->attach(\Swift_Attachment::fromPath($path)->setFilename($name));

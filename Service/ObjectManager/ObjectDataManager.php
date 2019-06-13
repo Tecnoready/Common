@@ -4,6 +4,7 @@ namespace Tecnoready\Common\Service\ObjectManager;
 
 use Tecnoready\Common\Service\ObjectManager\ConfigureInterface;
 use Tecnoready\Common\Service\ObjectManager\DocumentManager\ExporterManager\ExporterManager;
+use Tecnoready\Common\Exception\UnconfiguredException;
 
 /**
  * Administrador de datos de un objeto (documentos,notas,historial)
@@ -83,6 +84,9 @@ class ObjectDataManager implements ConfigureInterface
      */
     public function documents()
     {
+        if(!$this->documentManager){
+            throw new UnconfiguredException(sprintf("El '%s' no esta configurado para usar esta caracteristica.",DocumentManager\DocumentManager::class));
+        }
         return $this->documentManager;
     }
     
@@ -92,6 +96,9 @@ class ObjectDataManager implements ConfigureInterface
      */
     public function histories()
     {
+        if(!$this->historyManager){
+            throw new UnconfiguredException(sprintf("El '%s' no esta configurado para usar esta caracteristica.", HistoryManager\HistoryManager::class));
+        }
         return $this->historyManager;
     }
     
@@ -101,6 +108,9 @@ class ObjectDataManager implements ConfigureInterface
      */
     public function notes()
     {
+        if(!$this->noteManager){
+            throw new UnconfiguredException(sprintf("El '%s' no esta configurado para usar esta caracteristica.", NoteManager\NoteManager::class));
+        }
         return $this->noteManager;
     }
     
@@ -110,6 +120,9 @@ class ObjectDataManager implements ConfigureInterface
      */
     public function exporter()
     {
+        if(!$this->exporterManager){
+            throw new UnconfiguredException(sprintf("El '%s' no esta configurado para usar esta caracteristica.", ExporterManager::class));
+        }
         return $this->exporterManager;
     }
 }
