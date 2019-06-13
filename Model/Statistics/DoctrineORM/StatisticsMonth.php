@@ -3,21 +3,13 @@
 namespace Tecnoready\Common\Model\Statistics\DoctrineORM;
 
 use Doctrine\ORM\Mapping as ORM;
+use Tecnoready\Common\Model\Statistics\StatisticsYearInterface;
 
 /**
  * Contador mensual enteros
- * @ORM\Table(name="statistics_monthly")
- * @ORM\Entity()
  */
 class StatisticsMonth implements \Tecnoready\Common\Model\Statistics\StatisticsMonthInterface
 {
-    /**
-     * @var StatisticsYear
-     * @ORM\ManyToOne(targetEntity="Pandco\Bundle\AppBundle\Entity\Core\Statistics\StatisticsYear",inversedBy="months")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    protected $yearEntity;
-    
     /**
      * @var integer
      * @ORM\Column(name="year",type="integer", nullable=false)
@@ -223,40 +215,14 @@ class StatisticsMonth implements \Tecnoready\Common\Model\Statistics\StatisticsM
     protected $day31 = 0;
     
     /**
-     * @var \DateTime $created
+     * @var string
      *
-     * @ORM\Column(name="created_at",type="datetime")
+     * @ORM\Column(type="string",length=100)
      */
-    protected $createdAt;
+    protected $object;
+    
+    use \Tecnoready\Common\Model\ObjectManager\Base\TraitBaseORM;
 
-    /**
-     * @var \DateTime $updated
-     *
-     * @ORM\Column(name="updated_at",type="datetime")
-     */
-    protected $updatedAt;
-    
-    /**
-     * @ORM\Column(name="deleted_at", type="datetime", nullable=true)
-     */
-    protected $deletedAt;
-    
-    /**
-     * @var string $createdFromIp
-     *
-     * @ORM\Column(type="string", name="created_from_ip",length=45, nullable=true)
-     */
-    protected $createdFromIp;
-    
-    /**
-     * @var string $updatedFromIp
-     *
-     * @ORM\Column(type="string", name="updated_from_ip",length=45, nullable=true)
-     */
-    protected $updatedFromIp;
-    
-    use \Tecnoready\Common\Model\TraceableTrait;
-    
     public function getYear() {
         return $this->year;
     }
@@ -554,8 +520,31 @@ class StatisticsMonth implements \Tecnoready\Common\Model\Statistics\StatisticsM
         return $this;
     }
     
-    public function getTotal() {
+    public function getTotal()
+    {
         return $this->total;
+    }
+
+    public function getYearEntity() 
+    {
+        return $this->yearEntity;
+    }
+
+    public function setYearEntity(StatisticsYearInterface $yearEntity)
+    {
+        $this->yearEntity = $yearEntity;
+        return $this;
+    }
+
+    public function getObject()
+    {
+        return $this->object;
+    }
+    
+    public function setObject($object)
+    {
+        $this->object = $object;
+        return $this;
     }
 
     /**
@@ -584,13 +573,8 @@ class StatisticsMonth implements \Tecnoready\Common\Model\Statistics\StatisticsM
 //        var_dump(__FILE__);
 //        die;
     }
-    
-    public function getYearEntity() {
-        return $this->yearEntity;
-    }
 
-    public function setYearEntity(StatisticsYear $yearEntity) {
-        $this->yearEntity = $yearEntity;
-        return $this;
-    }
+    public function setUser($user){}
+    
+    public function getUser(){}
 }

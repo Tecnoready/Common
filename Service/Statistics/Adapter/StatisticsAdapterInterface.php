@@ -15,7 +15,8 @@ namespace Tecnoready\Common\Service\Statistics\Adapter;
  *
  * @author Carlos Mendoza <inhack20@gmail.com>
  */
-interface StatisticsAdapterInterface {
+interface StatisticsAdapterInterface 
+{
     public function persist($entity);
     public function flush();
     

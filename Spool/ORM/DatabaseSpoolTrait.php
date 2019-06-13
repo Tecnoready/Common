@@ -11,40 +11,42 @@
 
 namespace Tecnoready\Common\Spool\ORM;
 
-
-use Tecnoready\Common\Model\Email\ORM\Email;
 use Tecnoready\Common\Model\Email\ORM\EmailRepository;
-use Swift_Mime_Message;
 use Swift_Transport;
 use Tecnoready\Common\Model\Email\EmailInterface;
+use Doctrine\ORM\EntityManagerInterface;
 
 /**
- * Description of DatabaseSpool
+ * Trait de spool de base de datos
  *
  * @author Carlos Mendoza <inhack20@gmail.com>
  */
-class DatabaseSpool extends \Swift_ConfigurableSpool {
+trait DatabaseSpoolTrait
+{
+
     /**
-     * @var EmailRepository
+     * @var EntityManagerInterface
      */
-    private $repository;
-    
+    protected $em;
+
     /**
      * @var string
      */
     protected $entityClass;
+
     /**
      * @var boolean
      */
     protected $keepSentMessages;
+
     /**
      * @var string
      */
     private $environment;
-    
-    public function __construct(EmailRepository $repository,$entityClass, $environment, $keepSentMessages = false)
+
+    public function __construct(EntityManagerInterface $em,$entityClass, $environment, $keepSentMessages = false)
     {
-        $this->repository = $repository;
+        $this->em = $em;
         
         $this->keepSentMessages = $keepSentMessages;
         $obj = new $entityClass;
@@ -54,6 +56,7 @@ class DatabaseSpool extends \Swift_ConfigurableSpool {
         $this->entityClass = $entityClass;
         $this->environment = $environment;
     }
+
     /**
      * Starts this Spool mechanism.
      */
@@ -61,6 +64,7 @@ class DatabaseSpool extends \Swift_ConfigurableSpool {
     {
         // TODO: Implement start() method.
     }
+
     /**
      * Stops this Spool mechanism.
      */
@@ -68,6 +72,7 @@ class DatabaseSpool extends \Swift_ConfigurableSpool {
     {
         // TODO: Implement stop() method.
     }
+
     /**
      * Tests if this Spool mechanism has started.
      *
@@ -77,38 +82,7 @@ class DatabaseSpool extends \Swift_ConfigurableSpool {
     {
         return true;
     }
-    /**
-     * Queues a message.
-     *
-     * @param Swift_Mime_Message $message The message to store
-     *
-     * @return bool    Whether the operation has succeeded
-     */
-    public function queueMessage(Swift_Mime_Message $message)
-    {
-        $email = new $this->entityClass;
-        $email->setFromEmail(implode('; ', array_keys($message->getFrom())) );
-        if($message->getTo() !== null ){
-            $email->setToEmail(implode('; ', array_keys($message->getTo())) );
-        }
-        if($message->getCc() !== null ){
-            $email->setCcEmail(implode('; ', array_keys($message->getCc())) );
-        }
-        if($message->getBcc() !== null ){
-            $email->setBccEmail(implode('; ', array_keys($message->getBcc())) );
-        }
-        if($message->getReplyTo() !== null ){
-            $email->setReplyToEmail(implode('; ', array_keys($message->getReplyTo())) );
-        }
-        $email->setBody($message->getBody());
-        $email->setSubject($message->getSubject());
-        $email->setMessage($message);
-        $email->setEnvironment($this->environment);
 
-        $this->repository->addEmail($email);
-        
-        return true;
-    }
     /**
      * Sends messages using the given transport instance.
      *
@@ -119,56 +93,82 @@ class DatabaseSpool extends \Swift_ConfigurableSpool {
      */
     public function flushQueue(Swift_Transport $transport, &$failedRecipients = null)
     {
-        if (!$transport->isStarted())
-        {
+        if (!$transport->isStarted()) {
             $transport->start();
         }
         $count = 0;
         $limit = $this->getMessageLimit();
         $limit = $limit > 0 ? $limit : null;
-        $this->repository->updateTruncatedMessages($this->environment);
-        
-        $emails = $this->repository->getEmailQueue($this->environment,$limit);
+        $this->em->getRepository($this->entityClass)->updateTruncatedMessages($this->environment);
+
+        $emails = $this->em->getRepository($this->entityClass)->getEmailQueue($this->environment, $limit);
         if (!count($emails)) {
             return 0;
         }
         $logger = new \Swift_Plugins_Loggers_ArrayLogger();
         $transport->registerPlugin(new \Swift_Plugins_LoggerPlugin($logger));
-        
+
         $failedRecipients = (array) $failedRecipients;
         $count = 0;
         $time = time();
         $messagesExpired = [];
         $expired = false;
-        foreach($emails as $email){
+        foreach ($emails as $email) {
             if ($expired === true) {
                 $messagesExpired[] = $email->getId();
                 continue;
             }
-            try{
-                /*@var $message \Swift_Mime_Message */
+            try {
+                /* @var $message \Swift_Mime_Message */
                 $message = $email->getMessage();
-                if(!$message){
+                if (!$message) {
                     throw new \Swift_SwiftException('The email was not sent, by no unserialize.');
                 }
-                $count_= $transport->send($message, $failedRecipients);
-                if($count_ > 0){
-                    $this->repository->markCompleteSending($email);
+                $count_ = $transport->send($message, $failedRecipients);
+                if ($count_ > 0) {
+                    $this->em->getRepository($this->entityClass)->markCompleteSending($email);
                     $count += $count_;
-                }else{
+                } else {
                     throw new \Swift_SwiftException('The email was not sent.');
                 }
-            }catch(\Exception $ex) {
-                $message = $ex->getMessage()." - ".$logger->dump();
-                $this->repository->markFailedSending($email, $message);
+            } catch (\Exception $ex) {
+                $message = $ex->getMessage() . " - " . $logger->dump();
+                $this->em->getRepository($this->entityClass)->markFailedSending($email, $message);
             }
             if ($this->getTimeLimit() && (time() - $time) >= $this->getTimeLimit()) {
                 $expired = true;
             }
         }
-        if(count($messagesExpired ) > 0 ){
-            $this->repository->markExpiredToReady($messagesExpired);
+        if (count($messagesExpired) > 0) {
+            $this->em->getRepository($this->entityClass)->markExpiredToReady($messagesExpired);
         }
         return $count;
     }
+
+    protected function postQueueMessage($message)
+    {
+        $email = new $this->entityClass;
+        $email->setFromEmail(implode('; ', array_keys($message->getFrom())));
+        if ($message->getTo() !== null) {
+            $email->setToEmail(implode('; ', array_keys($message->getTo())));
+        }
+        if ($message->getCc() !== null) {
+            $email->setCcEmail(implode('; ', array_keys($message->getCc())));
+        }
+        if ($message->getBcc() !== null) {
+            $email->setBccEmail(implode('; ', array_keys($message->getBcc())));
+        }
+        if ($message->getReplyTo() !== null) {
+            $email->setReplyToEmail(implode('; ', array_keys($message->getReplyTo())));
+        }
+        $email->setBody($message->getBody());
+        $email->setSubject($message->getSubject());
+        $email->setMessage($message);
+        $email->setEnvironment($this->environment);
+
+        $this->em->getRepository($this->entityClass)->addEmail($email);
+
+        return true;
+    }
+
 }

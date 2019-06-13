@@ -32,6 +32,8 @@ class ConfigurationUtil {
         "optionsResolver" => "checkOptionsResolver",
         "guzzleHttp" => "checkGuzzleHttp",
         "propertyAccess" => "checkPropertyAccess",
+        "phpoffice/phpspreadsheet" => "checkPhpspreadsheet",
+        "tecnickcom/tcpdf" => "checkTCPDF",
     ];
     
     public static function checkLib($name) {
@@ -55,6 +57,16 @@ class ConfigurationUtil {
     private static function checkPropertyAccess() {
         if (!class_exists('\Symfony\Component\PropertyAccess\PropertyAccess')) {
             throw new \Exception(sprintf("The package '%s' is required, please install.",'"symfony/property-access": "~3.4"'));
+        }
+    }
+    private static function checkPhpspreadsheet() {
+        if (!class_exists('\PhpOffice\PhpSpreadsheet\IOFactory')) {
+            throw new \Exception(sprintf("The package '%s' is required, please install.",'"phpoffice/phpspreadsheet": "^1.6"'));
+        }
+    }
+    private static function checkTCPDF() {
+        if (!class_exists('\TCPDF')) {
+            throw new \Exception(sprintf("The package '%s' is required, please install.",'"tecnickcom/tcpdf": "^6.2"'));
         }
     }
     

@@ -11,13 +11,15 @@
 
 namespace Tecnoready\Common\Model\Statistics;
 
-use Tecnoready\Common\Model\TraceableInterface;
+use Tecnoready\Common\Model\ObjectManager\BaseInterface;
 
 /**
- *
+ * StatisticsMonthInterface
+ * 
  * @author Carlos Mendoza <inhack20@gmail.com>
  */
-interface StatisticsMonthInterface extends TraceableInterface {
+interface StatisticsMonthInterface extends BaseInterface 
+{
     public function getYear();
 
     public function getMonth();
@@ -157,6 +159,4 @@ interface StatisticsMonthInterface extends TraceableInterface {
     public function getYearEntity();
 
     public function setYearEntity(StatisticsYearInterface $yearEntity);
-    
-    
 }

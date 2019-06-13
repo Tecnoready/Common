@@ -9,6 +9,7 @@ use Twig_Environment;
 use Tecnoready\Common\Exception\UnsupportedException;
 use Tecnoready\Common\Service\Email\Adapter\EmailAdapterInterface;
 use Tecnoready\Common\Model\Email\EmailQueueInterface;
+use Tecnoready\Common\Service\ObjectManager\ObjectDataManager;
 
 /**
  * Servicio para enviar correo con una plantilla twig (tecnoready.swiftmailer)
@@ -37,6 +38,11 @@ class TwigSwiftMailer {
     protected $options;
     
     protected $templateSource;
+    
+    /**
+     * @var ObjectDataManager 
+     */
+    protected $objectDataManager;
 
     public function __construct(Swift_Mailer $mailer, Twig_Environment $twig,EmailAdapterInterface $adapter, array $options = []) {
         $this->mailer = $mailer;
@@ -70,12 +76,10 @@ class TwigSwiftMailer {
                 $this->templateSource = <<<EOF
                 {% extends template_from_string(baseString) %}
                 
-                {% block subject %}{% include (template_from_string(subjectString)) %}{% endblock subject %}
-
                 {% block header %}{% include template_from_string(headerString) %}{% endblock %}
 
                 {% block content_html %}{% include(template_from_string(bodyString)) with _context %}{% endblock %}
-
+                        
                 {% block footer %}{% include(template_from_string(footerString)) with _context %}{% endblock %}
 EOF;
     }
@@ -90,7 +94,7 @@ EOF;
      * @return EmailQueueInterface
      */
     public function emailQueue($id,$context,$toEmail,array $attachs = [],array $extras = []) {
-        $context = $this->buildDocumentContext($id, $context, $toEmail, $attachs);       
+        $context = $this->buildDocumentContext($id, $context, $toEmail, $attachs);
         $template =$this->twig->createTemplate($this->templateSource);
         $email = $this->buildEmail($template, $context, $toEmail);
         $email->setAttachs($attachs);
@@ -109,7 +113,14 @@ EOF;
      * @return type
      */
     public function sendEmailQueue(EmailQueueInterface $emailQueue,array $attachs = []) {
-        $message = \Swift_Message::newInstance()
+        $v = \Swift::VERSION;
+        $r = version_compare("6.0.0", $v);
+        if ($r === -1 || $r === 0) {
+            $message = new \Swift_Message();
+        } else {
+            $message = \Swift_Message::newInstance();
+        }
+        $message
             ->setSubject($emailQueue->getSubject())
             ->setFrom($emailQueue->getFromEmail())
             ->setTo($emailQueue->getToEmail());
@@ -117,12 +128,22 @@ EOF;
         $message->setBody($emailQueue->getBody(), 'text/html');
         $attachDocuments = $emailQueue->getExtraData(EmailQueueInterface::ATTACH_DOCUMENTS);
         if($attachDocuments !== null && is_array($attachDocuments)){
-            throw new UnsupportedException();
-//            $exporter = $this->getExporterManager();
-//            foreach ($attachDocuments as $attachDocument) {
-//                $path = $exporter->generateWithSource($attachDocument["id"],$attachDocument["chain"],$attachDocument["name"]);
-//                $attachs[basename($path)] = $path;
-//            }
+            if(!$this->container->has(ObjectDataManager::class)){
+                throw new UnsupportedException(sprintf("El servicio para exportar con '%s' no esta configurado.",ObjectDataManager::class));
+            }
+            $objectDataManager = $this->container->get(ObjectDataManager::class);
+            if(false){
+                $objectDataManager = new ObjectDataManager();
+            }
+            
+            foreach ($attachDocuments as $attachDocument) {
+                $objectDataManager->configure($attachDocument["id"],$attachDocument["chain"]);
+                
+                $file = $objectDataManager->exporter()->generateWithSource($attachDocument["name"],[
+                ],true);
+                $path = $file->getPathname();
+                $attachs[basename($path)] = $path;
+            }
         }
         foreach ($attachs as $name => $path) {
             $message->attach(\Swift_Attachment::fromPath($path)->setFilename($name));
@@ -140,10 +161,10 @@ EOF;
      */
     public function sendDocumentMessage($id,$context,$toEmail,array $attachs = [])
     {
-        $context = $this->buildDocumentContext($id, $context, $toEmail, $attachs);       
-        $template =$this->twig->createTemplate($this->templateSource);
-        $email = $this->buildEmail($template, $context, $toEmail);
-        return $this->sendEmailQueue($email,$attachs);
+        $context = $this->buildDocumentContext($id, $context, $toEmail, $attachs);           
+        $template =$this->twig->createTemplate($this->templateSource);  
+        $email = $this->buildEmail($template, $context, $toEmail); 
+        return $this->sendEmailQueue($email,$attachs);          
     }
     
     /**
@@ -154,34 +175,42 @@ EOF;
      * @return EmailQueueInterface
      */
     protected function buildEmail($templateName, $context, $toEmail,$fromEmail = null) {
-        $context['toEmail'] = $toEmail;
-        if(class_exists("FOS\UserBundle\Model\UserInterface" && $toEmail instanceof \FOS\UserBundle\Model\UserInterface)){
+        $context['toEmail'] = $toEmail;   
+        $context['appName'] = $this->options["from_name"];
+        
+        if(class_exists("FOS\UserBundle\Model\UserInterface") && $toEmail instanceof \FOS\UserBundle\Model\UserInterface){
             $toEmail = $toEmail->getEmail();
         }
-        if($templateName instanceof \Twig_Template){
-            $template = $templateName;
-        }else{
-             $template = $this->twig->loadTemplate($templateName);       
+        if(is_object($toEmail) && method_exists($toEmail,"getEmail")){
+            $toEmail = $toEmail->getEmail();
         }
-        $subject = $template->renderBlock('subject', $context);
-        $textBody = $template->renderBlock('body_text', $context);      
-        $htmlBody = $template->renderBlock('content_html', $context);
+
+//        var_dump(get_class($toEmail));
+//        die;
+        if($templateName instanceof \Twig_Template){
+            $template = $templateName;            
+        }elseif((class_exists("Twig\TemplateWrapper") && $templateName instanceof \Twig\TemplateWrapper) ||
+                 (class_exists("Twig_TemplateWrapper") && $templateName instanceof \Twig_TemplateWrapper)){
+            $template = $templateName;            
+        }else{
+             $template = $this->twig->loadTemplate($templateName);               
+        }
+        $tplSubjet = $this->twig->createTemplate("{% block subject %}{% include (template_from_string(subjectString)) %}{% endblock subject %}");
+        $subject = $tplSubjet->renderBlock('subject', $context);
+        $htmlBody = $template->render($context);
+
         if ($fromEmail === null) {
             $fromEmail = array($this->options["from_email"] => $this->options["from_name"]);
         }
-        
+        $toEmail = (array)$toEmail;
         $email = $this->adapter->createEmailQueue();
         $email
                 ->setStatus(EmailQueueInterface::STATUS_NOT_SENT)
                 ->setSubject($subject)
                 ->setFromEmail($fromEmail)
                 ->setToEmail($toEmail)
-        ;
-        if (!empty($htmlBody)) {
-            $email->setBody($htmlBody);
-        } else {
-            $email->setBody($textBody);
-        }
+        ;                
+        $email->setBody($htmlBody);
         return $email;
     }
     
@@ -210,9 +239,9 @@ EOF;
             $headerString = $header->getBody();
         }
         if($base){
-            $baseString = "{% block subject '' %}{% block body_text '' %}{% block content_html %}".$base->getBody()."{% endblock %}";
+            $baseString = "{% block body_html %}".$base->getBody()."{% endblock body_html %}";
         }else {
-            $baseString = "{% block subject '' %}{% block body_text '' %}{% block content_html %}{% endblock %}";
+            $baseString = "{% block body_html %}{% endblock body_html %}";
         }
         if($footer){
             $footerString = $footer->getBody();
@@ -233,41 +262,8 @@ EOF;
         return $context;
     }
 
-    /**
-     * Renderizar una plantilla twig para enviarla por correo
-     * @param type $templateName
-     * @param array $context parametros a pasar a la plantilla
-     * @param type $toEmail Direccion o direcciones destino del mensaje
-     * @param type $fromEmail Direccion de origen de correo
-     * @return type
-     */
-    public function renderMessage($templateName, $context, $toEmail, $fromEmail = null) {
-        $context['toEmail'] = $toEmail;
-
-        $template = $this->twig->loadTemplate($templateName);
-        $subject = $template->renderBlock('subject', $context);
-        $textBody = $template->renderBlock('body_text', $context);
-        $htmlBody = $template->renderBlock('body_html', $context);
-
-        if ($fromEmail === null) {
-            $fromEmail = array($this->options["from_email"] => $this->options["from_name"]);
-        }
-
-        $message = $this->getSwiftMessage()
-                ->setSubject($subject)
-                ->setFrom($fromEmail)
-                ->setTo($toEmail);
-
-        if (!empty($htmlBody)) {
-            $message->setBody($htmlBody, 'text/html')
-                    ->addPart($textBody, 'text/plain');
-        } else {
-            $message->setBody($textBody);
-        }
-        return $message;
-    }
     
-    private function send(\Swift_Mime_Message $message = null) {
+    private function send($message = null) {
         if($message === null){
             return true;
         }
