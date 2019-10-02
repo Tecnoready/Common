@@ -81,4 +81,23 @@ class StringUtil {
         $string = str_replace(' ', $spacer, $string); // Replaces all spaces with hyphens.
         return preg_replace($allowed, $spacer, $string); // Removes special chars.
     }
+    
+    /**
+     * Trunca un string
+     * @param string $label
+     * @param type $truncate
+     * @return string
+     */
+    public static function truncate($label, $truncate = 30, $onlylast = false)
+    {
+        if (empty($label)) {
+            return "...";
+        }
+        if ((strlen($label) > $truncate) && $onlylast == false) {
+            $label = mb_substr($label, 0, $truncate, 'UTF-8') . '...';
+        } else if ((strlen($label) > $truncate) && $onlylast == true) {
+            $label = substr($label, $truncate * -1);
+        }
+        return $label;
+    }
 }
