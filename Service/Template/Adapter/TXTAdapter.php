@@ -28,6 +28,7 @@ class TXTAdapter implements AdapterInterface
 
     private $fname;
     private $variables;
+    private $fileName;
 
     public function __construct(Twig_Environment $twig,array $options = [])
     {
@@ -50,6 +51,8 @@ class TXTAdapter implements AdapterInterface
             fwrite($fh,$template->getContent());
         fclose($fh);
 
+        $this->fileName = $template->getName().".txt";
+
         return $this->fname;
     }
     
@@ -60,7 +63,7 @@ class TXTAdapter implements AdapterInterface
             include $this->fname;
         fclose($fh);
         
-        return $filename;
+        return $this->fileName;
     }
 
     public function getDefaultParameters()
@@ -71,5 +74,10 @@ class TXTAdapter implements AdapterInterface
     public function getExtension()
     {
         return TemplateInterface::TYPE_TXT;
+    }
+
+    public function setFileName($fileName)
+    {
+        $this->fileName = $fileName;
     }
 }
