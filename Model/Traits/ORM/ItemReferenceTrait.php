@@ -10,7 +10,7 @@ namespace Tecnoready\Common\Model\Traits\ORM;
 trait ItemReferenceTrait
 {
     /**
-     * Referencia del pago
+     * Referencia del item
      * @var string 
      * @ORM\Column(type="string",length=30,nullable=false)
      */
