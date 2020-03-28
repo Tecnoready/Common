@@ -168,6 +168,22 @@ EOF;
     }
     
     /**
+     * 
+     * @param type $id
+     * @param type $context
+     * @param type $toEmail
+     * @param array $attachs
+     * @return EmailQueueInterface
+     */
+    public function renderEmail($id,$context,$toEmail,array $attachs = [])
+    {
+        $context = $this->buildDocumentContext($id, $context, $toEmail, $attachs);           
+        $template =$this->twig->createTemplate($this->templateSource);  
+        $email = $this->buildEmail($template, $context, $toEmail); 
+        return $email;
+    }
+    
+    /**
      * Construye un correo a partir de la plantilla
      * @param type $templateName
      * @param type $context
