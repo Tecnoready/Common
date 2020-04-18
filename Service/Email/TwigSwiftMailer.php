@@ -48,12 +48,11 @@ class TwigSwiftMailer {
         $this->mailer = $mailer;
         $this->twig = $twig;
         $this->adapter = $adapter;
-        
         $resolver = new OptionsResolver();
         $resolver->setDefaults([
             "debug" => false,
-            "extra_params" => null,
             "skeleton_email" => "skeleton_email.html.twig",//TODO falta agregar ruta completa
+            "domain_blacklist" => [],
         ]);
         $resolver->setRequired([
             "debug_mail", 
@@ -61,7 +60,6 @@ class TwigSwiftMailer {
             "from_email", 
             "from_name",
             "skeleton_email"]);
-        $resolver->setDefined(["extra_params"]);
         $resolver->setAllowedTypes("debug", "boolean");
         $resolver->setAllowedTypes("debug_mail", "string");
 
@@ -97,14 +95,14 @@ EOF;
         $context = $this->buildDocumentContext($id, $context, $toEmail, $attachs);
         $template =$this->twig->createTemplate($this->templateSource);
         $email = $this->buildEmail($template, $context, $toEmail);
-        $email->setAttachs($attachs);
-        $email->setExtras($extras);
-        $email->setEnvironment($this->options["env"]);
-        
-        $this->adapter->persist($email);
-        $this->adapter->flush();
-        
-        return $email;
+        if($email){
+            $email->setAttachs($attachs);
+            $email->setExtras($extras);
+            $email->setEnvironment($this->options["env"]);
+            $this->adapter->persist($email);
+            $this->adapter->flush();
+        }
+        return $email === null ? false: $email;
     }
     
     /**
@@ -112,7 +110,10 @@ EOF;
      * @param EmailQueue $emailQueue
      * @return type
      */
-    public function sendEmailQueue(EmailQueueInterface $emailQueue,array $attachs = []) {
+    public function sendEmailQueue(EmailQueueInterface $emailQueue = null,array $attachs = []) {
+        if(!$emailQueue){
+            return false;
+        }
         $v = \Swift::VERSION;
         $r = version_compare("6.0.0", $v);
         if ($r === -1 || $r === 0) {
@@ -200,9 +201,20 @@ EOF;
         if(is_object($toEmail) && method_exists($toEmail,"getEmail")){
             $toEmail = $toEmail->getEmail();
         }
-
-//        var_dump(get_class($toEmail));
-//        die;
+        $toEmail = (array)$toEmail;
+        $emailFilters = [];
+        //Se filtran los dominios de la lista negra
+        foreach ($toEmail as $emailAddress) {
+            $emailAddressExp = explode("@", $emailAddress);
+            if(count($emailAddressExp) == 2 && in_array(mb_strtolower($emailAddressExp[1]), $this->options["domain_blacklist"])){
+                continue;
+            }
+            $emailFilters[] = $emailAddress;
+        }
+        $toEmail = $emailFilters;
+        if(count($toEmail) === 0){
+            return null;
+        }
         if($templateName instanceof \Twig_Template){
             $template = $templateName;            
         }elseif((class_exists("Twig\TemplateWrapper") && $templateName instanceof \Twig\TemplateWrapper) ||
@@ -218,7 +230,7 @@ EOF;
         if ($fromEmail === null) {
             $fromEmail = array($this->options["from_email"] => $this->options["from_name"]);
         }
-        $toEmail = (array)$toEmail;
+        
         $email = $this->adapter->createEmailQueue();
         $email
                 ->setStatus(EmailQueueInterface::STATUS_NOT_SENT)
