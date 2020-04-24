@@ -61,7 +61,7 @@ class DiskAdapter implements DocumentAdapterInterface
     public function delete($fileName)
     {
         $fullPath = $this->getBasePath($fileName);
-        $file = new File($fullPath);
+        $file = new File($fullPath,false);//No se verifica el path para que no de una excepcion
         $this->fs->remove($file);
         $filenameMetadata = $this->getFilenameMetadata($fileName);
         if($this->fs->exists($filenameMetadata)){
