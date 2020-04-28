@@ -58,10 +58,16 @@ class TXTAdapter implements AdapterInterface
     
     public function compile($filename, $string, array $parameters)
     {
-        extract($this->variables);
-        $fh = fopen($filename, "w");
-            include $this->fname;
-        fclose($fh);
+        $execute = function($variables,$fname,$filename){
+            ob_start();
+            $fh = fopen($filename, "w");
+            extract($variables);
+            include $fname;
+            fclose($fh);
+            ob_end_clean();
+        };
+        $execute($this->variables,$this->fname,$filename);
+        unset($execute);
         
         return $this->fileName;
     }
