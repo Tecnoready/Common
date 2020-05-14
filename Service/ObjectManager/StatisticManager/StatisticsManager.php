@@ -176,7 +176,11 @@ class StatisticsManager implements ConfigureInterface
     public function findStatisticsYear($year) 
     {
         $year = (int)$year;
-        $foundStatistics = $this->adapter->findStatisticsYear(["object" => $this->object, "year" => $year]);
+        $foundStatistics = $this->adapter->findStatisticsYear([
+            "object" => $this->object,
+            "objectId" => $this->objectId,
+            "year" => $year
+        ]);
         if (!$foundStatistics) {
             $foundStatistics = null;
         }
