@@ -198,8 +198,9 @@ EOF;
         $context['toEmail'] = $toEmail;
         $context['appName'] = $this->options["from_name"];
 
-
-        $toEmail = (array) $toEmail;
+        if(!is_array($fromEmail)){
+            $toEmail = [$toEmail];
+        }
         $emailsParsed = [];
         foreach ($toEmail as $email) {
             if (class_exists("FOS\UserBundle\Model\UserInterface") && $email instanceof \FOS\UserBundle\Model\UserInterface) {
