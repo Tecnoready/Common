@@ -198,7 +198,7 @@ EOF;
         $context['toEmail'] = $toEmail;
         $context['appName'] = $this->options["from_name"];
 
-        if(!is_array($fromEmail)){
+        if(!is_array($toEmail)){
             $toEmail = [$toEmail];
         }
         $emailsParsed = [];
