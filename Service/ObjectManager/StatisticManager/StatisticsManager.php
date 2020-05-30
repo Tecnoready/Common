@@ -362,4 +362,16 @@ class StatisticsManager implements ConfigureInterface
     {
         $this->objectValids[$objectType] = $objectValids;
     }
+
+    /**
+     * Registro de objeto de estadistica actual
+     * This is a cool function
+     * @author Máximo Sojo <maxsojo13@gmail.com>
+     * @param  String $object
+     */
+    public function setObject($object)
+    {
+        $this->object = $object;
+        return $this;
+    }
 }
