@@ -100,4 +100,51 @@ class StringUtil {
         }
         return $label;
     }
+    
+    public static function unParseUrl(array $parsed)
+    {
+        $pass = $parsed['pass'] ?? null;
+            $user = $parsed['user'] ?? null;
+            $userinfo = $pass !== null ? "$user:$pass" : $user;
+            $port = $parsed['port'] ?? 0;
+            $scheme = $parsed['scheme'] ?? "";
+            $query = $parsed['query'] ?? "";
+            $fragment = $parsed['fragment'] ?? "";
+            $authority = (
+                    ($userinfo !== null ? "$userinfo@" : "") .
+                    ($parsed['host'] ?? "") .
+                    ($port ? ":$port" : "")
+                    );
+            return (
+                    (\strlen($scheme) > 0 ? "$scheme:" : "") .
+                    (\strlen($authority) > 0 ? "//$authority" : "") .
+                    ($parsed['path'] ?? "") .
+                    (\strlen($query) > 0 ? "?$query" : "") .
+                    (\strlen($fragment) > 0 ? "#$fragment" : "")
+                    );
+    }
+    
+    /**
+     * 
+     * @param type $url
+     * @param array $toRemove
+     * @return type
+     */
+    public function removeQueryStringURL($url,array $toRemove)
+    {
+        $urlParsedReferer = parse_url($url);
+            $queryOut = [];
+            $result = $url;
+            if (isset($urlParsedReferer["query"])) {
+                parse_str($urlParsedReferer["query"], $queryOut);
+                foreach ($toRemove as $key) {
+                    if (isset($queryOut[$key])) {
+                        unset($queryOut[$key]);
+                    }
+                }
+                $urlParsedReferer["query"] = http_build_query($queryOut);
+                $result = self::unParseUrl($urlParsedReferer);
+            }
+            return $result;
+    }
 }
