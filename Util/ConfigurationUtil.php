@@ -34,6 +34,8 @@ class ConfigurationUtil {
         "propertyAccess" => "checkPropertyAccess",
         "phpoffice/phpspreadsheet" => "checkPhpspreadsheet",
         "tecnickcom/tcpdf" => "checkTCPDF",
+        "symfony/event-dispatcher" => "checkEventDispatcher",
+        "symfony/templating" => "checkTemplating",
     ];
     
     public static function checkLib($name) {
@@ -67,6 +69,16 @@ class ConfigurationUtil {
     private static function checkTCPDF() {
         if (!class_exists('\TCPDF')) {
             throw new \Exception(sprintf("The package '%s' is required, please install.",'"tecnickcom/tcpdf": "^6.2"'));
+        }
+    }
+    private static function checkEventDispatcher() {
+        if (!class_exists('\Symfony\Component\EventDispatcher\Event')) {
+            throw new \Exception(sprintf("The package '%s' is required, please install.",'"symfony/event-dispatcher": "^4.0"'));
+        }
+    }
+    private static function checkTemplating() {
+        if (!interface_exists('\Symfony\Component\Templating\EngineInterface')) {
+            throw new \Exception(sprintf("The package '%s' is required, please install.",'"symfony/templating": "^4.0"'));
         }
     }
     
