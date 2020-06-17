@@ -25,11 +25,16 @@ class DemoBlockWidget extends BaseWidget
            
         );
     }
+    
+    public function getDefaults()
+    {
+        return [self::NAME_DEMO];
+    }
 
     public function getTemplates()
     {
         return array(
-            '@TecnocreacionesTools/widget_demo.html.twig' => 'default',
+            '@TecnocreacionesTools/WidgetBox/widget_demo.html.twig' => 'default',
         );
     }
 

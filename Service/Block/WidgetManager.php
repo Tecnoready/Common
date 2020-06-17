@@ -32,7 +32,7 @@ class WidgetManager
      * @var EventDispatcherInterface
      */
     private $eventDispatcher;
-    
+
     /**
      * Limite de columas en en grid
      * @var type 
@@ -41,13 +41,13 @@ class WidgetManager
     private $currentRow = 1;
     private $quantityBlock = 1;
     private $blocks;
-    
+
     /**
      * Todos los widgets
      * @var array
      */
     private $widgets;
-    
+
     /**
      * Widgets agrupados
      * @var array
@@ -72,6 +72,12 @@ class WidgetManager
      * @var WidgetBoxAdapterInterface
      */
     private $adapter;
+    
+    /**
+     * Renderizador de widget
+     * @var WidgetRenderer
+     */
+    private $widgetRenderer;
 
     public function __construct(WidgetBoxAdapterInterface $adapter)
     {
@@ -82,6 +88,7 @@ class WidgetManager
         $this->widgets = array();
         $this->widgetsByGroup = array();
         $this->adapter = $adapter;
+        $this->widgetRenderer = new WidgetRenderer($this);
     }
 
     /**
@@ -95,6 +102,8 @@ class WidgetManager
         $resolver->setDefaults([
             'enable' => true,
             'debug' => false,
+            'widget_adapter' => null,
+            'widget_class' => null,
             'base_layout' => '::layout.html.twig',
             "trans_default_domain" => "widgetBox",
         ]);
@@ -209,18 +218,34 @@ class WidgetManager
     }
 
     /**
-     * 
+     * Busca un widget por el tipo
      * @param type $type
      * @return WidgetInterface
      */
-    function getWidget($type)
+    public function getWidget($type)
     {
         if (!isset($this->widgets[$type])) {
             throw new InvalidArgumentException(sprintf("The definition of widget box '%s' is not added.", $type));
         }
         return $this->widgets[$type];
     }
+    
+    /**
+     * Busca el widget de un bloque
+     * @param BlockInterface $block
+     * @return BlockServiceInterface
+     */
+    public function getBlockService(BlockInterface $block)
+    {
+        return $this->getWidget($block->getType());
+    }
 
+    /**
+     * 
+     * @param type $group
+     * @return WidgetInterface
+     * @throws InvalidArgumentException
+     */
     public function getWidgetByGroup($group)
     {
         if (!isset($this->widgetsByGroup[$group])) {
@@ -363,8 +388,8 @@ class WidgetManager
 
         return $result;
     }
-    
-     /**
+
+    /**
      * @param string $name
      * @param array  $options
      *
@@ -376,9 +401,9 @@ class WidgetManager
 
         /** @var BlockEvent $event */
         $event = $this->eventDispatcher->dispatch($eventName, new BlockEvent($options));
-        
-        $this->resolveWidgets($event, $eventName);
-        
+
+        $this->resolveWidgets($event, $name);
+
         $content = '';
 
         foreach ($event->getBlocks() as $block) {
@@ -387,21 +412,59 @@ class WidgetManager
 
         return $content;
     }
-    
+
+    /**
+     * @param mixed $block
+     * @param array $options
+     *
+     * @return null|string
+     */
+    public function render(BlockInterface $block, array $options = [])
+    {
+//        $widgetContext = $this->getWidget($block->getType());
+
+//        var_dump($widgetContext->getBlock());
+//        die;
+        $service = $this->getBlockService($block);
+        $resolver = new OptionsResolver();
+        $service->configureSettings($resolver);
+        $settings = $resolver->resolve($block->getSettings());
+        $blockContext = new BlockContext($block,$settings);
+        if (!$blockContext instanceof BlockContextInterface) {
+            return '';
+        }
+
+//        $service = $this->blockServiceManager->get($widgetContext->getBlock());
+
+//        $useCache = $blockContext->getSetting('use_cache');
+
+
+        $response = $this->widgetRenderer->render($blockContext);
+        return $response->getContent();
+    }
+
     /**
      * Resuelve los widgets
      * @param BlockEvent $event
      * @param type $eventName
      */
-    public function resolveWidgets(BlockEvent $event,$eventName)
+    public function resolveWidgets(BlockEvent $event, $eventName)
     {
         $totalPublished = $this->countPublishedByEvent($eventName);
-        if($totalPublished === 0){
+        if ($totalPublished === 0) {
             $this->addDefaultByEvent($eventName);
         }
-        $this->addAllPublishedByEvent($event,$eventName);
+        $this->addAllPublishedByEvent($event, $eventName);
     }
     
+    /**
+     * @return WidgetBoxAdapterInterface
+     */
+    public function getAdapter()
+    {
+        return $this->adapter;
+    }
+
     /**
      * @required
      * @param EventDispatcherInterface $eventDispatcher
@@ -412,4 +475,5 @@ class WidgetManager
         $this->eventDispatcher = $eventDispatcher;
         return $this;
     }
+
 }

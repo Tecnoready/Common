@@ -7,6 +7,7 @@ use Tecnoready\Common\Model\Block\Adapter\WidgetORMAdapter;
 use Tecnoready\Common\Tests\BaseWebTestCase;
 use Tecnoready\Common\Model\Block\DemoBlockWidget;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use App\Entity\M\Core\BlockWidgetBox;
 
 /**
  * Pruebas del manejador de widget
@@ -18,7 +19,7 @@ class WidgetManagerTest extends BaseWebTestCase
     public function testBuild()
     {
         $container = $this->client->getContainer();
-        $adapter = new WidgetORMAdapter(\App\Entity\M\Core\BlockWidgetBox::class);
+        $adapter = new WidgetORMAdapter(BlockWidgetBox::class);
         $adapter->setContainer($container);
         
         $demo = new DemoBlockWidget("tecno.block.widget.demo", $container->get("templating"));
@@ -31,5 +32,7 @@ class WidgetManagerTest extends BaseWebTestCase
         $this->assertCount(0, $widgetManager->getWidgets());
         $widgetManager->addWidget($demo);
         $this->assertCount(1, $widgetManager->getWidgets());
+        
+        $widgetManager->renderEvent("dashboard");
     }
 }

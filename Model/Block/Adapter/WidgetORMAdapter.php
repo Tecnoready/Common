@@ -149,7 +149,7 @@ class WidgetORMAdapter extends BaseAdapter implements ContainerAwareInterface
      *
      * @throws LogicException If DoctrineBundle is not available
      */
-    public function getDoctrine()
+    private function getDoctrine()
     {
         if (!$this->container->has('doctrine')) {
             throw new LogicException('The DoctrineBundle is not registered in your application.');
@@ -159,26 +159,29 @@ class WidgetORMAdapter extends BaseAdapter implements ContainerAwareInterface
     }
 
     /**
-     * Get a user from the Security Context
+     * Get a user from the Security Token Storage.
      *
-     * @return mixed
+     * @return object|null
      *
-     * @throws LogicException If SecurityBundle is not available
+     * @throws \LogicException If SecurityBundle is not available
      *
      * @see TokenInterface::getUser()
+     *
+     * @final
      */
-    public function getUser()
+    protected function getUser()
     {
-        if (!$this->container->has('security.context')) {
-            throw new LogicException('The SecurityBundle is not registered in your application.');
+        if (!$this->container->has('security.token_storage')) {
+            throw new \LogicException('The SecurityBundle is not registered in your application. Try running "composer require symfony/security-bundle".');
         }
 
-        if (null === $token = $this->container->get('security.context')->getToken()) {
-            return;
+        if (null === $token = $this->container->get('security.token_storage')->getToken()) {
+            return null;
         }
 
-        if (!is_object($user = $token->getUser())) {
-            return;
+        if (!\is_object($user = $token->getUser())) {
+            // e.g. anonymous authentication
+            return null;
         }
 
         return $user;
