@@ -6,6 +6,7 @@ use Tecnoready\Common\Service\Block\WidgetManager;
 use Tecnoready\Common\Model\Block\Adapter\WidgetORMAdapter;
 use Tecnoready\Common\Tests\BaseWebTestCase;
 use Tecnoready\Common\Model\Block\DemoBlockWidget;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Pruebas del manejador de widget
@@ -24,7 +25,11 @@ class WidgetManagerTest extends BaseWebTestCase
         $demo->setContainer($container);
         
         $widgetManager = new WidgetManager($adapter);
+        $widgetManager->setEventDispatcher($container->get("event_dispatcher"));
         
-        $widgetManager->addDefinitionsBlockGrid($demo);
+        
+        $this->assertCount(0, $widgetManager->getWidgets());
+        $widgetManager->addWidget($demo);
+        $this->assertCount(1, $widgetManager->getWidgets());
     }
 }

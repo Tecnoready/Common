@@ -41,12 +41,18 @@ class WidgetManager
     private $currentRow = 1;
     private $quantityBlock = 1;
     private $blocks;
+    
     /**
-     * 
+     * Todos los widgets
      * @var array
      */
-    private $definitionsBlockGrid;
-    private $definitionsBlockGridByGroup;
+    private $widgets;
+    
+    /**
+     * Widgets agrupados
+     * @var array
+     */
+    private $widgetsByGroup;
 
     /**
      *
@@ -73,8 +79,8 @@ class WidgetManager
         ConfigurationUtil::checkLib("symfony/event-dispatcher");
         ConfigurationUtil::checkLib("symfony/templating");
         $this->blocks = array();
-        $this->definitionsBlockGrid = array();
-        $this->definitionsBlockGridByGroup = array();
+        $this->widgets = array();
+        $this->widgetsByGroup = array();
         $this->adapter = $adapter;
     }
 
@@ -184,20 +190,20 @@ class WidgetManager
 
     /**
      * Añade un widget block
-     * @param WidgetInterface $definitionsBlockGrid
+     * @param WidgetInterface $widget
      * @return $this
      * @throws InvalidArgumentException
      */
-    function addDefinitionsBlockGrid(WidgetInterface $definitionsBlockGrid)
+    public function addWidget(WidgetInterface $widget)
     {
-        if (isset($this->definitionsBlockGrid[$definitionsBlockGrid->getType()])) {
-            throw new InvalidArgumentException(sprintf("The definition of widget box '%s' is already added.", $definitionsBlockGrid->getType()));
+        if (isset($this->widgets[$widget->getType()])) {
+            throw new InvalidArgumentException(sprintf("The definition of widget box '%s' is already added.", $widget->getType()));
         }
-        $this->definitionsBlockGrid[$definitionsBlockGrid->getType()] = $definitionsBlockGrid;
-        if (!isset($this->definitionsBlockGridByGroup[$definitionsBlockGrid->getGroup()])) {
-            $this->definitionsBlockGridByGroup[$definitionsBlockGrid->getGroup()] = [];
+        $this->widgets[$widget->getType()] = $widget;
+        if (!isset($this->widgetsByGroup[$widget->getGroup()])) {
+            $this->widgetsByGroup[$widget->getGroup()] = [];
         }
-        $this->definitionsBlockGridByGroup[$definitionsBlockGrid->getGroup()][] = $definitionsBlockGrid;
+        $this->widgetsByGroup[$widget->getGroup()][] = $widget;
 
         return $this;
     }
@@ -207,34 +213,34 @@ class WidgetManager
      * @param type $type
      * @return WidgetInterface
      */
-    function getDefinitionBlockGrid($type)
+    function getWidget($type)
     {
-        if (!isset($this->definitionsBlockGrid[$type])) {
+        if (!isset($this->widgets[$type])) {
             throw new InvalidArgumentException(sprintf("The definition of widget box '%s' is not added.", $type));
         }
-        return $this->definitionsBlockGrid[$type];
+        return $this->widgets[$type];
     }
 
-    public function getDefinitionBlockGridByGroup($group)
+    public function getWidgetByGroup($group)
     {
-        if (!isset($this->definitionsBlockGridByGroup[$group])) {
+        if (!isset($this->widgetsByGroup[$group])) {
             throw new InvalidArgumentException(sprintf("The definition group '%s' is not added.", $group));
         }
-        return $this->definitionsBlockGridByGroup[$group];
+        return $this->widgetsByGroup[$group];
     }
 
     /**
      * 
      * @return WidgetInterface
      */
-    function getDefinitionsBlockGrid()
+    public function getWidgets()
     {
-        return $this->definitionsBlockGrid;
+        return $this->widgets;
     }
 
-    public function getDefinitionsBlockGridByGroup()
+    public function getWidgetsByGroup()
     {
-        return $this->definitionsBlockGridByGroup;
+        return $this->widgetsByGroup;
     }
 
     /**
@@ -257,11 +263,11 @@ class WidgetManager
      */
     public function addAll($type, $nameFilter = null)
     {
-        $definitionBlockGrid = $this->getDefinitionBlockGrid($type);
+        $definitionBlockGrid = $this->getWidget($type);
         if ($definitionBlockGrid->hasPermission() == false) {
             throw new \Symfony\Component\Security\Core\Exception\AccessDeniedException();
         }
-        $events = $definitionBlockGrid->getParseEvents();
+        $events = $definitionBlockGrid->getEvents();
         $names = $definitionBlockGrid->getNames();
 
         $templates = $definitionBlockGrid->getTemplates();
@@ -298,7 +304,7 @@ class WidgetManager
             return $this->cacheGroup[$group];
         }
         $total = 0;
-        $definitions = $this->getDefinitionBlockGridByGroup($group);
+        $definitions = $this->getWidgetByGroup($group);
         foreach ($definitions as $definition) {
             $total += $definition->countWidgets();
         }
@@ -313,7 +319,7 @@ class WidgetManager
     public function countNews()
     {
         $news = 0;
-        foreach ($this->getDefinitionsBlockGrid() as $grid) {
+        foreach ($this->getWidgets() as $grid) {
             $news += $grid->countNews();
         }
         return $news;
@@ -328,8 +334,8 @@ class WidgetManager
     {
         $added = 0;
         $limit = 3;
-        foreach ($this->getDefinitionsBlockGrid() as $grid) {
-            if (!in_array($eventName, $grid->getParseEvents())) {
+        foreach ($this->getWidgets() as $grid) {
+            if (!in_array($eventName, $grid->getEvents())) {
                 continue;
             }
             foreach ($grid->getDefaults() as $name) {

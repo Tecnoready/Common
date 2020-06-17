@@ -72,15 +72,6 @@ abstract class BaseWidget extends AbstractBlockService implements WidgetInterfac
         );
     }
     
-    public function getParseEvents() {
-        $events = [];
-        foreach ($this->getEvents() as $event) {
-            $events[] = $event;
-        }
-        return $events;
-    }
-
-    
     public function configureSettings(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(

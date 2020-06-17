@@ -50,7 +50,7 @@ interface WidgetInterface
     /**
      * Transforma los eventos su forma parseada
      */
-    function getParseEvents();
+    function getEvents();
     
     public function isNew($name);
     
