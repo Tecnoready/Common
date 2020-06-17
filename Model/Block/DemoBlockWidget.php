@@ -2,14 +2,14 @@
 
 namespace Tecnoready\Common\Model\Block;
 
-use Tecnoready\Common\Model\Block\BaseBlockWidgetBoxService;
+use Tecnoready\Common\Model\Block\BaseWidget;
 
 /**
  * Bloque de prueba
  *
  * @author Carlos Mendoza <inhack20@gmail.com>
  */
-class DemoBlockWidget extends BaseBlockWidgetBoxService
+class DemoBlockWidget extends BaseWidget
 {
     const NAME_DEMO = "widget.group.demo.demo";
     

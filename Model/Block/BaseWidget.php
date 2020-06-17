@@ -14,9 +14,8 @@ namespace Tecnoready\Common\Model\Block;
 use Tecnoready\Common\Service\Block\BlockContextInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Tecnoready\Common\Model\Block\DefinitionBlockWidgetBoxInterface;
+use Tecnoready\Common\Model\Block\WidgetInterface;
 use Tecnoready\Common\Service\Block\AbstractBlockService;
-use Tecnoready\Common\Service\Block\Event\MainSummaryBlockEvent;
 use InvalidArgumentException;
 
 /**
@@ -24,7 +23,7 @@ use InvalidArgumentException;
  *
  * @author Carlos Mendoza <inhack20@tecnocreaciones.com>
  */
-abstract class BaseBlockWidgetBoxService extends AbstractBlockService implements DefinitionBlockWidgetBoxInterface
+abstract class BaseWidget extends AbstractBlockService implements WidgetInterface
 {
     protected $cachePermission = [];
     
@@ -76,7 +75,7 @@ abstract class BaseBlockWidgetBoxService extends AbstractBlockService implements
     public function getParseEvents() {
         $events = [];
         foreach ($this->getEvents() as $event) {
-            $events[] = MainSummaryBlockEvent::parseEvent($event);
+            $events[] = $event;
         }
         return $events;
     }
