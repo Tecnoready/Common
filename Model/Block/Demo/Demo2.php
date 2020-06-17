@@ -3,6 +3,7 @@
 namespace Tecnoready\Common\Model\Block\Demo;
 
 use Tecnoready\Common\Model\Block\BaseWidget;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Bloque de prueba
@@ -15,6 +16,14 @@ class Demo2 extends BaseWidget
     
     public function getGroup() {
         return "widget.group.demo";
+    }
+    
+    public function configureSettings(OptionsResolver $resolver)
+    {
+        parent::configureSettings($resolver);
+        $resolver->setDefaults([
+            "isTransparent" => true,
+        ]);
     }
 
     public function getNames() {
