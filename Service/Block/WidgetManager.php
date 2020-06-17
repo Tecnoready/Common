@@ -407,6 +407,13 @@ class WidgetManager
         $content = '';
 
         foreach ($event->getBlocks() as $block) {
+            try {
+               $this->getWidget($block->getType());
+            } catch (InvalidArgumentException $ex) {
+                //No esta definido ese widget cuando se recupero de la bd
+                $this->adapter->remove($block);
+                continue;
+            }
             $content .= $this->render($block);
         }
 

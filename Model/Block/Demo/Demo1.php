@@ -1,6 +1,6 @@
 <?php
 
-namespace Tecnoready\Common\Model\Block;
+namespace Tecnoready\Common\Model\Block\Demo;
 
 use Tecnoready\Common\Model\Block\BaseWidget;
 
@@ -9,9 +9,9 @@ use Tecnoready\Common\Model\Block\BaseWidget;
  *
  * @author Carlos Mendoza <inhack20@gmail.com>
  */
-class DemoBlockWidget extends BaseWidget
+class Demo1 extends BaseWidget
 {
-    const NAME_DEMO = "widget.group.demo.demo";
+    const NAME_DEMO = "widget.group.demo.1";
     
     public function getGroup() {
         return "widget.group.demo";
@@ -39,7 +39,7 @@ class DemoBlockWidget extends BaseWidget
     }
 
     public function getType() {
-        return 'block.widget.demo';
+        return 'block.widget.demo.1';
     }
 
 }
