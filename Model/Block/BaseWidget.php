@@ -88,7 +88,7 @@ abstract class BaseWidget extends AbstractBlockService implements WidgetInterfac
             'defaultSizeX' => 4,
             'defaultSizeY' => 4,
             'oldSizeY' => 4,
-            'icon' => '<i class="fa fa-sort"></i>',
+            'icon' => 'fas fa-th mr-1',
             'isMaximizable' => false,
             'isReloadble' => true,
             'isCollapsible' => true,
