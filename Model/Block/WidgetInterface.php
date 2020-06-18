@@ -15,7 +15,7 @@ namespace Tecnoready\Common\Model\Block;
  *
  * @author Carlos Mendoza <inhack20@tecnocreaciones.com>
  */
-interface DefinitionBlockWidgetBoxInterface 
+interface WidgetInterface 
 {
     /**
      * Nombre del servicio definido
@@ -50,7 +50,7 @@ interface DefinitionBlockWidgetBoxInterface
     /**
      * Transforma los eventos su forma parseada
      */
-    function getParseEvents();
+    function getEvents();
     
     public function isNew($name);
     
@@ -67,7 +67,7 @@ interface DefinitionBlockWidgetBoxInterface
     public function getGroup();
     
     /**
-     * Filtros por defecto a añadir automaticamente en caso de tener cero widgets.
+     * Widgets por defecto a añadir automaticamente en caso de tener cero widgets.
      */
     public function getDefaults();
     
