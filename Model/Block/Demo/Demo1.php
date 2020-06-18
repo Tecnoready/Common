@@ -1,17 +1,17 @@
 <?php
 
-namespace Tecnoready\Common\Model\Block;
+namespace Tecnoready\Common\Model\Block\Demo;
 
-use Tecnoready\Common\Model\Block\BaseBlockWidgetBoxService;
+use Tecnoready\Common\Model\Block\BaseWidget;
 
 /**
  * Bloque de prueba
  *
  * @author Carlos Mendoza <inhack20@gmail.com>
  */
-class DemoBlockWidget extends BaseBlockWidgetBoxService
+class Demo1 extends BaseWidget
 {
-    const NAME_DEMO = "widget.group.demo.demo";
+    const NAME_DEMO = "widget.group.demo.1";
     
     public function getGroup() {
         return "widget.group.demo";
@@ -25,16 +25,21 @@ class DemoBlockWidget extends BaseBlockWidgetBoxService
            
         );
     }
+    
+    public function getDefaults()
+    {
+        return [self::NAME_DEMO];
+    }
 
     public function getTemplates()
     {
         return array(
-            '@TecnocreacionesTools/widget_demo.html.twig' => 'default',
+            '@TecnocreacionesTools/WidgetBox/widget_demo.html.twig' => 'default',
         );
     }
 
     public function getType() {
-        return 'block.widget.demo';
+        return 'block.widget.demo.1';
     }
 
 }

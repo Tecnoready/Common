@@ -14,9 +14,8 @@ namespace Tecnoready\Common\Model\Block;
 use Tecnoready\Common\Service\Block\BlockContextInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Tecnoready\Common\Model\Block\DefinitionBlockWidgetBoxInterface;
+use Tecnoready\Common\Model\Block\WidgetInterface;
 use Tecnoready\Common\Service\Block\AbstractBlockService;
-use Tecnoready\Common\Service\Block\Event\MainSummaryBlockEvent;
 use InvalidArgumentException;
 
 /**
@@ -24,7 +23,7 @@ use InvalidArgumentException;
  *
  * @author Carlos Mendoza <inhack20@tecnocreaciones.com>
  */
-abstract class BaseBlockWidgetBoxService extends AbstractBlockService implements DefinitionBlockWidgetBoxInterface
+abstract class BaseWidget extends AbstractBlockService implements WidgetInterface
 {
     protected $cachePermission = [];
     
@@ -73,15 +72,6 @@ abstract class BaseBlockWidgetBoxService extends AbstractBlockService implements
         );
     }
     
-    public function getParseEvents() {
-        $events = [];
-        foreach ($this->getEvents() as $event) {
-            $events[] = MainSummaryBlockEvent::parseEvent($event);
-        }
-        return $events;
-    }
-
-    
     public function configureSettings(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
@@ -98,7 +88,7 @@ abstract class BaseBlockWidgetBoxService extends AbstractBlockService implements
             'defaultSizeX' => 4,
             'defaultSizeY' => 4,
             'oldSizeY' => 4,
-            'icon' => '<i class="fa fa-sort"></i>',
+            'icon' => 'fas fa-th mr-1',
             'isMaximizable' => false,
             'isReloadble' => true,
             'isCollapsible' => true,

@@ -9,12 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Tecnoready\Common\Model\Block\Manager;
+namespace Tecnoready\Common\Model\Block\Adapter;
 
 use Tecnoready\Common\Model\Block\BlockInterface;
 
 /**
- *
+ * Adaptador para guardar los widgets de un usuario
  * @author Carlos Mendoza <inhack20@tecnocreaciones.com>
  */
 interface WidgetBoxAdapterInterface
