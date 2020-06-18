@@ -185,6 +185,29 @@ class ExporterManager implements ConfigureInterface
         $options["data"]["entity"] = $entity;
         return $this->generate($name,$options,$overwrite);
     }
+
+    /**
+     * Genera un documento a partir de un id
+     * @param type $id
+     * @param type $objectType
+     * @param type $file
+     * @param array $options
+     * @return File La ruta del archivo generado
+     * @throws RuntimeException
+     */
+    public function uploadWithSource($file,array $options = [],$overwrite = false)
+    {
+        $chainModel = $this->getChainModel($this->objectType);
+
+        $fileName = $file->getClientOriginalName();
+        
+        $this->documentManager->folder("uploaded");
+        $file = $this->documentManager->upload($file,[
+            "overwrite" => $overwrite,
+            "name" => $fileName,
+        ]);
+        return $file;
+    }
     
     /**
      * Resuelve el modelo de exportacion y le establece los parametros
@@ -207,11 +230,9 @@ class ExporterManager implements ConfigureInterface
     /**
      * @return DocumentManager
      */
-    public function documents()
+    public function documents($folder = "generated")
     {
-        $this->documentManager->folder("generated");
+        $this->documentManager->folder($folder);
         return $this->documentManager;
     }
-
-
 }

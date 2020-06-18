@@ -12,7 +12,11 @@ interface TemplateInterface
      * Se usa wkhtmltopdf para generar el PDF a partir de HTML
      */
     const TYPE_PDF = "PDF";
-//    const TYPE_TXT = "TXT";
+    
+    /**
+     * Tipo: Texto
+     */
+    const TYPE_TXT = "TXT";
 //    const TYPE_WORD = "WORD";
     /**
      * Tipo: Excel

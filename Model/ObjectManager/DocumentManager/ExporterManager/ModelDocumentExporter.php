@@ -10,7 +10,13 @@ use InvalidArgumentException;
  * @author Carlos Mendoza <inhack20@gmail.com>
  */
 abstract class ModelDocumentExporter
-{
+{   
+    /**
+     * $id
+     * @var String
+     */
+    private $id;
+
     /**
      * @var ChainModel
      */
@@ -47,6 +53,27 @@ abstract class ModelDocumentExporter
 
     public function __construct($name) {
         $this->name = $name;
+    }
+
+    /**
+     * Se registra identificador de plantilla
+     * @author Máximo Sojo <maxsojo13@gmail.com>
+     * @param  $id
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+        return $this;
+    }
+
+    /**
+     * Retornar identificador de plantilla
+     * @author Máximo Sojo <maxsojo13@gmail.com>
+     * @return Id Template
+     */
+    public function getId()
+    {
+        return $this->id;
     }
     
     public function getName() {

@@ -22,6 +22,12 @@ class TabContent
      * @var Tab
      */
     private $tabRoot;
+    
+    /**
+     * Parametros globables puede ser un callable que retorne un array o un array
+     * @var mixed 
+     */
+    private $viewParameters;
 
     public function __construct(array $options = []) 
     {
@@ -165,6 +171,20 @@ class TabContent
     public function setTabRoot(Tab $tabRoot)
     {
         $this->tabRoot = $tabRoot;
+        return $this;
+    }
+    
+    public function getViewParameters()
+    {
+        return $this->viewParameters;
+    }
+
+    public function setViewParameters($viewParameters)
+    {
+        if(!is_callable($viewParameters) && !is_array($viewParameters)){
+            throw new RuntimeException(sprintf("viewParameters debe ser array o callable pero se dio %s", gettype($viewParameters)));
+        }
+        $this->viewParameters = $viewParameters;
         return $this;
     }
                 

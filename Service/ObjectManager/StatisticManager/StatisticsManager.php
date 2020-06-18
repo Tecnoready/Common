@@ -176,7 +176,12 @@ class StatisticsManager implements ConfigureInterface
     public function findStatisticsYear($year) 
     {
         $year = (int)$year;
-        $foundStatistics = $this->adapter->findStatisticsYear(["object" => $this->object, "year" => $year]);
+        $foundStatistics = $this->adapter->findStatisticsYear([
+            "object" => $this->object,
+            "objectId" => $this->objectId,
+            "objectType" => $this->objectType,
+            "year" => $year
+        ]);
         if (!$foundStatistics) {
             $foundStatistics = null;
         }
@@ -356,5 +361,17 @@ class StatisticsManager implements ConfigureInterface
     public function addObjectValids($objectType,array $objectValids = array())
     {
         $this->objectValids[$objectType] = $objectValids;
+    }
+
+    /**
+     * Registro de objeto de estadistica actual
+     * This is a cool function
+     * @author Máximo Sojo <maxsojo13@gmail.com>
+     * @param  String $object
+     */
+    public function setObject($object)
+    {
+        $this->object = $object;
+        return $this;
     }
 }
