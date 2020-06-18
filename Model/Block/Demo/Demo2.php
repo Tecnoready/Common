@@ -34,11 +34,6 @@ class Demo2 extends BaseWidget
            
         );
     }
-    
-    public function getDefaults()
-    {
-        return [self::NAME_DEMO];
-    }
 
     public function getTemplates()
     {
