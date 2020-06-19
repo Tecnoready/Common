@@ -9,12 +9,12 @@ use Tecnoready\Common\Model\Block\BaseWidget;
  *
  * @author Carlos Mendoza <inhack20@gmail.com>
  */
-class Demo1 extends BaseWidget
+class DemoDefault extends BaseWidget
 {
-    const NAME_DEMO = "widget.group.demo.1";
+    const NAME_DEMO = "widget.group.default";
     
     public function getGroup() {
-        return "widget.group.demo";
+        return "widget.group.default";
     }
 
     public function getNames() {
@@ -24,6 +24,15 @@ class Demo1 extends BaseWidget
             ),
            
         );
+    }
+    
+    public function configureSettings(\Symfony\Component\OptionsResolver\OptionsResolver $resolver)
+    {
+        parent::configureSettings($resolver);
+        $resolver->setDefaults([
+            "title" => "title.widget.default.info",
+            "icon" => "fas fa-info-circle",
+        ]);
     }
     
     public function getDefaults()
@@ -39,7 +48,7 @@ class Demo1 extends BaseWidget
     }
 
     public function getType() {
-        return 'block.widget.demo.1';
+        return 'block.widget.default';
     }
 
 }
