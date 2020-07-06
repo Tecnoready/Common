@@ -15,7 +15,7 @@ use Tecnoready\Common\Service\ObjectManager\ConfigureInterface;
 use InvalidArgumentException;
 
 /**
- * Manejador de estadisticas
+ * Manejador de estadisticas para el manejador de objetos (ObjectManager)
  *
  * @author Carlos Mendoza <inhack20@gmail.com>
  */
