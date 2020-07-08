@@ -21,11 +21,11 @@ interface StatisticsAdapterInterface
     public function flush();
     
     /**
-     * @return \Tecnoready\Common\Model\Configuration\Statistics\StatisticsYearInterface Description
+     * @return \Tecnoready\Common\Model\Statistics\StatisticsYearInterface Description
      */
     public function newYearStatistics(\Tecnoready\Common\Service\Statistics\StatisticsManager $statisticsManager);
     /**
-     * @return \Tecnoready\Common\Model\Configuration\Statistics\StatisticsMonthInterface Description
+     * @return \Tecnoready\Common\Model\Statistics\StatisticsMonthInterface Description
      */
     public function newStatisticsMonth(\Tecnoready\Common\Service\Statistics\StatisticsManager $statisticsManager);
 }

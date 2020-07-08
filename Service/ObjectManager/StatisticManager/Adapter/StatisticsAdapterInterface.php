@@ -28,4 +28,11 @@ interface StatisticsAdapterInterface
      * @return \Tecnoready\Common\Model\Configuration\Statistics\StatisticsMonthInterface Description
      */
     public function newStatisticsMonth(\Tecnoready\Common\Service\ObjectManager\StatisticManager\StatisticsManager $statisticsManager);
+    
+    /**
+     * Busca las estadisticas de un año
+     * @param array $params
+     * @return \Tecnoready\Common\Model\Statistics\StatisticsYearInterface
+     */
+    public function findStatisticsYear(array $params = array());
 }
