@@ -110,6 +110,39 @@ class StatisticsManager implements ConfigureInterface
     }
     
     /**
+     * @deprecated Usar getTotalDay
+     */
+    public function getStatisticsMonthValue($year = null,$month = null,$day= null)
+    {
+        return $this->getTotalDay([
+            "year" => $year,
+            "month" => $month,
+            "day" => $day,
+        ]);
+    }
+    
+    /**
+     * @deprecated usar getStatisticsMonthTotal
+     */
+    public function getStatisticsMonthTotal($year = null,$month = null) 
+    {
+        return $this->getTotalMonth([
+            "year" => $year,
+            "month" => $month,
+        ]);
+    }
+    
+    /**
+     * @deprecated Usar getStatisticsYearValue
+     */
+    public function getStatisticsYearValue($year = null)
+    {
+        return $this->getTotalYear([
+            "year" => $year,
+        ]);
+    }
+    
+    /**
      * Retorna las estadisticas de un día especifico por año,mes y dia.
      * Antiguo: getStatisticsMonthValue
      * @param array $options [year,month,day]
