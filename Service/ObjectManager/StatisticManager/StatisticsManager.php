@@ -242,8 +242,9 @@ class StatisticsManager implements ConfigureInterface
     }
 
     /**
-     * Cuenta uno a las estadisticas de un objeto por el año, mes y dia
-     * @param array $options [year,month,day,value]
+     * Cuenta uno a las estadisticas de un objeto por el año, mes y dia<br/>
+     * <b>$value: Puede incrementar +20, restar -15 o colocar un valor fijo 5</b>
+     * @param array $options [year,month,day,value] 
      * @return \Tecnoready\Common\Model\Statistics\StatisticsMonthInterface
      */
     public function countStatisticsMonth(array $options = [])
@@ -259,6 +260,7 @@ class StatisticsManager implements ConfigureInterface
         $resolver->setDefaults($defaults);
         foreach ($defaults as $option => $v) {
             if(in_array($option,["$option"])){
+                $resolver->setAllowedTypes($option,["int","string","null"]);
                 continue;
             }
             $resolver->setAllowedTypes($option,"int");
@@ -280,6 +282,7 @@ class StatisticsManager implements ConfigureInterface
             $value = $this->getValueDay($options["day"], $foundStatisticsMonth);
             $value++;
         }
+//        var_dump($value);
 
         $this->setValueDay($foundStatisticsMonth, $options["day"], $value);
         $foundStatisticsMonth->totalize();
@@ -406,9 +409,10 @@ class StatisticsManager implements ConfigureInterface
     /**
      * Registro de objeto a usar en las llamadas futuras
      * @author Máximo Sojo <maxsojo13@gmail.com>
+     * @author Carlos Mendoza <inhack20@gmail.com>
      * @param  String $object
      */
-    public function setObject($object)
+    public function setObject($object = null)
     {
         if ($this->options["object"] !== null && !in_array($this->options["object"], $this->objectValids[$this->objectType])) {
             throw new InvalidArgumentException(sprintf("The object '%s' not add in object type '%s', please add. Available are %s", $this->options["object"], $this->objectType, implode(",", $this->objectValids[$this->objectType])));
