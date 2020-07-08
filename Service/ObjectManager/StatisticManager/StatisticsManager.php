@@ -108,13 +108,14 @@ class StatisticsManager implements ConfigureInterface
         $this->setObject($this->options["object"]);
         $this->adapter->configure($objectId, $objectType);
     }
-
+    
     /**
-     * Retorna las estadisticas de un mes especifico por año y dia
+     * Retorna las estadisticas de un día especifico por año,mes y dia.
+     * Antiguo: getStatisticsMonthValue
      * @param array $options [year,month,day]
      * @return StatisticsMonthValue
      */
-    public function getStatisticsMonthValue(array $options = [])
+    public function getTotalDay(array $options = [])
     {
         $resolver = new OptionsResolver();
         $now = new DateTime();
@@ -137,11 +138,12 @@ class StatisticsManager implements ConfigureInterface
     }
 
     /**
-     * Busca el total de un mes
+     * Busca el total de un mes.
+     * Antiguo: getStatisticsMonthTotal
      * @param array $options [year,month]
      * @return int
      */
-    public function getStatisticsMonthTotal(array $options = [])
+    public function getTotalMonth(array $options = [])
     {
         $resolver = new OptionsResolver();
         $now = new DateTime();
@@ -166,10 +168,11 @@ class StatisticsManager implements ConfigureInterface
 
     /**
      * Busca el total de un año
+     * Antiguo: getStatisticsYearValue
      * @param array $options [year]
      * @return int
      */
-    public function getStatisticsYearValue(array $options = [])
+    public function getTotalYear(array $options = [])
     {
         $resolver = new OptionsResolver();
         $now = new DateTime();
@@ -190,13 +193,28 @@ class StatisticsManager implements ConfigureInterface
 
         return $total;
     }
+    
+    /**
+     * Retorna el resumen de las estadisticas del año en un array
+     * @param type $year
+     * @return YearStatistics
+     */
+    public function getSummaryYear($year = null)
+    {
+        $summary = [];
+        for ($month = 1; $month <= 12; $month++) {
+            $summary[$month] = $this->getStatisticsMonthTotal($year, $month);
+        }
+
+        return $summary;
+    }
 
     /**
      * Retorna las estadisticas de un mes por el año
      * @param array $options [year,month]
      * @return int
      */
-    public function findStatisticsMonth(array $options = [])
+    private function findStatisticsMonth(array $options = [])
     {
         $resolver = new OptionsResolver();
         $now = new DateTime();
@@ -225,7 +243,7 @@ class StatisticsManager implements ConfigureInterface
      * @param type $month
      * @return \Tecnoready\Common\Model\Statistics\StatisticsYearInterface
      */
-    public function findStatisticsYear($year)
+    private function findStatisticsYear($year)
     {
         $year = (int) $year;
         $foundStatistics = $this->adapter->findStatisticsYear([
@@ -298,21 +316,6 @@ class StatisticsManager implements ConfigureInterface
         return $foundStatisticsMonth;
     }
     
-    /**
-     * Retorna el resumen de las estadisticas del anio en un array
-     * @param type $year
-     * @return YearStatistics
-     */
-    public function getSummaryYear($year = null)
-    {
-        $summary = [];
-        for ($month = 1; $month <= 12; $month++) {
-            $summary[$month] = $this->getStatisticsMonthTotal($year, $month);
-        }
-
-        return $summary;
-    }
-
     /**
      * Retorna el valor de un dia
      * @param type $day
