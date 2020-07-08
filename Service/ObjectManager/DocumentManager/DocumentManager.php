@@ -49,9 +49,9 @@ class DocumentManager implements DocumentAdapterInterface
      * @param type $id
      * @param type $type
      */
-    public function configure($objectId, $objectType)
+    public function configure($objectId, $objectType,array $options = [])
     {
-        $this->adapter->configure($objectId, $objectType);
+        $this->adapter->configure($objectId, $objectType,$options);
         $this->adapter->folder(null);
     }
 

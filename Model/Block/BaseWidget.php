@@ -34,7 +34,7 @@ abstract class BaseWidget extends AbstractBlockService implements WidgetInterfac
         $settings = $blockContext->getSettings();
         
         return $this->renderResponse($blockContext->getTemplate(),array(
-            'block'     => $blockContext->getBlock(),
+            'widget'     => $blockContext->getBlock(),
             'settings'  => $settings,
         ),$response);
     }
@@ -76,10 +76,10 @@ abstract class BaseWidget extends AbstractBlockService implements WidgetInterfac
     {
         $resolver->setDefaults(array(
             'widget_id' => null,
-            'url'      => false,
+//            'url'      => false,
             'title'    => 'Titulo',
-            'name'    => 'Nombre',
-            'template' => 'TecnocreacionesToolsBundle:WidgetBox:block_widget_box.html.twig',
+            'name'    => null,//Nombre del widget renderizado
+            'template' => null,//Plantilla a renderizar el widget cuanto tiene varios templates
             'blockBase' => 'TecnocreacionesToolsBundle:WidgetBox:block_widget_box.html.twig',
             'positionX' => 1,
             'positionY' => 1,
@@ -99,12 +99,12 @@ abstract class BaseWidget extends AbstractBlockService implements WidgetInterfac
             'isColorable' => false,//Se puede cambiar el color del wiget
             'widgetColor' => null,//Color del widget
             'renderTitle' => true,//¿Renderizar el titulo del widget?
-            'translationDomain' => $this->getTranslationDomain(),//Color del widget
+            'translationDomain' => $this->getTranslationDomain(),
         ));
     }
     
     public function getTranslationDomain() {
-        return 'widgets';
+        return 'messages';
     }
     
     public function countWidgets() {
