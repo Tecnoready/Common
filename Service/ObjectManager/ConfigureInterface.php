@@ -8,5 +8,5 @@ namespace Tecnoready\Common\Service\ObjectManager;
  */
 interface ConfigureInterface
 {
-    public function configure($objectId, $objectType);
+    public function configure($objectId, $objectType,array $options = []);
 }

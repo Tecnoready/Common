@@ -36,10 +36,10 @@ class NoteManager implements NoteAdapterInterface
         $this->options = $resolver->resolve($options);
     }
     
-    public function configure($objectId, $objectType)
+    public function configure($objectId, $objectType,array $options = [])
     {
         if($this->adapter){
-            $this->adapter->configure($objectId, $objectType);
+            $this->adapter->configure($objectId, $objectType,$options);
         }
     }
 

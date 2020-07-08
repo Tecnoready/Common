@@ -54,11 +54,11 @@ class ExporterManager implements ConfigureInterface
         $this->documentManager = $documentManager;
     }
     
-    public function configure($objectId, $objectType)
+    public function configure($objectId, $objectType,array $options = [])
     {
         $this->objectId = $objectId;
         $this->objectType = $objectType;
-        $this->documentManager->configure($objectId, $objectType);
+        $this->documentManager->configure($objectId, $objectType,$options);
         return $this;
     }
     

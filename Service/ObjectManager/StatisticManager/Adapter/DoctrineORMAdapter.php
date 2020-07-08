@@ -18,8 +18,10 @@ use Tecnoready\Common\Service\ObjectManager\ConfigureInterface;
  *
  * @author Carlos Mendoza <inhack20@gmail.com>
  */
-class DoctrineORMAdapter implements StatisticsAdapterInterface
+class DoctrineORMAdapter implements StatisticsAdapterInterface,ConfigureInterface
 {
+    use \Tecnoready\Common\Service\ObjectManager\TraitConfigure;
+    
     /**
      * @var string
      */
@@ -44,17 +46,6 @@ class DoctrineORMAdapter implements StatisticsAdapterInterface
     }
 
     /**
-     * @author Máximo Sojo <maxsojo13@gmail.com>
-     * @param  $objectId
-     * @param  $objectType
-     */
-    public function configure($objectId, $objectType)
-    {   
-        $this->objectId = $objectId;
-        $this->objectType = $objectType;
-    }
-
-	/**
      * @return \Tecnoready\Common\Model\Configuration\Statistics\StatisticsYearInterface Description
      */
     public function newYearStatistics(\Tecnoready\Common\Service\ObjectManager\StatisticManager\StatisticsManager $statisticsManager)
@@ -102,7 +93,7 @@ class DoctrineORMAdapter implements StatisticsAdapterInterface
      *  
      * @author Máximo Sojo <maxsojo13@gmail.com>
      * @param  array  $params
-     * @return StatisticYear
+     * @return \Tecnoready\Common\Model\Statistics\StatisticsYearInterface
      */
     public function findStatisticsYear(array $params = array())
     {
