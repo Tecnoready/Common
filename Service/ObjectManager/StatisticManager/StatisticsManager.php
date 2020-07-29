@@ -190,7 +190,10 @@ class StatisticsManager implements ConfigureInterface
         }
         $options = $resolver->resolve($options);
         
-        $foundStatistics = $this->findStatisticsMonth($option["year"], $option["month"]);
+        $foundStatistics = $this->findStatisticsMonth([
+            "year" => $options["year"],
+            "month" => $options["month"],
+        ]);
         $total = 0;
         if ($foundStatistics !== null) {
             $total = $foundStatistics->getTotal();
