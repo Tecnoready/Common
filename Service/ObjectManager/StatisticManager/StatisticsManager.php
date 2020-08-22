@@ -150,6 +150,7 @@ class StatisticsManager implements ConfigureInterface
      */
     public function getTotalDay(array $options = [])
     {
+        $options = $this->parseOldValues($options);
         $resolver = new OptionsResolver();
         $now = new DateTime();
         $defaults = [
@@ -169,7 +170,7 @@ class StatisticsManager implements ConfigureInterface
         ]);
         return (int) $this->getValueDay($options["day"], $foundStatistics);
     }
-
+    
     /**
      * Busca el total de un mes.
      * Antiguo: getStatisticsMonthTotal
@@ -178,6 +179,7 @@ class StatisticsManager implements ConfigureInterface
      */
     public function getTotalMonth(array $options = [])
     {
+        $options = $this->parseOldValues($options);
         $resolver = new OptionsResolver();
         $now = new DateTime();
         $defaults = [
@@ -210,6 +212,7 @@ class StatisticsManager implements ConfigureInterface
      */
     public function getTotalYear(array $options = [])
     {
+        $options = $this->parseOldValues($options);
         $resolver = new OptionsResolver();
         $now = new DateTime();
         $defaults = [
@@ -458,6 +461,22 @@ class StatisticsManager implements ConfigureInterface
         }
         $this->options["object"] = $object;
         return $this;
+    }
+    
+    /**
+     * Compatibilidad con lo viejo de getStatisticsMonthTotal
+     * @param array $options
+     * @return array
+     */
+    private function parseOldValues(array $options = [])
+    {
+        //Compatibilidad con lo viejo de getStatisticsMonthTotal
+        foreach ($options as $key => $value) {
+            if($value === null){
+                unset($options[$key]);
+            }
+        }
+        return $options;
     }
 
 }
