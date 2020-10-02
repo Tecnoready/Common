@@ -1,15 +1,9 @@
 <?php
 
-/*
- * This file is part of the BtoB4Rewards package.
- * 
- * (c) www.btob4rewards.com
- * 
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 namespace Tecnoready\Common\Util;
+
+use Exception;
+use InvalidArgumentException;
 
 /**
  * Util de la libreria de configuracion
@@ -36,49 +30,67 @@ class ConfigurationUtil {
         "tecnickcom/tcpdf" => "checkTCPDF",
         "symfony/event-dispatcher" => "checkEventDispatcher",
         "symfony/templating" => "checkTemplating",
+        "guzzlehttp/guzzle" => [
+            "class" => "GuzzleHttp\Client",
+            "solution" => [
+                "type" => "composer",
+                "package" => "guzzlehttp/guzzle",
+                "version" => "~6.0"
+            ],
+        ],
     ];
     
     public static function checkLib($name) {
         if(!isset(self::$libs[$name])){
-            throw new \InvalidArgumentException(sprintf("The libname '%s' is not valid."));
+            throw new InvalidArgumentException(sprintf("The libname '%s' is not valid."));
         }
-        $method = self::$libs[$name];
-        self::{$method}();
+        $options = self::$libs[$name];
+        if(is_array($options)){
+            if(!class_exists($options["class"])){
+                $solution = $options["solution"];
+                if($solution["type"] === "composer"){
+                    throw new Exception(sprintf("The package '%s' is required, please install https://packagist.org/packages/%s",'"symfony/options-resolver": "~3.4"',
+                            $solution["package"],$solution["package"],$solution["package"],$solution["version"]));
+                }
+            }
+        }else{
+            self::{$options}();
+        }
     }
     
     private static function checkOptionsResolver() {
         if(!class_exists("Symfony\Component\OptionsResolver\OptionsResolver")){
-            throw new \Exception(sprintf("The package '%s' is required, please install https://packagist.org/packages/symfony/options-resolver",'"symfony/options-resolver": "~3.4"'));
+            throw new Exception(sprintf("The package '%s' is required, please install https://packagist.org/packages/symfony/options-resolver",'"symfony/options-resolver": "~3.4"'));
         }
     }
     private static function checkGuzzleHttp() {
         if (!class_exists('\GuzzleHttp\Client')) {
-            throw new \Exception(sprintf("The package '%s' is required, please install https://packagist.org/packages/guzzlehttp/guzzle",'"guzzlehttp/guzzle": "~6.3"'));
+            throw new Exception(sprintf("The package '%s' is required, please install https://packagist.org/packages/guzzlehttp/guzzle",'"guzzlehttp/guzzle": "~6.3"'));
         }
     }
     private static function checkPropertyAccess() {
         if (!class_exists('\Symfony\Component\PropertyAccess\PropertyAccess')) {
-            throw new \Exception(sprintf("The package '%s' is required, please install.",'"symfony/property-access": "~3.4"'));
+            throw new Exception(sprintf("The package '%s' is required, please install.",'"symfony/property-access": "~3.4"'));
         }
     }
     private static function checkPhpspreadsheet() {
         if (!class_exists('\PhpOffice\PhpSpreadsheet\IOFactory')) {
-            throw new \Exception(sprintf("The package '%s' is required, please install.",'"phpoffice/phpspreadsheet": "^1.6"'));
+            throw new Exception(sprintf("The package '%s' is required, please install.",'"phpoffice/phpspreadsheet": "^1.6"'));
         }
     }
     private static function checkTCPDF() {
         if (!class_exists('\TCPDF')) {
-            throw new \Exception(sprintf("The package '%s' is required, please install.",'"tecnickcom/tcpdf": "^6.2"'));
+            throw new Exception(sprintf("The package '%s' is required, please install.",'"tecnickcom/tcpdf": "^6.2"'));
         }
     }
     private static function checkEventDispatcher() {
         if (!class_exists('\Symfony\Component\EventDispatcher\Event')) {
-            throw new \Exception(sprintf("The package '%s' is required, please install.",'"symfony/event-dispatcher": "^4.0"'));
+            throw new Exception(sprintf("The package '%s' is required, please install.",'"symfony/event-dispatcher": "^4.0"'));
         }
     }
     private static function checkTemplating() {
         if (!interface_exists('\Symfony\Component\Templating\EngineInterface')) {
-            throw new \Exception(sprintf("The package '%s' is required, please install.",'"symfony/templating": "^4.0"'));
+            throw new Exception(sprintf("The package '%s' is required, please install.",'"symfony/templating": "^4.0"'));
         }
     }
     
