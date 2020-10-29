@@ -19,6 +19,7 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Tecnoready\Common\Service\ObjectManager\ConfigureInterface;
 use Tecnoready\Common\Service\ObjectManager\StatisticManager\Adapter\StatisticsAdapterInterface;
+use Tecnoready\Common\Model\Statistics\StatisticsMonthInterface;
 
 /**
  * Manejador de estadisticas para el manejador de objetos (ObjectManager)
@@ -168,7 +169,7 @@ class StatisticsManager implements ConfigureInterface
             "year" => $options["year"],
             "month" => $options["month"],
         ]);
-        return (int) $this->getValueDay($options["day"], $foundStatistics);
+        return (double) $this->getValueDay($options["day"], $foundStatistics);
     }
     
     /**
@@ -334,7 +335,8 @@ class StatisticsManager implements ConfigureInterface
 
         $value = $options["value"];
         if ($value && is_string($value)) {
-            $value = $this->getValueDay($options["day"], $foundStatisticsMonth) + intval($value);
+            $value = doubleval($value);
+            $value = $this->getValueDay($options["day"], $foundStatisticsMonth) + doubleval($value);
         } elseif (!$value) {
             $value = $this->getValueDay($options["day"], $foundStatisticsMonth);
             $value++;
@@ -368,7 +370,10 @@ class StatisticsManager implements ConfigureInterface
         }
         $statisticsPropertyPath = "day" . $day;
         $value = $this->propertyAccess->getValue($foundStatistics, $statisticsPropertyPath);
-
+//        var_dump($foundStatistics->getId());
+//        var_dump($value);
+//        var_dump($statisticsPropertyPath);
+//        die;
         return $value;
     }
 
