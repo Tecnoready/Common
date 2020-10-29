@@ -70,6 +70,11 @@ class DocumentManager implements DocumentAdapterInterface
         return $this->adapter->getAll();
     }
 
+    public function toArray(\Symfony\Component\Finder\SplFileInfo $file)
+    {
+        return $this->adapter->toArray($file);
+    }
+
     /**
      * Sube un documento
      * @param File $file

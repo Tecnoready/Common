@@ -242,4 +242,17 @@ class DiskAdapter implements DocumentAdapterInterface
         $this->folder = $subPath;
         return $this;
     }
+
+    public function toArray(\Symfony\Component\Finder\SplFileInfo $file)
+    {
+        $fileName = $file->getFilename();
+        $date = new \DateTime();
+        $date->setTimestamp($file->getMTime());
+
+        return [
+            "fileName" => $fileName,
+            "icon" => $file->getExtension(),
+            "date" => $date->format('d/m/Y h:i a')
+        ];
+    }
 }

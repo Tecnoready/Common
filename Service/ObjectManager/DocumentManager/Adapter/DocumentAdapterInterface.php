@@ -42,6 +42,12 @@ interface DocumentAdapterInterface extends ConfigureInterface
      * @return Finder
      */
     public function getAll();
+
+    /**
+     * Genera un array del documento.
+     * @return Finder
+     */
+    public function toArray(\Symfony\Component\Finder\SplFileInfo $file);
     
     /**
      * Establece la sub carpeta a leeer
