@@ -95,8 +95,9 @@ class SnippetManager
         }
         
         $engine = $this->getEngine($snippet->getEngine());
-        $result = $engine->render($snippet->getCode(),$parameters,$options);
-        if($result !== 0 && empty($result)){
+        $result = $engine->render($snippet,$parameters,$options);
+        //Fix: no comparar tipo de dato sino cuando retorna 0 tipo string falla.
+        if($result != 0 && empty($result)){
             throw new RuntimeException(sprintf("El resultado del snippet '%s' no puede estar vacio o ser NULL. Retorno '%s'",$snippet->getCode(),$result));
         }
         return $result;

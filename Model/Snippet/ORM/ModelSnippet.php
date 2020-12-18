@@ -76,4 +76,10 @@ abstract class ModelSnippet implements SnippetInterface
         $this->name = $name;
         return $this;
     }
+    
+    public function getId()
+    {
+        return $this->id;
+    }
+
 }
