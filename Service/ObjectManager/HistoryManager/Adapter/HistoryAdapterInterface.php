@@ -18,4 +18,6 @@ interface HistoryAdapterInterface extends ConfigureInterface
     public function find($id);
     
     public function getPaginator(array $criteria = [],array $sortBy = []);
+    
+    public function createNew(array $options = []);
 }
