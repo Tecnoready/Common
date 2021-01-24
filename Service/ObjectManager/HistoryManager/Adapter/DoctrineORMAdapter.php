@@ -55,7 +55,7 @@ class DoctrineORMAdapter implements HistoryAdapterInterface
     /**
      * @param array $criteria
      * @param array $sortBy
-     * @return Paginator
+     * @return \Doctrine\ORM\QueryBuilder
      */
     public function getPaginator(array $criteria = [], array $sortBy = [])
     {
@@ -68,6 +68,16 @@ class DoctrineORMAdapter implements HistoryAdapterInterface
                 ->setParameter("objectType", $this->objectType)
                 ->orderBy("e.createdAt", "DESC")
         ;
+        //Doctrine\ORM\Query
+        $sort = $criteria["sort"];
+        $direction = $criteria["direction"];
+        if (!empty($sort) && !empty($direction)) {
+            $sort = explode("+", $sort);
+            foreach ($sort as $field) {
+                $qb->orderBy($field, $direction);
+            }
+        }
+        
         $pagerfanta = new Paginator(new Adapter($qb));
         return $pagerfanta;
     }
