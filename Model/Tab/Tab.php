@@ -313,7 +313,7 @@ class Tab
     public function getParameter($key)
     {
         if(!isset($this->parameters[$key])){
-            throw new RuntimeException(sprintf("The parameter '%s' is not exists.",$key));
+            throw new RuntimeException(sprintf("The parameter '%s' is not exists. Available are %s",$key, implode(",", array_keys($this->parameters))));
         }
         return $this->parameters[$key];
     }
