@@ -161,10 +161,16 @@ class TemplateService
                 throw new RuntimeException(sprintf("Los parametros '%s' son requeridos.", implode(", ", $diff)));
             }
         }
-        if($path === null){
-            $path = tempnam(null,"template_compile");
-        }
         $string = $this->render($template, $variables);
+        
+        if($path === null){
+            $path = tempnam(null,"tpl");
+        }
+        $fileNameCalculated = $adapter->getFileName();
+        //Si durante la renderizacion se calculo el nombre entonces se toma ese como final
+        if(!empty($fileNameCalculated)){
+            $path = dirname($path).DIRECTORY_SEPARATOR.$fileNameCalculated;
+        }
         $adapter->compile($path, $string, $parameters);
         $file = null;
         if(is_file($path)){
