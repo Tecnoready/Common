@@ -50,7 +50,7 @@ class WkhtmlToPDFEngine extends BaseEngine
         return $result;
     }
 
-    public function compile($filename, $string, array $parameters)
+    public function compile($filename, $string, array $parameters):void
     {
         $resolver = new OptionsResolver();
         $resolver->setRequired([
@@ -94,7 +94,6 @@ class WkhtmlToPDFEngine extends BaseEngine
         if($forceDownload === true){
             $pdf->send(basename($filename));
         }
-        return true;
     }
 
     public function getExtension()

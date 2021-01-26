@@ -12,7 +12,7 @@ interface EngineInterface
 {
     public function render(TemplateInterface $template,array $variables);
     
-    public function compile($filename,$string,array $parameters);
+    public function compile($filename,$string,array $parameters): void;
     
     public function getExtension();
     

@@ -47,7 +47,7 @@ class TXTEchoEngine extends BaseEngine
         return $resul;
     }
 
-    public function compile($filename, $string, array $parameters)
+    public function compile($filename, $string, array $parameters):void
     {
         if(file_exists($filename)){
             unlink($filename);
@@ -55,7 +55,6 @@ class TXTEchoEngine extends BaseEngine
         $fh = fopen($filename, "w");
         fwrite($fh,$string);
         fclose($fh);
-        return file_exists($filename) === true;
     }
 
     public function getDefaultParameters()

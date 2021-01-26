@@ -7,6 +7,7 @@ use Tecnoready\Common\Model\Template\TemplateInterface;
 use RuntimeException;
 use Tecnoready\Common\Service\Template\Adapter\AdapterInterface;
 use Tecnoready\Common\Service\Template\Engine\EngineInterface;
+use Symfony\Component\HttpFoundation\File\File;
 
 /**
  * Servicio que renderiza y compila plantillas para generad documentos (pdf)
@@ -113,7 +114,7 @@ class TemplateService
      * @param array $parameters
      * @return type
      */
-    public function compile($id, $filename, array $variables, array $parameters = [])
+    public function compile($id,string $filename = null, array $variables = [], array $parameters = [])
     {
         $template = $this->adapter->find($id);
         return $this->compileTemplate($template, $filename, $variables, $parameters);
@@ -124,7 +125,7 @@ class TemplateService
      * @param type $string
      * @param array $parameters
      */
-    public function compileTemplate(TemplateInterface $template, $filename, array $variables, array $parameters = [])
+    public function compileTemplate(TemplateInterface $template, string $path = null, array $variables = [], array $parameters = []) :?File
     {
         $adapter = $this->getEngine($template->getTypeTemplate());
 
@@ -160,9 +161,16 @@ class TemplateService
                 throw new RuntimeException(sprintf("Los parametros '%s' son requeridos.", implode(", ", $diff)));
             }
         }
-
+        if($path === null){
+            $path = tempnam(null,"template_compile");
+        }
         $string = $this->render($template, $variables);
-        return $adapter->compile($filename, $string, $parameters);
+        $adapter->compile($path, $string, $parameters);
+        $file = null;
+        if(is_file($path)){
+            $file = new File($path);
+        }
+        return $file;
     }
 
 }

@@ -31,12 +31,10 @@ class PhpSpreadsheetXLSXEngine extends BaseEngine
         return $spreadsheet;
     }
 
-    public function compile($filename, $spreadsheet, array $parameters)
+    public function compile($filename, $spreadsheet, array $parameters):void
     {
         $writer = new Xlsx($spreadsheet);
         $writer->save($filename);
-
-        return true;
     }
 
     public function getDefaultParameters()
