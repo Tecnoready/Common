@@ -16,8 +16,14 @@ interface TemplateInterface
 
     public function setContent($content);
 
+    /**
+     * @return \Tecnocreaciones\Bundle\ToolsBundle\Model\ORM\Template\ModelVariable Description
+     */
     public function getVariables();
 
+    /**
+     * @return \Tecnocreaciones\Bundle\ToolsBundle\Model\ORM\Template\ModelParameter Description
+     */
     public function getParameters();
 
     public function setId($id);

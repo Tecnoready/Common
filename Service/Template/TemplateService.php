@@ -15,12 +15,13 @@ use Tecnoready\Common\Service\Template\Engine\EngineInterface;
  */
 class TemplateService
 {
+
     /**
      * Motores disponibles
      * @var EngineInterface
      */
     private $engines;
-    
+
     /**
      * Adaptador para buscar las plantillas
      * @var AdapterInterface
@@ -35,11 +36,11 @@ class TemplateService
         ]);
         $resolver->setRequired([
             "env",
-            ]
+                ]
         );
         $this->engines = [];
     }
-    
+
     /**
      * Retorna todos los moteres
      * @return array
@@ -48,11 +49,11 @@ class TemplateService
     {
         $engines = [];
         foreach ($this->engines as $engine) {
-            $engines[sprintf("[%s] %s - %s",$engine->getExtension(),$engine->getLanguage(),$engine->getDescription())] = $engine->getId();
+            $engines[sprintf("[%s] %s - %s", $engine->getExtension(), $engine->getLanguage(), $engine->getDescription())] = $engine->getId();
         }
         return $engines;
     }
-    
+
     /**
      * Establece el adaptador
      * @param AdapterInterface $adapter
@@ -63,7 +64,7 @@ class TemplateService
         $this->adapter = $adapter;
         return $this;
     }
-    
+
     /**
      * Añade un motor
      * @param \Tecnoready\Common\Service\Template\EngineInterface $adapter
@@ -75,7 +76,7 @@ class TemplateService
             throw new RuntimeException(sprintf("The adapter with name '%s' is already added.", $adapter->getExtension()));
         }
         $this->engines[$adapter->getId()] = $adapter;
-        
+
         return $this;
     }
 
@@ -115,7 +116,7 @@ class TemplateService
     public function compile($id, $filename, array $variables, array $parameters = [])
     {
         $template = $this->adapter->find($id);
-        return $this->compileTemplate($template, $filename, $variables,$parameters);
+        return $this->compileTemplate($template, $filename, $variables, $parameters);
     }
 
     /**
@@ -126,6 +127,40 @@ class TemplateService
     public function compileTemplate(TemplateInterface $template, $filename, array $variables, array $parameters = [])
     {
         $adapter = $this->getEngine($template->getTypeTemplate());
+
+        //Todas las variables son requeridas
+        $variablesToCheck = $template->getVariables();
+        if (count($variablesToCheck) > 0) {
+            $diff = [];
+            foreach ($variablesToCheck as $variable) {
+                $key = $variable->getName();
+                if (!isset($variables[$key])) {
+                    $diff[] = $key;
+                }
+            }
+            if (count($diff) > 0) {
+                throw new RuntimeException(sprintf("Las variables '%s' son requeridos.", implode(", ", $diff)));
+            }
+        }
+
+        //Verificar los parametros obligatorios
+        $parametersToCheck = $template->getParameters();
+        if (count($parametersToCheck) > 0) {
+            $diff = [];
+            foreach ($parametersToCheck as $parameter) {
+                if($parameter->getRequired() === false){
+                    continue;
+                }
+                $key = $parameter->getName();
+                if (!isset($parameters[$key])) {
+                    $diff[] = $key;
+                }
+            }
+            if (count($diff) > 0) {
+                throw new RuntimeException(sprintf("Los parametros '%s' son requeridos.", implode(", ", $diff)));
+            }
+        }
+
         $string = $this->render($template, $variables);
         return $adapter->compile($filename, $string, $parameters);
     }
