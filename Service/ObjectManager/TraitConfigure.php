@@ -21,7 +21,7 @@ trait TraitConfigure
      */
     private $objectId;
     
-    public function configure($objectId, $objectType)
+    public function configure($objectId, $objectType,array $options = [])
     {
         $this->objectId = $objectId;
         $this->objectType = $objectType;

@@ -54,11 +54,11 @@ class ExporterManager implements ConfigureInterface
         $this->documentManager = $documentManager;
     }
     
-    public function configure($objectId, $objectType)
+    public function configure($objectId, $objectType,array $options = [])
     {
         $this->objectId = $objectId;
         $this->objectType = $objectType;
-        $this->documentManager->configure($objectId, $objectType);
+        $this->documentManager->configure($objectId, $objectType,$options);
         return $this;
     }
     
@@ -172,10 +172,19 @@ class ExporterManager implements ConfigureInterface
      * @return File La ruta del archivo generado
      * @throws RuntimeException
      */
-    public function generateWithSource($name,array $options = [],$overwrite = false) {
+    public function generateWithSource($name,array $options = [],$overwrite = false)
+    {
         if(!$this->adapter){
             throw new RuntimeException(sprintf("The adapter must be set for enable this feature."));
         }
+
+        $resolver = new OptionsResolver();
+        $resolver->setDefaults([
+            "fileName" => null,
+            "request" => null
+        ]);
+        $options = $resolver->resolve($options);
+
         $chainModel = $this->getChainModel($this->objectType);
         $className = $chainModel->getClassName();
         $entity = $this->adapter->find($chainModel->getClassName(),$this->objectId);
@@ -183,7 +192,32 @@ class ExporterManager implements ConfigureInterface
             throw new RuntimeException(sprintf("The source '%s' with '%s' not found.",$className,$this->objectId));
         }
         $options["data"]["entity"] = $entity;
+        $options["data"]["request"] = $options["request"];
+        
         return $this->generate($name,$options,$overwrite);
+    }
+
+    /**
+     * Genera un documento a partir de un id
+     * @param type $id
+     * @param type $objectType
+     * @param type $file
+     * @param array $options
+     * @return File La ruta del archivo generado
+     * @throws RuntimeException
+     */
+    public function uploadWithSource($file,array $options = [],$overwrite = false)
+    {
+        $chainModel = $this->getChainModel($this->objectType);
+
+        $fileName = $file->getClientOriginalName();
+        
+        $this->documentManager->folder("uploaded");
+        $file = $this->documentManager->upload($file,[
+            "overwrite" => $overwrite,
+            "name" => $fileName,
+        ]);
+        return $file;
     }
     
     /**
@@ -197,6 +231,7 @@ class ExporterManager implements ConfigureInterface
         $resolver->setDefaults([
             "data" => [],
             "fileName" => null,
+            "request" => null
         ]);
         $resolver->setAllowedTypes("data","array");
         $options = $resolver->resolve($options);
@@ -207,11 +242,9 @@ class ExporterManager implements ConfigureInterface
     /**
      * @return DocumentManager
      */
-    public function documents()
+    public function documents($folder = "generated")
     {
-        $this->documentManager->folder("generated");
+        $this->documentManager->folder($folder);
         return $this->documentManager;
     }
-
-
 }

@@ -127,6 +127,7 @@ abstract class DoctrineORMConfiguration implements ConfigurationInterface
 
     public function setKey($key) {
         $this->key = $key;
+        $this->setCreatedAt();
         return $this;
     }
 

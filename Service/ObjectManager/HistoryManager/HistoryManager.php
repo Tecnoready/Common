@@ -35,6 +35,13 @@ class HistoryManager implements HistoryAdapterInterface
         ]);
         $this->options = $resolver->resolve($options);
     }
+    
+    public function configure($objectId, $objectType, array $options = array())
+    {
+        $this->objectId = $objectId;
+        $this->objectType = $objectType;
+        $this->adapter->configure($objectId, $objectType, $options);
+    }
 
     
     public function create(\Tecnoready\Common\Model\ObjectManager\HistoryManager\HistoryInterface $entity)
@@ -55,5 +62,10 @@ class HistoryManager implements HistoryAdapterInterface
     public function getPaginator(array $criteria = array(), array $sortBy = array())
     {
         return $this->adapter->getPaginator($criteria,$sortBy);
+    }
+
+    public function createNew(array $options = array())
+    {
+        return $this->adapter->createNew($options);
     }
 }

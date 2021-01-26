@@ -49,6 +49,12 @@ class Tab
      * @var array 
      */
     private $parameters = [];
+    
+    /**
+     * Parametros globables puede ser un callable que retorne un array o un array
+     * @var mixed 
+     */
+    private $viewParameters;
 
     public function __construct(array $options = []) 
     {
@@ -67,6 +73,7 @@ class Tab
         $resolver->setDefaults([
             "active_first" => true,
             "object_id" => null,
+            "default_template" => null,
         ]);
         $this->options = $resolver->resolve($options);
         
@@ -306,7 +313,7 @@ class Tab
     public function getParameter($key)
     {
         if(!isset($this->parameters[$key])){
-            throw new RuntimeException(sprintf("The parameter '%s' is not exists.",$key));
+            throw new RuntimeException(sprintf("The parameter '%s' is not exists. Available are %s",$key, implode(",", array_keys($this->parameters))));
         }
         return $this->parameters[$key];
     }
@@ -316,4 +323,30 @@ class Tab
         $this->parameters = $parameters;
         return $this;
     }
+    
+    /**
+     * Busca una opcion
+     * @param type $name
+     * @return type
+     */
+    public function getOption($name) 
+    {
+        $value = $this->options[$name];
+        return $value;
+    }
+    
+    public function getViewParameters()
+    {
+        return $this->viewParameters;
+    }
+
+    public function setViewParameters($viewParameters)
+    {
+        if(!is_callable($viewParameters) && !is_array($viewParameters)){
+            throw new RuntimeException(sprintf("viewParameters debe ser array o callable pero se dio %s", gettype($viewParameters)));
+        }
+        $this->viewParameters = $viewParameters;
+        return $this;
+    }
+
 }

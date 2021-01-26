@@ -61,7 +61,7 @@ class DiskAdapter implements DocumentAdapterInterface
     public function delete($fileName)
     {
         $fullPath = $this->getBasePath($fileName);
-        $file = new File($fullPath);
+        $file = new File($fullPath,false);//No se verifica el path para que no de una excepcion
         $this->fs->remove($file);
         $filenameMetadata = $this->getFilenameMetadata($fileName);
         if($this->fs->exists($filenameMetadata)){
@@ -241,5 +241,18 @@ class DiskAdapter implements DocumentAdapterInterface
     {
         $this->folder = $subPath;
         return $this;
+    }
+
+    public function toArray(\Symfony\Component\Finder\SplFileInfo $file)
+    {
+        $fileName = $file->getFilename();
+        $date = new \DateTime();
+        $date->setTimestamp($file->getMTime());
+
+        return [
+            "fileName" => $fileName,
+            "icon" => $file->getExtension(),
+            "date" => $date->format('d/m/Y h:i a')
+        ];
     }
 }
