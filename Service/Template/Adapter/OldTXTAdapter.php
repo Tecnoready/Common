@@ -5,15 +5,15 @@ namespace Tecnoready\Common\Service\Template\Adapter;
 use Tecnoready\Common\Service\Template\AdapterInterface;
 use Tecnoready\Common\Model\Template\TemplateInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use RuntimeException;
 use Twig_Environment;
 
 /**
  * Adaptador para exportar a txt
  *
  * @author Máximo Sojo <maxsojo13@gmail.com>
+ * @deprecated Usar Tecnoready\Common\Service\Template\Engine\TXTEngine
  */
-class TXTAdapter implements AdapterInterface
+class OldTXTAdapter
 {
     /**
      * @var Twig_Environment 

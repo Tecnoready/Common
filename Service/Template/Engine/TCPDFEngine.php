@@ -1,20 +1,20 @@
 <?php
 
-namespace Tecnoready\Common\Service\Template\Adapter;
+namespace Tecnoready\Common\Service\Template\Engine;
 
-use Tecnoready\Common\Service\Template\AdapterInterface;
 use Tecnoready\Common\Model\Template\TemplateInterface;
 use Twig_Environment;
 use TCPDF;
-use Tecnoready\Common\Util\ConfigurationUtil;
 
 /**
  * Adaptador de PDF con TCPDF
  *
  * @author Carlos Mendoza <inhack20@gmail.com>
  */
-class TCPDFAdapter implements AdapterInterface
+class TCPDFEngine extends BaseEngine
 {
+
+    const NAME = "TCPDF";
 
     /**
      * @var Twig_Environment 
@@ -23,7 +23,6 @@ class TCPDFAdapter implements AdapterInterface
 
     public function __construct(Twig_Environment $twig)
     {
-        ConfigurationUtil::checkLib("tecnickcom/tcpdf");
         $this->twig = $twig;
     }
 
@@ -92,6 +91,35 @@ class TCPDFAdapter implements AdapterInterface
         $result = $templateTwig->render($variables);
 
         return $result;
+    }
+
+    public function checkAvailability(): bool
+    {
+        $result = true;
+        if (!class_exists('\TCPDF')) {
+            $this->addSolution(sprintf("The package '%s' is required, please install.", '"tecnickcom/tcpdf": "^6.2"'));
+            $result = false;
+        }
+        return $result;
+    }
+
+    public function getDescription(): string
+    {
+        return "[TWIG] TCPDF";
+    }
+
+    public function getName(): string
+    {
+        return self::NAME;
+    }
+
+    public function getExample(): string
+    {
+        $content = <<<EOF
+Html compiler
+Hola <b>{{ name }}</b>.
+EOF;
+        return $content;
     }
 
 }

@@ -1,10 +1,8 @@
 <?php
 
-namespace Tecnoready\Common\Service\Template\Adapter;
+namespace Tecnoready\Common\Service\Template\Engine;
 
-use Tecnoready\Common\Service\Template\AdapterInterface;
 use Tecnoready\Common\Model\Template\TemplateInterface;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 use RuntimeException;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -14,32 +12,30 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
  *
  * @author Carlos Mendoza <inhack20@gmail.com>
  */
-class XLSXAdapter implements AdapterInterface
+class PhpSpreadsheetXLSXEngine extends BaseEngine
 {
-    public function __construct()
-    {
-        \Tecnoready\Common\Util\ConfigurationUtil::checkLib("phpoffice/phpspreadsheet");
-    }
-    
+
+    const NAME = "PHP_SPREADSHEET";
+
     public function render(TemplateInterface $template, array $variables)
     {
         $spreadsheet = null;
-        extract($variables);//Define como variables locales
+        extract($variables); //Define como variables locales
         $content = "use PhpOffice\PhpSpreadsheet\Spreadsheet;";
         $content .= $template->getContent();
         $content .= "return \$spreadsheet;";
         eval($content);
-        if($spreadsheet === null){
+        if ($spreadsheet === null) {
             throw new RuntimeException("La variable \$spreadsheet no puede ser null. Debe setearla en la plantilla.");
         }
         return $spreadsheet;
     }
-    
+
     public function compile($filename, $spreadsheet, array $parameters)
     {
         $writer = new Xlsx($spreadsheet);
         $writer->save($filename);
-        
+
         return true;
     }
 
@@ -52,4 +48,35 @@ class XLSXAdapter implements AdapterInterface
     {
         return TemplateInterface::TYPE_XLSX;
     }
+
+    public function checkAvailability(): bool
+    {
+        $result = true;
+        if (!class_exists('\PhpOffice\PhpSpreadsheet\IOFactory')) {
+            $this->addSolution(sprintf("The package '%s' is required, please install.", '"phpoffice/phpspreadsheet": "^1.6"'));
+            $result = false;
+        }
+        return $result;
+    }
+
+    public function getDescription(): string
+    {
+        return "[PHP] Excel (PhpSpreadsheet)";
+    }
+
+    public function getName(): string
+    {
+        return self::NAME;
+    }
+
+    public function getExample(): string
+    {
+        $content = <<<EOF
+        \$spreadsheet = new Spreadsheet();
+        \$sheet = \$spreadsheet->getActiveSheet();
+        \$sheet->setCellValue('A1', 'Hello World '.\$name.'!');            
+EOF;
+        return $content;
+    }
+
 }

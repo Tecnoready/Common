@@ -1,6 +1,6 @@
 <?php
 
-namespace Tecnoready\Common\Service\Template;
+namespace Tecnoready\Common\Service\Template\Engine;
 
 use Tecnoready\Common\Model\Template\TemplateInterface;
 
@@ -8,7 +8,7 @@ use Tecnoready\Common\Model\Template\TemplateInterface;
  *
  * @author Carlos Mendoza <inhack20@gmail.com>
  */
-interface AdapterInterface
+interface EngineInterface
 {
     public function render(TemplateInterface $template,array $variables);
     
@@ -18,4 +18,13 @@ interface AdapterInterface
     
     public function getDefaultParameters();
 
+    public function checkAvailability() : bool;
+    
+    public function getInstallSolutions(): string;
+    
+    public function getDescription(): string;
+    
+    public function getName(): string;
+    
+    public function getExample(): string;
 }

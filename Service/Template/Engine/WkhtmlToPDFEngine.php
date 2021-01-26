@@ -1,8 +1,7 @@
 <?php
 
-namespace Tecnoready\Common\Service\Template\Adapter;
+namespace Tecnoready\Common\Service\Template\Engine;
 
-use Tecnoready\Common\Service\Template\AdapterInterface;
 use Tecnoready\Common\Model\Template\TemplateInterface;
 use Twig_Environment;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -15,8 +14,10 @@ use RuntimeException;
  *
  * @author Carlos Mendoza <inhack20@gmail.com>
  */
-class PDFAdapter implements AdapterInterface
+class WkhtmlToPDFEngine extends BaseEngine
 {
+    const NAME = "WKHT_MLTO_PDF";
+    
     /**
      * @var Twig_Environment 
      */
@@ -120,6 +121,34 @@ class PDFAdapter implements AdapterInterface
                     'procEnv' => ['LANG' => 'es_ES.utf-8'],
             ]
         ];
+    }
+
+    public function checkAvailability(): bool
+    {
+        $result = true;
+        if(!class_exists("mikehaertl\wkhtmlto\Pdf")){
+            $this->addSolution(sprintf("The package '%s' is required, please install.",'"mikehaertl/phpwkhtmltopdf": "^2.4.2"'));
+        }
+        return $result;
+    }
+
+    public function getDescription(): string
+    {
+        return "[TWIG] wkhtmltopdf";
+    }
+
+    public function getName(): string
+    {
+        return self::NAME;
+    }
+
+    public function getExample(): string
+    {
+        $content = <<<EOF
+Html compiler
+Hola <b>{{ name }}</b>.
+EOF;
+        return $content;
     }
 
 }

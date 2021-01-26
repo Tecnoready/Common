@@ -5,6 +5,10 @@ namespace Tecnoready\Common\Tests\Service\Template;
 use PHPUnit\Framework\TestCase;
 use Tecnoready\Common\Tests\BaseWebTestCase;
 use Tecnoready\Common\Model\Template\ModelTemplate;
+use Tecnoready\Common\Service\Template\Engine\PhpSpreadsheetXLSXEngine;
+use Tecnoready\Common\Service\Template\Engine\TCPDFEngine;
+use Tecnoready\Common\Service\Template\Engine\TXTEngine;
+use Tecnoready\Common\Service\Template\Engine\WkhtmlToPDFEngine;
 
 /**
  * Test del serivcio de compilador de plantillas
@@ -23,13 +27,24 @@ class TemplateServiceTest extends BaseWebTestCase
             "env" => "test",
         ]);
         $twig = $this->client->getContainer()->get("twig");
-        $adapterPDF = new \Tecnoready\Common\Service\Template\Adapter\PDFAdapter($twig);
-        $templateService->addAdapter($adapterPDF);
-        $adapterXLSX = new \Tecnoready\Common\Service\Template\Adapter\XLSXAdapter();
-        $templateService->addAdapter($adapterXLSX);
+        
+        $adapterPDF = new TCPDFEngine($twig);
+        $templateService->addEngine($adapterPDF);
+        
+        $adapterPDF2 = new WkhtmlToPDFEngine($twig);
+        $templateService->addEngine($adapterPDF2);
+        
+        $adapterXLSX = new PhpSpreadsheetXLSXEngine();
+        $templateService->addEngine($adapterXLSX);
+        
+        $adapterTXT = new TXTEngine();
+        $templateService->addEngine($adapterTXT);
+        
+        
         return $templateService;
     }
-    public function testPDFAdapter()
+    
+    public function testTCPDFEngine()
     {
         $variables = [
             "name" => "Carlos"
@@ -41,7 +56,7 @@ Hola {{ name }}.
 EOF;
         $template = new ModelTemplate();
         $template
-            ->setTypeTemplate(ModelTemplate::TYPE_PDF)
+            ->setTypeTemplate(TCPDFEngine::NAME)
             ->setId("demo")
             ->setContent($content)
             ->setVariables([])
@@ -52,12 +67,12 @@ EOF;
         $this->assertEquals("Hola Carlos.", $r);
         
         $filename = $this->getTempPath("TemplateService")."/"."archivo.pdf";
-        $templateService->compile($template, $filename, $variables, $parameters);
+        $templateService->compileTemplate($template, $filename, $variables, $parameters);
         $this->assertFileExists($filename);
         @unlink($filename);
     }
     
-    public function testXLSXAdapter()
+    public function testPhpSpreadsheetXLSXEngine()
     {
         $variables = [
             "name" => "Carlos"
@@ -71,7 +86,7 @@ EOF;
 EOF;
         $template = new ModelTemplate();
         $template
-            ->setTypeTemplate(ModelTemplate::TYPE_XLSX)
+            ->setTypeTemplate(PhpSpreadsheetXLSXEngine::NAME)
             ->setId("demo")
             ->setContent($content)
             ->setVariables([])
@@ -83,7 +98,42 @@ EOF;
         $this->assertInstanceOf("PhpOffice\PhpSpreadsheet\Spreadsheet", $r);
         
         $filename = $this->getTempPath("TemplateService")."/"."archivo.xlsx";
-        $templateService->compile($template, $filename, $variables, $parameters);
+        $templateService->compileTemplate($template, $filename, $variables, $parameters);
+        $this->assertFileExists($filename);
+        @unlink($filename);
+    }
+    
+    public function testTXTEngine()
+    {
+        $variables = [
+            "name" => "Carlos",
+            "lastname" => "Mendoza",
+        ];
+        $parameters = [];
+        
+        $content = <<<EOF
+<?php
+fwrite(\$fh,"Hola \$name.\n");
+fwrite(\$fh,"Apellido \$lastname.");
+EOF;
+        $template = new ModelTemplate();
+        $template
+            ->setTypeTemplate(TXTEngine::NAME)
+            ->setId("demo")
+            ->setContent($content)
+            ->setVariables([])
+            ->setParameters([])
+            ;
+        $templateService = $this->getService();
+        $r = $templateService->render($template,$variables);
+        $r2 = <<<EOF
+Hola Carlos.
+Apellido Mendoza.
+EOF;
+        $this->assertEquals($r2, $r);
+        
+        $filename = $this->getTempPath("TemplateService")."/"."archivo.txt";
+        $templateService->compileTemplate($template, $filename, $variables, $parameters);
         $this->assertFileExists($filename);
         @unlink($filename);
     }
