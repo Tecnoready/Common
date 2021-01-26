@@ -10,7 +10,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  *
  * @author Carlos Mendoza <inhack20@gmail.com>
  */
-class TXTEngine extends BaseEngine
+class TXTNativeEngine extends BaseEngine
 {
     const NAME = "TXT_NATIVE";
 

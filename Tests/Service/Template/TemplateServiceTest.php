@@ -6,9 +6,10 @@ use PHPUnit\Framework\TestCase;
 use Tecnoready\Common\Tests\BaseWebTestCase;
 use Tecnoready\Common\Model\Template\ModelTemplate;
 use Tecnoready\Common\Service\Template\Engine\PhpSpreadsheetXLSXEngine;
-use Tecnoready\Common\Service\Template\Engine\TCPDFEngine;
-use Tecnoready\Common\Service\Template\Engine\TXTEngine;
+use Tecnoready\Common\Service\Template\Engine\TXTNativeEngine;
 use Tecnoready\Common\Service\Template\Engine\WkhtmlToPDFEngine;
+use Tecnoready\Common\Service\Template\Engine\TXTEchoEngine;
+use Tecnoready\Common\Service\Template\Engine\TCPDFEngine;
 
 /**
  * Test del serivcio de compilador de plantillas
@@ -37,9 +38,11 @@ class TemplateServiceTest extends BaseWebTestCase
         $adapterXLSX = new PhpSpreadsheetXLSXEngine();
         $templateService->addEngine($adapterXLSX);
         
-        $adapterTXT = new TXTEngine();
+        $adapterTXT = new TXTNativeEngine();
         $templateService->addEngine($adapterTXT);
         
+        $adapterTXT2 = new TXTEchoEngine();
+        $templateService->addEngine($adapterTXT2);
         
         return $templateService;
     }
@@ -118,7 +121,41 @@ fwrite(\$fh,"Apellido \$lastname.");
 EOF;
         $template = new ModelTemplate();
         $template
-            ->setTypeTemplate(TXTEngine::NAME)
+            ->setTypeTemplate(TXTNativeEngine::NAME)
+            ->setId("demo")
+            ->setContent($content)
+            ->setVariables([])
+            ->setParameters([])
+            ;
+        $templateService = $this->getService();
+        $r = $templateService->render($template,$variables);
+        $r2 = <<<EOF
+Hola Carlos.
+Apellido Mendoza.
+EOF;
+        $this->assertEquals($r2, $r);
+        
+        $filename = $this->getTempPath("TemplateService")."/"."archivo.txt";
+        $templateService->compileTemplate($template, $filename, $variables, $parameters);
+        $this->assertFileExists($filename);
+        @unlink($filename);
+    }
+    
+    public function testTXTEchoEngine()
+    {
+        $variables = [
+            "name" => "Carlos",
+            "lastname" => "Mendoza",
+        ];
+        $parameters = [];
+        
+        $content = <<<EOF
+echo "Hola \$name.\n";
+echo "Apellido \$lastname.";
+EOF;
+        $template = new ModelTemplate();
+        $template
+            ->setTypeTemplate(TXTEchoEngine::NAME)
             ->setId("demo")
             ->setContent($content)
             ->setVariables([])

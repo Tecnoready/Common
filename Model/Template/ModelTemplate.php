@@ -15,6 +15,8 @@ class ModelTemplate implements TemplateInterface
     private $typeTemplate;
     private $id;
     
+    private $name;
+
     public function getContent()
     {
         return $this->content;
@@ -69,4 +71,16 @@ class ModelTemplate implements TemplateInterface
         $this->id = $id;
         return $this;
     }
+    
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    public function setName($name)
+    {
+        $this->name = $name;
+        return $this;
+    }
+
 }
