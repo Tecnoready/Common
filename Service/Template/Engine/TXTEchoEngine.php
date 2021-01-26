@@ -75,10 +75,10 @@ class TXTEchoEngine extends BaseEngine
 
     public function getDescription(): string
     {
-        return "[PHP] Native (echo)";
+        return "Native (echo)";
     }
 
-    public function getName(): string
+    public function getId(): string
     {
         return self::NAME;
     }
@@ -92,5 +92,11 @@ echo "Apellido \$lastname.";
 EOF;
         return $content;
     }
+    
+    public function getLanguage(): string
+    {
+        return "PHP";
+    }
+
 
 }

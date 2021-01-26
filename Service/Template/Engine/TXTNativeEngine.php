@@ -79,10 +79,10 @@ class TXTNativeEngine extends BaseEngine
 
     public function getDescription(): string
     {
-        return "[PHP] Native (fopen)";
+        return "Native (fopen)";
     }
 
-    public function getName(): string
+    public function getId(): string
     {
         return self::NAME;
     }
@@ -96,5 +96,10 @@ fwrite(\$fh,"Apellido \$lastname.");
 EOF;
         return $content;
     }
-
+    
+    
+    public function getLanguage(): string
+    {
+        return "PHP";
+    }
 }

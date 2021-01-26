@@ -105,10 +105,10 @@ class TCPDFEngine extends BaseEngine
 
     public function getDescription(): string
     {
-        return "[TWIG] TCPDF";
+        return "TCPDF (tecnickcom/tcpdf)";
     }
 
-    public function getName(): string
+    public function getId(): string
     {
         return self::NAME;
     }
@@ -120,6 +120,11 @@ Html compiler
 Hola <b>{{ name }}</b>.
 EOF;
         return $content;
+    }
+    
+    public function getLanguage(): string
+    {
+        return "TWIG";
     }
 
 }

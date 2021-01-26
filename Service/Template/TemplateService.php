@@ -17,7 +17,7 @@ class TemplateService
 {
     /**
      * Motores disponibles
-     * @var array
+     * @var EngineInterface
      */
     private $engines;
     
@@ -48,7 +48,7 @@ class TemplateService
     {
         $engines = [];
         foreach ($this->engines as $engine) {
-            $engines[sprintf("[%s] %s",$engine->getExtension(),$engine->getDescription())] = $engine->getName();
+            $engines[sprintf("[%s] %s - %s",$engine->getExtension(),$engine->getLanguage(),$engine->getDescription())] = $engine->getId();
         }
         return $engines;
     }
@@ -71,10 +71,10 @@ class TemplateService
      */
     public function addEngine(EngineInterface $adapter)
     {
-        if (isset($this->engines[$adapter->getName()])) {
+        if (isset($this->engines[$adapter->getId()])) {
             throw new RuntimeException(sprintf("The adapter with name '%s' is already added.", $adapter->getExtension()));
         }
-        $this->engines[$adapter->getName()] = $adapter;
+        $this->engines[$adapter->getId()] = $adapter;
         
         return $this;
     }

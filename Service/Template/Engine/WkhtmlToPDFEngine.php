@@ -134,10 +134,10 @@ class WkhtmlToPDFEngine extends BaseEngine
 
     public function getDescription(): string
     {
-        return "[TWIG] wkhtmltopdf";
+        return "wkhtmltopdf (mikehaertl/phpwkhtmltopdf)";
     }
 
-    public function getName(): string
+    public function getId(): string
     {
         return self::NAME;
     }
@@ -149,6 +149,11 @@ Html compiler
 Hola <b>{{ name }}</b>.
 EOF;
         return $content;
+    }
+    
+    public function getLanguage(): string
+    {
+        return "TWIG";
     }
 
 }

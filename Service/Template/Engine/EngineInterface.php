@@ -22,9 +22,27 @@ interface EngineInterface
     
     public function getInstallSolutions(): string;
     
+    /**
+     * Descripcion del motor
+     * @return string
+     */
     public function getDescription(): string;
     
-    public function getName(): string;
+    /**
+     * id del motor (debe ser unico)
+     * @return string
+     */
+    public function getId(): string;
     
+    /**
+     * Ejemplo
+     * @return string
+     */
     public function getExample(): string;
+    
+    /**
+     * Lenguaje de progamacion que usa la plantilla
+     * @return string
+     */
+    public function getLanguage(): string;
 }

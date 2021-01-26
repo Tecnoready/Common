@@ -61,10 +61,10 @@ class PhpSpreadsheetXLSXEngine extends BaseEngine
 
     public function getDescription(): string
     {
-        return "[PHP] Excel (PhpSpreadsheet)";
+        return "Excel (phpoffice/phpspreadsheet)";
     }
 
-    public function getName(): string
+    public function getId(): string
     {
         return self::NAME;
     }
@@ -77,6 +77,11 @@ class PhpSpreadsheetXLSXEngine extends BaseEngine
         \$sheet->setCellValue('A1', 'Hello World '.\$name.'!');            
 EOF;
         return $content;
+    }
+
+    public function getLanguage(): string
+    {
+        return "PHP";
     }
 
 }
