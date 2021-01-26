@@ -41,6 +41,19 @@ class TemplateService
     }
     
     /**
+     * Retorna todos los moteres
+     * @return array
+     */
+    public function getDefinedEngines()
+    {
+        $engines = [];
+        foreach ($this->engines as $engine) {
+            $engines[sprintf("[%s] %s",$engine->getExtension(),$engine->getDescription())] = $engine->getName();
+        }
+        return $engines;
+    }
+    
+    /**
      * Establece el adaptador
      * @param AdapterInterface $adapter
      * @return $this

@@ -82,7 +82,7 @@ class TCPDFEngine extends BaseEngine
 
     public function getExtension()
     {
-        return TemplateInterface::TYPE_PDF;
+        return "PDF";
     }
 
     public function render(TemplateInterface $template, array $variables)

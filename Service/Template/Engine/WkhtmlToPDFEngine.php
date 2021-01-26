@@ -99,7 +99,7 @@ class WkhtmlToPDFEngine extends BaseEngine
 
     public function getExtension()
     {
-        return TemplateInterface::TYPE_PDF;
+        return "PDF";
     }
 
     public function getDefaultParameters()

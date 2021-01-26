@@ -65,7 +65,7 @@ class TXTEchoEngine extends BaseEngine
 
     public function getExtension()
     {
-        return TemplateInterface::TYPE_TXT;
+        return "TXT";
     }
 
     public function checkAvailability(): bool

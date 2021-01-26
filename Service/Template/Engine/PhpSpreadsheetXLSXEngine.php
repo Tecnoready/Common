@@ -46,7 +46,7 @@ class PhpSpreadsheetXLSXEngine extends BaseEngine
 
     public function getExtension()
     {
-        return TemplateInterface::TYPE_XLSX;
+        return "XLSX";
     }
 
     public function checkAvailability(): bool
