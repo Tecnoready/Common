@@ -11,7 +11,7 @@ abstract class BaseEngine implements EngineInterface
 {
 
     /**
-     * Nombre de archivo generado durante la compilacion (si es null se deja el generado temoporal o el pasado en el parametro)
+     * Nombre de archivo generado durante la compilacion (si es null se deja el generado temporal o el pasado en el parametro)
      * @var string
      */
     protected $fileName = null;
@@ -33,7 +33,7 @@ abstract class BaseEngine implements EngineInterface
         return implode(",", $this->installSolutions);
     }
 
-    public function getFileName(): string
+    public function getFileName(): ?string
     {
         return $this->fileName;
     }

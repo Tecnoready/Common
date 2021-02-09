@@ -46,5 +46,5 @@ interface EngineInterface
      */
     public function getLanguage(): string;
     
-    public function getFileName(): string;
+    public function getFileName(): ?string;
 }

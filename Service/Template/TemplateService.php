@@ -99,6 +99,7 @@ class TemplateService
      * Metodo que renderiza el template y retona el string
      * @param type $template
      * @param array $variables
+     * @return string
      */
     public function render(TemplateInterface $template, array $variables)
     {
@@ -112,7 +113,7 @@ class TemplateService
      * @param type $filename
      * @param array $variables
      * @param array $parameters
-     * @return type
+     * @return File
      */
     public function compile($id,string $filename = null, array $variables = [], array $parameters = [])
     {
@@ -124,6 +125,7 @@ class TemplateService
      * Toma el string generado y crea el archivo PDF,TXT
      * @param type $string
      * @param array $parameters
+     * @return File
      */
     public function compileTemplate(TemplateInterface $template, string $path = null, array $variables = [], array $parameters = []) :?File
     {
