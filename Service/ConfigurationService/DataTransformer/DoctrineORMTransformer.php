@@ -42,7 +42,6 @@ class DoctrineORMTransformer implements DataTransformerInterface
     }
 
     public function transform($value, ConfigurationInterface $configuration) {
-     var_dump($configuration->getType());
         if(in_array($configuration->getType(),["object",self::TYPE_DOCTRINE])){
             try {
                 $className = ClassUtils::getRealClass(get_class($value));
