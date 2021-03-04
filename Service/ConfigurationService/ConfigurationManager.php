@@ -1,14 +1,5 @@
 <?php
 
-/*
- * This file is part of the BtoB4Rewards package.
- * 
- * (c) www.btob4rewards.com
- * 
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 namespace Tecnoready\Common\Service\ConfigurationService;
 
 use Tecnoready\Common\Service\ConfigurationService\CacheInterface;
@@ -183,8 +174,6 @@ class ConfigurationManager {
             $configuration->setDescription($description);
             $configuration->setNameWrapper($wrapperName);
             $configuration->setCreatedAt(new \DateTime());
-            $type = gettype($value);
-            $configuration->setType($type);
         }else{
             //Actualizacion de la descripcion
             if($description !== null){
@@ -192,6 +181,8 @@ class ConfigurationManager {
             }
             $configuration->setUpdatedAt();
         }
+        $type = gettype($value);
+        $configuration->setType($type);
         $configuration->setValue($this->transform($value, $configuration));
         $this->adapter->persist($configuration);
         $success = $this->adapter->flush();

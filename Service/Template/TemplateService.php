@@ -133,15 +133,17 @@ class TemplateService
 
         //Todas las variables son requeridas
         $variablesToCheck = $template->getVariables();
+       
         if (count($variablesToCheck) > 0) {
             $diff = [];
             foreach ($variablesToCheck as $variable) {
                 $key = $variable->getName();
-                if (!isset($variables[$key])) {
+                if (!array_key_exists($key, $variables)) {
                     $diff[] = $key;
                 }
             }
             if (count($diff) > 0) {
+                die;
                 throw new RuntimeException(sprintf("Las variables '%s' son requeridos.", implode(", ", $diff)));
             }
         }
@@ -155,7 +157,7 @@ class TemplateService
                     continue;
                 }
                 $key = $parameter->getName();
-                if (!isset($parameters[$key])) {
+                if (!array_key_exists($key, $parameters)) {
                     $diff[] = $key;
                 }
             }
