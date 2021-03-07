@@ -6,6 +6,7 @@ use Tecnoready\Common\Model\Template\TemplateInterface;
 use RuntimeException;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Adaptador para exportar a excel con la libreria "phpoffice/phpspreadsheet": "^1.6"
@@ -33,7 +34,21 @@ class PhpSpreadsheetXLSXEngine extends BaseEngine
 
     public function compile($filename, $spreadsheet, array $parameters):void
     {
-        $writer = new Xlsx($spreadsheet);
+        $resolver = new OptionsResolver();
+        $resolver->setDefaults([
+            "writer" => "Xlsx",
+        ]);
+        $resolver->setAllowedValues("writer",["Xlsx","Tcpdf","Mpdf","Dompdf"]);
+        $parameters = $resolver->resolve($parameters);
+        
+        $writes = [
+            "Xlsx" => "PhpOffice\PhpSpreadsheet\Writer\Xlsx",
+            "Tcpdf" => "PhpOffice\PhpSpreadsheet\Writer\Pdf\Tcpdf",
+            "Mpdf" => "PhpOffice\PhpSpreadsheet\Writer\Pdf\Mpdf",
+            "Dompdf" => "PhpOffice\PhpSpreadsheet\Writer\Pdf\Dompdf",
+        ];
+        
+        $writer = new $writes[$parameters["writer"]]($spreadsheet);
         $writer->save($filename);
     }
 
