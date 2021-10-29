@@ -77,6 +77,7 @@ class StatisticsManager implements ConfigureInterface
 
         $this->propertyAccess = $builder->getPropertyAccessor();
         $this->defaultAdapter = $adapter;
+        $this->objectValids = [];
     }
 
     /**
@@ -461,8 +462,8 @@ class StatisticsManager implements ConfigureInterface
      */
     public function setObject($object = null)
     {
-        if ($this->options["object"] !== null && !in_array($this->options["object"], $this->objectValids[$this->objectType])) {
-            throw new InvalidArgumentException(sprintf("The object '%s' not add in object type '%s', please add. Available are %s", $this->options["object"], $this->objectType, implode(",", $this->objectValids[$this->objectType])));
+        if (count($this->objectValids) == 0 || ($this->options["object"] !== null && !in_array($this->options["object"], $this->objectValids[$this->objectType])) ) {
+            throw new InvalidArgumentException(sprintf("The object '%s' not add in object type '%s', please add. Available are %s", $this->options["object"], $this->objectType, implode(",", $this->objectValids[$this->objectType] ?? [] )));
         }
         $this->options["object"] = $object;
         return $this;
