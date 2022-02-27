@@ -246,6 +246,9 @@ interface StatisticsYearInterface extends BaseInterface
      */
     public function getMonths();
     
+    /**
+     * @param StatisticsMonthInterface $month
+     */
     public function getMonth($month);
     
     public function totalize();

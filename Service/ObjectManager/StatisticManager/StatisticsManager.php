@@ -253,7 +253,7 @@ class StatisticsManager implements ConfigureInterface
     /**
      * Retorna las estadisticas de un mes por el año
      * @param array $options [year,month]
-     * @return int
+     * @return StatisticsMonthInterface
      */
     private function findStatisticsMonth(array $options = [])
     {
@@ -315,6 +315,7 @@ class StatisticsManager implements ConfigureInterface
             "month" => (int) $now->format("m"),
             "day" => (int) $now->format("d"),
             "value" => null,
+            "mode" => null,
         ];
         $resolver->setDefaults($defaults);
         foreach ($defaults as $option => $v) {
@@ -324,6 +325,7 @@ class StatisticsManager implements ConfigureInterface
             }
             $resolver->setAllowedTypes($option,"int");
         }
+        $resolver->setAllowedValues("mode",["cumulative","set","count",null]);
         $options = $resolver->resolve($options);
 
         // Consulta de estadistica año
@@ -335,14 +337,17 @@ class StatisticsManager implements ConfigureInterface
         $foundStatisticsMonth = $foundStatisticsYear->getMonth($options["month"]);
 
         $value = $options["value"];
-        if ($value && is_string($value)) {
+        if ($options["mode"] === "cumulative" || ($value && is_string($value))) {
             $value = doubleval($value);
             $value = $this->getValueDay($options["day"], $foundStatisticsMonth) + doubleval($value);
-        } elseif (!$value) {
+        } elseif ($options["mode"] === "count" || $value === null) {
+            //Se quiere contar
             $value = $this->getValueDay($options["day"], $foundStatisticsMonth);
             $value++;
+        } elseif ($options["mode"] === "set") {
+            //Se establece el valor directo
+            $value = $options["value"];
         }
-//        var_dump($value);
 
         $this->setValueDay($foundStatisticsMonth, $options["day"], $value);
         $foundStatisticsMonth->totalize();
@@ -462,7 +467,7 @@ class StatisticsManager implements ConfigureInterface
      */
     public function setObject($object = null)
     {
-        if (count($this->objectValids) == 0 || ($this->options["object"] !== null && !in_array($this->options["object"], $this->objectValids[$this->objectType])) ) {
+        if (count($this->objectValids) == 0 || ($this->options["object"] !== null && (!isset($this->objectValids[$this->objectType]) || !in_array($this->options["object"], $this->objectValids[$this->objectType])) ) ) {
             throw new InvalidArgumentException(sprintf("The object '%s' not add in object type '%s', please add. Available are %s", $this->options["object"], $this->objectType, implode(",", $this->objectValids[$this->objectType] ?? [] )));
         }
         $this->options["object"] = $object;
