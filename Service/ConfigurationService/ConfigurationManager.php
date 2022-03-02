@@ -183,7 +183,8 @@ class ConfigurationManager {
         }
         $type = gettype($value);
         $configuration->setType($type);
-        $configuration->setValue($this->transform($value, $configuration));
+        $valueTransformed = $this->transform($value, $configuration);
+        $configuration->setValue($valueTransformed);
         $this->adapter->persist($configuration);
         $success = $this->adapter->flush();
         
@@ -194,7 +195,7 @@ class ConfigurationManager {
             $this->warmUp();
             $isWarmUp = true;
         }else{
-            $this->cache->save($key, $wrapperName, $value);
+            $this->cache->save($key, $wrapperName, $valueTransformed);
         }
         if($success === true && $clearCache){
             $this->clearCache();
