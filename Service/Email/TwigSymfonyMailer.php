@@ -23,7 +23,7 @@ class TwigSymfonyMailer
     protected $mailer;
 
     /**
-     * @var Twig_Environment
+     * @var Environment
      */
     protected $twig;
 
