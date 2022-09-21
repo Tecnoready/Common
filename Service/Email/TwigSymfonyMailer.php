@@ -17,6 +17,8 @@ use Tecnoready\Common\Service\Email\Adapter\EmailAdapterInterface;
  */
 class TwigSymfonyMailer
 {
+    use \Symfony\Component\DependencyInjection\ContainerAwareTrait;
+
 	/**
      * @var MailerInterface
      */
@@ -32,7 +34,7 @@ class TwigSymfonyMailer
      */
     protected $adapter;
 
-    public function __construct(MailerInterface $mailer,Environment $twig, EmailAdapterInterface $adapter, array $options = [])
+    public function __construct(MailerInterface $mailer, Environment $twig, EmailAdapterInterface $adapter, array $options = [])
     {
         $this->mailer = $mailer;
         $this->twig = $twig;
@@ -44,7 +46,8 @@ class TwigSymfonyMailer
         $resolver->setDefaults([
             "debug" => false,
             "extra_params" => null,
-            "skeleton_email" => "skeleton_email.html.twig"
+            "skeleton_email" => "skeleton_email.html.twig",
+            "domain_blacklist" => []
         ]);
         $resolver->setRequired([
             "debug_mail", 
@@ -69,6 +72,9 @@ class TwigSymfonyMailer
 EOF;
     }
 
+    /**
+     * Construye y envia un email inmediatamente
+     */
     public function email($templateName, $toEmail, $context, array $attachs = [])
     {
         $message = $this->render($templateName,$toEmail,$context,$attachs);
@@ -78,6 +84,9 @@ EOF;
         $this->send($message);
     }
 
+    /**
+     * Renderiza la plantilla del email
+     */
     private function render($templateName, $toEmail, $context,array $attachs = [])
     {
         $context = $this->buildDocumentContext($templateName, $context, $toEmail, $attachs);
@@ -86,6 +95,9 @@ EOF;
         return $message;
     }
 
+    /**
+     * Envia el email usando el trasport
+     */
     private function send($message)
     {
         try {
@@ -132,6 +144,9 @@ EOF;
         return $message;
     }
 
+    /**
+     * Arma el documento cuerpo del email
+     */
     private function buildDocumentContext($id,$context,$toEmail,array $attachs = [])
     {
         $idExp = explode("/",$id);
