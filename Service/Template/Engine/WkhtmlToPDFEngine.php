@@ -3,7 +3,7 @@
 namespace Tecnoready\Common\Service\Template\Engine;
 
 use Tecnoready\Common\Model\Template\TemplateInterface;
-use Twig_Environment;
+use Twig\Environment;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use mikehaertl\wkhtmlto\Pdf;
 use RuntimeException;
@@ -19,7 +19,7 @@ class WkhtmlToPDFEngine extends BaseEngine
     const NAME = "WKHT_MLTO_PDF";
     
     /**
-     * @var Twig_Environment 
+     * @var Environment 
      */
     private $twig;
     
@@ -29,7 +29,7 @@ class WkhtmlToPDFEngine extends BaseEngine
      */
     private $options;
     
-    public function __construct(Twig_Environment $twig,array $options = [])
+    public function __construct(Environment $twig,array $options = [])
     {
         $this->twig = $twig;
         $resolver = new OptionsResolver();

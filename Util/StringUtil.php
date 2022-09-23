@@ -130,7 +130,7 @@ class StringUtil {
      * @param array $toRemove
      * @return type
      */
-    public function removeQueryStringURL($url,array $toRemove)
+    public static function removeQueryStringURL($url,array $toRemove)
     {
         $urlParsedReferer = parse_url($url);
             $queryOut = [];
