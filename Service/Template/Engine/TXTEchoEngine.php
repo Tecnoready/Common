@@ -52,6 +52,10 @@ class TXTEchoEngine extends BaseEngine
         if(file_exists($filename)){
             unlink($filename);
         }
+        $dir = dirname($filename);
+        if(!is_dir($dir)){
+            mkdir($dir, 0777, true);
+        }
         $fh = fopen($filename, "w");
         fwrite($fh,$string);
         fclose($fh);
