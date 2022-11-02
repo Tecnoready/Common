@@ -1,0 +1,126 @@
+<?php
+
+namespace Tecnoready\Common\Model\ShowBuilder;
+
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Tecnoready\Common\Model\ShowBuilder\Title;
+use Tecnoready\Common\Model\ShowBuilder\Item;
+use JMS\Serializer\Annotation as JMS;
+
+/**
+ * Contenido de show
+ *
+ * @author Carlos Mendoza <inhack20@gmail.com>
+ */
+class Content
+{
+    use TraitTransformers;
+    
+    /**
+     * @var array
+     * @JMS\Expose
+     */
+    private $items;
+    
+    public function __construct()
+    {
+        $this->items = [];
+    }
+    
+    public function getItems()
+    {
+        return $this->items;
+    }
+
+    /**
+     * Añade un titulo
+     * @param type $label
+     * @param type $icon
+     * @param array $options
+     * @return $this
+     */
+    public function addSubTitle($label,$icon = null,array $options = [])
+    {
+        $label = $this->transformValue($label);
+        
+        $title = new Title();
+        $title->setText($label);
+        $title->setIcon($icon);
+        $this->items[] = $title;
+        
+        return $this;
+    }
+    
+    /**
+     * Añade un item (linea)
+     * @param type $value
+     * @param array $options
+     * @return $this
+     */
+    public function addItem($value,array $options = [])
+    {
+        //Se ignoran valores vacio
+        if(empty($value)){
+            return $this;
+        }
+        $value = $this->transformValue($value);
+        $resolver = new OptionsResolver();
+        $resolver->setDefaults([
+            "label" => null
+        ]);
+        $options = $resolver->resolve($options);
+        
+        if(!empty($options["label"])){
+            $value = sprintf("%s: %s",$options["label"],$value);
+        }
+        
+        $item = new Item();
+        $item->setText($value);
+        $this->items[] = $item;
+        
+        return $this;
+    }
+    /**
+     * Se agrega una imagen guardada con UploaderBundle
+     * @param type $entity
+     * @param array $options
+     * @return $this
+     */
+    public function addImage($entity,array $options = [])
+    {
+        //Se ignoran valores vacio
+        if(empty($entity)){
+            return $this;
+        }
+        $resolver = new OptionsResolver();
+        $resolver->setDefaults([
+            "label" => null,
+            "default" => null,
+            "properties" => []
+        ]);
+        $resolver->setRequired(["property"]);
+        $options = $resolver->resolve($options);
+        
+        $resolver = new OptionsResolver();
+        $resolver->setDefaults([
+            "width" => 50,
+            "height" => 50,
+        ]);
+        $properties = $resolver->resolve($options["properties"]);
+        
+        $entity = $this->transformValue($entity,[
+            "property" => $options["property"],
+            "default" => $options["default"],
+        ]);
+        
+        $item = new Image();
+        $item->setIcon($entity);
+        $item->setText($options["label"]);
+        $item->setWidth($properties["width"]);
+        $item->setHeight($properties["height"]);
+        
+        $this->items[] = $item;
+        return $this;
+    }
+}
