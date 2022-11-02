@@ -7,12 +7,8 @@ namespace Tecnoready\Common\Model\ShowBuilder;
  *
  * @author Carlos Mendoza <inhack20@gmail.com>
  */
-abstract class ModelItem
+abstract class ModelShowWidget
 {
-    const WIDGET_TITLE = "title";
-    const WIDGET_ITEM = "item";
-    const WIDGET_IMAGE = "image";
-    
     /**
      * Elemnto a renderizar
      * @var string
@@ -30,6 +26,10 @@ abstract class ModelItem
      * @var string
      */
     protected $text;
+    
+    public function __construct($widgetName) {
+        $this->widget = $widgetName;
+    }
     
     
     public function getIcon()
@@ -53,5 +53,6 @@ abstract class ModelItem
         $this->text = $text;
         return $this;
     }
+    
 
 }

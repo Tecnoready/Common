@@ -7,10 +7,26 @@ namespace Tecnoready\Common\Model\ShowBuilder;
  *
  * @author Carlos Mendoza <inhack20@gmail.com>
  */
-class Title extends ModelItem
+class Title extends ModelShowWidget
 {
+    /**
+     * Sub titulo a mostrar
+     * @var string
+     */
+    protected $subTitle;
+    
     public function __construct()
     {
-        $this->widget = self::WIDGET_TITLE;
+        parent::__construct("title");
     }
+    
+    public function getSubTitle() {
+        return $this->subTitle;
+    }
+
+    public function setSubTitle($subTitle) {
+        $this->subTitle = $subTitle;
+        return $this;
+    }
+
 }

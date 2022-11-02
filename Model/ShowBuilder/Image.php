@@ -7,7 +7,7 @@ namespace Tecnoready\Common\Model\ShowBuilder;
  *
  * @author Carlos Mendoza <inhack20@gmail.com>
  */
-class Image extends ModelItem
+class Image extends ModelShowWidget
 {
     /**
      * Ancho
@@ -23,7 +23,7 @@ class Image extends ModelItem
     
     public function __construct()
     {
-        $this->widget = self::WIDGET_IMAGE;
+        parent::__construct("image");
     }
     
     public function getWidth()

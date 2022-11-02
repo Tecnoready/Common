@@ -81,6 +81,17 @@ class Content
         
         return $this;
     }
+    
+    /**
+     * Añade un custom widget del usuario
+     * @param ModelShowWidget $widget
+     * @return $this
+     */
+    public function addWidget(ModelShowWidget $widget) {
+        $this->items[] = $widget;
+        return $this;
+    }
+    
     /**
      * Se agrega una imagen guardada con UploaderBundle
      * @param type $entity

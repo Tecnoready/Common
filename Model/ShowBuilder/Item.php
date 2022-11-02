@@ -7,10 +7,10 @@ namespace Tecnoready\Common\Model\ShowBuilder;
  *
  * @author Carlos Mendoza <inhack20@gmail.com>
  */
-class Item extends ModelItem
+class Item extends ModelShowWidget
 {
     public function __construct()
     {
-        $this->widget = self::WIDGET_ITEM;
+        parent::__construct("item");
     }
 }
