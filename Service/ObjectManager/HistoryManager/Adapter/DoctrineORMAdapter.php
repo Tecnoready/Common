@@ -4,8 +4,9 @@ namespace Tecnoready\Common\Service\ObjectManager\HistoryManager\Adapter;
 
 use Tecnoready\Common\Model\ObjectManager\HistoryManager\HistoryInterface;
 use Doctrine\ORM\EntityManager;
-use Pagerfanta\Pagerfanta as Paginator;
-use Pagerfanta\Adapter\DoctrineORMAdapter as Adapter;
+// use Pagerfanta\Pagerfanta as Paginator;
+use Tecnocreaciones\Bundle\ToolsBundle\Model\Paginator\Paginator;
+use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use DateTime;
 
@@ -105,7 +106,8 @@ class DoctrineORMAdapter implements HistoryAdapterInterface
             }
         }
         
-        $pagerfanta = new Paginator(new Adapter($qb));
+        $pagerfanta = new Paginator(new QueryAdapter($qb));
+        $pagerfanta->setDefaultFormat(Paginator::FORMAT_ARRAY_STANDARD);
         return $pagerfanta;
     }
 
