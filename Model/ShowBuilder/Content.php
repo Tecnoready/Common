@@ -42,10 +42,17 @@ class Content
      */
     public function addSubTitle($label,$icon = null,array $options = [])
     {
+        $resolver = new OptionsResolver();
+        $resolver->setDefaults([
+            "sub_title" => null,
+        ]);
+        $options = $resolver->resolve($options);
+        
         $label = $this->transformValue($label);
         
         $title = new Title();
         $title->setText($label);
+        $title->setSubTitle($options["sub_title"]);
         $title->setIcon($icon);
         $this->items[] = $title;
         
