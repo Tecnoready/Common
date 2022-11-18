@@ -50,13 +50,13 @@ class ShowBuilderManager
     
     /**
      * Inicia el constructor
-     * @return $this
+     * @return ShowView
      */
     public function start()
     {
-        $this->showView = new ShowView();
-        $this->showView->getContent()->setTransformers($this->transformers);
-        return $this;
+        $this->showView = new ShowView($this->serializer);
+        $this->showView->content()->setTransformers($this->transformers);
+        return $this->showView;
     }
     
     /**
@@ -67,11 +67,11 @@ class ShowBuilderManager
     {
 //        $data = $this->serializer->serialize($this->builder,"json");
 //        $this->builder = [];
-        $this->showView->getContent()->setTransformers([]);
-//        $data = $this->serializer->serialize($this->showView,"json");
+        $this->showView->end();
         $showView = $this->showView;
         $this->showView = null;
-        return $showView;
+        $data = $this->serializer->serialize($showView,"json");
+        return $data;
     }
     
     /**
@@ -80,7 +80,7 @@ class ShowBuilderManager
      */
     public function content()
     {
-        return $this->showView->getContent();
+        return $this->showView->content();
     }
     
     /**

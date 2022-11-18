@@ -13,7 +13,7 @@ use JMS\Serializer\Annotation as JMS;
  *
  * @author Carlos Mendoza <inhack20@gmail.com>
  */
-class Content
+class Content implements \JsonSerializable
 {
     use TraitTransformers;
     
@@ -115,9 +115,9 @@ class Content
         $resolver->setDefaults([
             "label" => null,
             "default" => null,
+            "property" => null,
             "properties" => []
         ]);
-        $resolver->setRequired(["property"]);
         $options = $resolver->resolve($options);
         
         $resolver = new OptionsResolver();
@@ -140,5 +140,11 @@ class Content
         
         $this->items[] = $item;
         return $this;
+    }
+    
+    public function jsonSerialize() {
+        $arr = get_object_vars( $this );
+        
+        return $arr;
     }
 }

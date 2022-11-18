@@ -7,7 +7,7 @@ namespace Tecnoready\Common\Model\ShowBuilder;
  *
  * @author Carlos Mendoza <inhack20@gmail.com>
  */
-abstract class ModelShowWidget
+abstract class ModelShowWidget implements \JsonSerializable
 {
     /**
      * Elemnto a renderizar
@@ -54,5 +54,10 @@ abstract class ModelShowWidget
         return $this;
     }
     
+    public function jsonSerialize() {
+        $arr = get_object_vars( $this );
+        
+        return $arr;
+    }
 
 }
