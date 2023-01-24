@@ -33,6 +33,12 @@ class TwigSymfonyMailer
      * @var EmailAdapterInterface
      */
     protected $adapter;
+    
+    /**
+     * Opciones
+     * @var array
+     */
+    private $options;
 
     public function __construct(MailerInterface $mailer, Environment $twig, EmailAdapterInterface $adapter, array $options = [])
     {
@@ -81,7 +87,7 @@ EOF;
         foreach ($attachs as $name => $path) {
             $message->attachFromPath($path,$name);
         }
-        $this->send($message);
+        return $this->send($message);
     }
 
     /**
@@ -100,12 +106,15 @@ EOF;
      */
     private function send($message)
     {
+        $r = false;
         try {
             $r = $this->mailer->send($message);
         } catch (TransportExceptionInterface $e) {
             // some error prevented the email sending; display an
             // error message or try to resend the message
+//            throw $e;
         }
+        return $r;
     }
 
 	/**
@@ -117,6 +126,9 @@ EOF;
      */
     private function buildEmail($templateName, $toEmail, $context)
     {
+        if($this->options["debug"] === true){
+            $toEmail = $this->options["debug_mail"];
+        }
         $context['toEmail'] = $toEmail;   
         $context['appName'] = $this->options["from_name"];
         
