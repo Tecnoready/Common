@@ -27,6 +27,18 @@ abstract class ModelShowWidget implements \JsonSerializable
      */
     protected $text;
     
+    /**
+     * (color) Color del texto
+     * @var string|null
+     */
+    protected $textColor;
+    
+    /**
+     * (Tamaño) Texto a mostrar
+     * @var int|null
+     */
+    protected $textFontSize;
+    
     public function __construct($widgetName) {
         $this->widget = $widgetName;
     }
@@ -51,6 +63,24 @@ abstract class ModelShowWidget implements \JsonSerializable
     public function setText($text)
     {
         $this->text = $text;
+        return $this;
+    }
+    
+     public function getTextColor(): ?string {
+        return $this->textColor;
+    }
+
+    public function setTextColor(?string $textColor) {
+        $this->textColor = $textColor;
+        return $this;
+    }
+    
+    public function getTextFontSize(): ?int {
+        return $this->textFontSize;
+    }
+
+    public function setTextFontSize(?int $textFontSize) {
+        $this->textFontSize = $textFontSize;
         return $this;
     }
     
