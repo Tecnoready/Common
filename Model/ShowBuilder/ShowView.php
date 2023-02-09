@@ -23,6 +23,14 @@ class ShowView implements \JsonSerializable
     private $title;
     
     /**
+     * Configuracion
+     * @var Configuration
+     * @JMS\Expose
+     * @JMS\SerializedName("configuration")
+     */
+    private $configuration;
+    
+    /**
      * Contenido
      * @var Content
      * @JMS\Expose
@@ -38,6 +46,7 @@ class ShowView implements \JsonSerializable
     
     public function __construct(SerializerInterface $serializer) {
         $this->serializer = $serializer;
+        $this->configuration = new Configuration();
     }
     
     public function getTitle(): Title
@@ -52,6 +61,11 @@ class ShowView implements \JsonSerializable
 //        }
 //        return $this->content;
 //    }
+    
+    public function configuration(): Configuration {
+        return $this->configuration;
+    }
+        
     public function content(): Content
     {
         if($this->content === null){
