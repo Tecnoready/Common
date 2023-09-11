@@ -21,6 +21,14 @@ class ShowView implements \JsonSerializable
      * @JMS\Type("Tecnoready\Common\Model\ShowBuilder\Title")
      */
     private $title;
+    /**
+     * Opciones extras
+     * @var array
+     * @JMS\SerializedName("extra_options")
+     * @JMS\Expose
+     * @JMS\Type("array")
+     */
+    private $extraOptions;
     
     /**
      * Configuracion
@@ -47,6 +55,7 @@ class ShowView implements \JsonSerializable
     public function __construct(SerializerInterface $serializer) {
         $this->serializer = $serializer;
         $this->configuration = new Configuration();
+        $this->extraOptions = [];
     }
     
     public function getTitle(): Title
@@ -83,6 +92,18 @@ class ShowView implements \JsonSerializable
     public function setContent(Content $content)
     {
         $this->content = $content;
+        return $this;
+    }
+    
+    /**
+     * Opcion extra
+     * @param type $name
+     * @param type $value
+     * @return $this
+     */
+    public function setExtraOption($name,$value) {
+        $this->extraOptions[$name] = $value;
+        
         return $this;
     }
     
