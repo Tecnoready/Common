@@ -49,7 +49,7 @@ abstract class ModelShowWidget implements \JsonSerializable
         $this->widget = $widgetName;
     }
 
-    public function setId(string $id)
+    public function setId(?string $id)
     {
         $this->id = $id;
 
