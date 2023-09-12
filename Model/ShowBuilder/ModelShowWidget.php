@@ -10,6 +10,11 @@ namespace Tecnoready\Common\Model\ShowBuilder;
 abstract class ModelShowWidget implements \JsonSerializable
 {
     /**
+     * @var array
+     */
+    protected $id;
+
+    /**
      * Elemnto a renderizar
      * @var string
      */
@@ -39,10 +44,17 @@ abstract class ModelShowWidget implements \JsonSerializable
      */
     protected $textFontSize;
     
-    public function __construct($widgetName) {
+    public function __construct($widgetName)
+    {
         $this->widget = $widgetName;
     }
-    
+
+    public function setId(string $id)
+    {
+        $this->id = $id;
+
+        return $this;
+    }
     
     public function getIcon()
     {
