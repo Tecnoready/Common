@@ -55,7 +55,6 @@ class ShowView implements \JsonSerializable
     public function __construct(SerializerInterface $serializer) {
         $this->serializer = $serializer;
         $this->configuration = new Configuration();
-        $this->extraOptions = [];
     }
     
     public function getTitle(): Title
@@ -102,6 +101,9 @@ class ShowView implements \JsonSerializable
      * @return $this
      */
     public function setExtraOption($name,$value) {
+        if(!is_array($this->extraOptions)){
+            $this->extraOptions = [];
+        }
         $this->extraOptions[$name] = $value;
         
         return $this;
