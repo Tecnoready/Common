@@ -1,33 +1,32 @@
 <?php
 
-namespace Tecnoready\Common\Service\Template\Adapter;
+namespace Tecnoready\Common\Service\Template\Engine;
 
-use Tecnoready\Common\Service\Template\AdapterInterface;
 use Tecnoready\Common\Model\Template\TemplateInterface;
-use Twig_Environment;
+use Twig\Environment;
 use TCPDF;
-use Tecnoready\Common\Util\ConfigurationUtil;
 
 /**
  * Adaptador de PDF con TCPDF
  *
  * @author Carlos Mendoza <inhack20@gmail.com>
  */
-class TCPDFAdapter implements AdapterInterface
+class TCPDFEngine extends BaseEngine
 {
 
+    const NAME = "TCPDF";
+
     /**
-     * @var Twig_Environment 
+     * @var Environment 
      */
     private $twig;
 
-    public function __construct(Twig_Environment $twig)
+    public function __construct(Environment $twig)
     {
-        ConfigurationUtil::checkLib("tecnickcom/tcpdf");
         $this->twig = $twig;
     }
 
-    public function compile($filename, $string, array $parameters)
+    public function compile($filename, $string, array $parameters):void
     {
         // create new PDF document
         $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
@@ -83,7 +82,7 @@ class TCPDFAdapter implements AdapterInterface
 
     public function getExtension()
     {
-        return TemplateInterface::TYPE_PDF;
+        return "PDF";
     }
 
     public function render(TemplateInterface $template, array $variables)
@@ -92,6 +91,40 @@ class TCPDFAdapter implements AdapterInterface
         $result = $templateTwig->render($variables);
 
         return $result;
+    }
+
+    public function checkAvailability(): bool
+    {
+        $result = true;
+        if (!class_exists('\TCPDF')) {
+            $this->addSolution(sprintf("The package '%s' is required, please install.", '"tecnickcom/tcpdf": "^6.2"'));
+            $result = false;
+        }
+        return $result;
+    }
+
+    public function getDescription(): string
+    {
+        return "TCPDF (tecnickcom/tcpdf)";
+    }
+
+    public function getId(): string
+    {
+        return self::NAME;
+    }
+
+    public function getExample(): string
+    {
+        $content = <<<EOF
+Html compiler
+Hola <b>{{ name }}</b>.
+EOF;
+        return $content;
+    }
+    
+    public function getLanguage(): string
+    {
+        return "TWIG";
     }
 
 }

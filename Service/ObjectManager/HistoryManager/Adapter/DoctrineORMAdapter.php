@@ -4,8 +4,9 @@ namespace Tecnoready\Common\Service\ObjectManager\HistoryManager\Adapter;
 
 use Tecnoready\Common\Model\ObjectManager\HistoryManager\HistoryInterface;
 use Doctrine\ORM\EntityManager;
-use Pagerfanta\Pagerfanta as Paginator;
-use Pagerfanta\Adapter\DoctrineORMAdapter as Adapter;
+// use Pagerfanta\Pagerfanta as Paginator;
+use Tecnocreaciones\Bundle\ToolsBundle\Model\Paginator\Paginator;
+use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use DateTime;
 
@@ -59,15 +60,42 @@ class DoctrineORMAdapter implements HistoryAdapterInterface
      */
     public function getPaginator(array $criteria = [], array $sortBy = [])
     {
+        $resolver = new OptionsResolver();
+        $resolver->setDefaults([
+            "sort" => null,
+            "direction" => null,
+            "user" => null
+        ]);
+        $criteria = $resolver->resolve($criteria);
+
         $repository = $this->em->getRepository($this->className);
         $qb = $repository->createQueryBuilder("e");
-        $qb
+        $qb->orderBy("e.createdAt", "DESC");
+
+        // Busca por id de objeto
+        if (($objectId = $this->objectId) != null) {
+            $qb
                 ->andWhere("e.objectId = :objectId")
+                ->setParameter("objectId", $objectId)
+            ;
+        }
+
+        // Busca por tipo en especifico
+        if (($objectType = $this->objectType) != null) {
+            $qb
                 ->andWhere("e.objectType = :objectType")
-                ->setParameter("objectId", $this->objectId)
-                ->setParameter("objectType", $this->objectType)
-                ->orderBy("e.createdAt", "DESC")
-        ;
+                ->setParameter("objectType", $objectType)
+            ;
+        }
+
+        // Busca por usuario que registro el historial
+        if (($user = $criteria["user"]) != null) {
+            $qb
+                ->andWhere("e.user = :user")
+                ->setParameter("user", $user)
+            ;   
+        }
+
         //Doctrine\ORM\Query
         $sort = $criteria["sort"];
         $direction = $criteria["direction"];
@@ -78,7 +106,8 @@ class DoctrineORMAdapter implements HistoryAdapterInterface
             }
         }
         
-        $pagerfanta = new Paginator(new Adapter($qb));
+        $pagerfanta = new Paginator(new QueryAdapter($qb));
+        $pagerfanta->setDefaultFormat(Paginator::FORMAT_ARRAY_STANDARD);
         return $pagerfanta;
     }
 

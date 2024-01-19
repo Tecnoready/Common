@@ -28,8 +28,9 @@ use Tecnoready\Common\Model\Statistics\StatisticsMonthInterface;
  */
 class StatisticsManager implements ConfigureInterface
 {
+
     use \Tecnoready\Common\Service\ObjectManager\TraitConfigure;
-    
+
     /**
      * @var PropertyAccessor 
      */
@@ -77,6 +78,7 @@ class StatisticsManager implements ConfigureInterface
 
         $this->propertyAccess = $builder->getPropertyAccessor();
         $this->defaultAdapter = $adapter;
+        $this->objectValids = [];
     }
 
     /**
@@ -85,6 +87,8 @@ class StatisticsManager implements ConfigureInterface
      * @author Carlos Mendoza <inhack20@gmail.com>
      * @param  $objectId
      * @param  $objectType
+     * @throws RuntimeException
+     * @return StatisticsManager
      */
     public function configure($objectId, $objectType, array $options = [])
     {
@@ -95,10 +99,10 @@ class StatisticsManager implements ConfigureInterface
         if ($this->adapter === null) {
             throw new RuntimeException(sprintf("No hay ningun adaptador configurado para '%s' en '%s' debe agregar por lo menos uno.", $objectType, StatisticsManager::class));
         }
-        
+
         $this->objectId = $objectId;
         $this->objectType = $objectType;
-        
+
         $resolver = new OptionsResolver();
         $resolver->setDefaults([
             "object" => null,
@@ -108,41 +112,43 @@ class StatisticsManager implements ConfigureInterface
 
         $this->setObject($this->options["object"]);
         $this->adapter->configure($objectId, $objectType);
+        $instance = $this;
+        return clone $instance;
     }
-    
+
     /**
      * @deprecated Usar getTotalDay
      */
-    public function getStatisticsMonthValue($year = null,$month = null,$day= null)
+    public function getStatisticsMonthValue($year = null, $month = null, $day = null)
     {
         return $this->getTotalDay([
-            "year" => $year,
-            "month" => $month,
-            "day" => $day,
+                    "year" => $year,
+                    "month" => $month,
+                    "day" => $day,
         ]);
     }
-    
+
     /**
      * @deprecated usar getStatisticsMonthTotal
      */
-    public function getStatisticsMonthTotal($year = null,$month = null) 
+    public function getStatisticsMonthTotal($year = null, $month = null)
     {
         return $this->getTotalMonth([
-            "year" => $year,
-            "month" => $month,
+                    "year" => $year,
+                    "month" => $month,
         ]);
     }
-    
+
     /**
      * @deprecated Usar getStatisticsYearValue
      */
     public function getStatisticsYearValue($year = null)
     {
         return $this->getTotalYear([
-            "year" => $year,
+                    "year" => $year,
         ]);
     }
-    
+
     /**
      * Retorna las estadisticas de un día especifico por año,mes y dia.
      * Antiguo: getStatisticsMonthValue
@@ -161,17 +167,17 @@ class StatisticsManager implements ConfigureInterface
         ];
         $resolver->setDefaults($defaults);
         foreach ($defaults as $option => $value) {
-            $resolver->setAllowedTypes($option,"int");
+            $resolver->setAllowedTypes($option, "int");
         }
         $options = $resolver->resolve($options);
-        
+
         $foundStatistics = $this->findStatisticsMonth([
             "year" => $options["year"],
             "month" => $options["month"],
         ]);
         return (double) $this->getValueDay($options["day"], $foundStatistics);
     }
-    
+
     /**
      * Busca el total de un mes.
      * Antiguo: getStatisticsMonthTotal
@@ -189,10 +195,10 @@ class StatisticsManager implements ConfigureInterface
         ];
         $resolver->setDefaults($defaults);
         foreach ($defaults as $option => $value) {
-            $resolver->setAllowedTypes($option,"int");
+            $resolver->setAllowedTypes($option, "int");
         }
         $options = $resolver->resolve($options);
-        
+
         $foundStatistics = $this->findStatisticsMonth([
             "year" => $options["year"],
             "month" => $options["month"],
@@ -221,10 +227,10 @@ class StatisticsManager implements ConfigureInterface
         ];
         $resolver->setDefaults($defaults);
         foreach ($defaults as $option => $value) {
-            $resolver->setAllowedTypes($option,"int");
+            $resolver->setAllowedTypes($option, "int");
         }
         $options = $resolver->resolve($options);
-        
+
         $foundStatistics = $this->findStatisticsYear($options["year"]);
         $total = 0;
         if ($foundStatistics) {
@@ -233,7 +239,7 @@ class StatisticsManager implements ConfigureInterface
 
         return $total;
     }
-    
+
     /**
      * Retorna el resumen de las estadisticas del año en un array
      * @param type $year
@@ -250,9 +256,42 @@ class StatisticsManager implements ConfigureInterface
     }
 
     /**
+     * Obtiene un resumen del mes
+     * @param array $options
+     * @return array
+     */
+    public function getSummaryMonth(array $options = [])
+    {
+        $now = new DateTime();
+        $resolver = new OptionsResolver();
+        $defaults = [
+            "year" => (int) $now->format("Y"),
+            "month" => (int) $now->format("m"),
+        ];
+        $resolver->setDefaults($defaults);
+        foreach ($defaults as $option => $value) {
+            $resolver->setAllowedTypes($option, "int");
+        }
+        $options = $resolver->resolve($options);
+
+        $summary = [];
+
+        $days = cal_days_in_month(CAL_GREGORIAN, $options["month"], $options["year"]);
+
+        for ($day = 1; $day <= $days; $day++) {
+            $summary[$day] = $this->getTotalDay([
+                "year" => $options["year"],
+                "month" => $options["month"],
+                "day" => $day,
+            ]);
+        }
+        return $summary;
+    }
+
+    /**
      * Retorna las estadisticas de un mes por el año
      * @param array $options [year,month]
-     * @return int
+     * @return StatisticsMonthInterface
      */
     private function findStatisticsMonth(array $options = [])
     {
@@ -264,10 +303,10 @@ class StatisticsManager implements ConfigureInterface
         ];
         $resolver->setDefaults($defaults);
         foreach ($defaults as $option => $value) {
-            $resolver->setAllowedTypes($option,"int");
+            $resolver->setAllowedTypes($option, "int");
         }
         $options = $resolver->resolve($options);
-        
+
         $foundStatisticsYear = $this->findStatisticsYear($options["year"]);
         $foundStatistics = null;
         if ($foundStatisticsYear !== null) {
@@ -314,15 +353,17 @@ class StatisticsManager implements ConfigureInterface
             "month" => (int) $now->format("m"),
             "day" => (int) $now->format("d"),
             "value" => null,
+            "mode" => null,
         ];
         $resolver->setDefaults($defaults);
         foreach ($defaults as $option => $v) {
-            if(in_array($option,["$option"])){
-                $resolver->setAllowedTypes($option,["int","string","null"]);
+            if (in_array($option, ["$option"])) {
+                $resolver->setAllowedTypes($option, ["int", "string", "null", "double"]);
                 continue;
             }
-            $resolver->setAllowedTypes($option,"int");
+            $resolver->setAllowedTypes($option, "int");
         }
+        $resolver->setAllowedValues("mode", ["cumulative", "set", "count", null]);
         $options = $resolver->resolve($options);
 
         // Consulta de estadistica año
@@ -334,14 +375,17 @@ class StatisticsManager implements ConfigureInterface
         $foundStatisticsMonth = $foundStatisticsYear->getMonth($options["month"]);
 
         $value = $options["value"];
-        if ($value && is_string($value)) {
+        if ($options["mode"] === "cumulative" || ($value && is_string($value))) {
             $value = doubleval($value);
             $value = $this->getValueDay($options["day"], $foundStatisticsMonth) + doubleval($value);
-        } elseif (!$value) {
+        } elseif ($options["mode"] === "count" || $value === null) {
+            //Se quiere contar
             $value = $this->getValueDay($options["day"], $foundStatisticsMonth);
             $value++;
+        } elseif ($options["mode"] === "set") {
+            //Se establece el valor directo
+            $value = $options["value"];
         }
-//        var_dump($value);
 
         $this->setValueDay($foundStatisticsMonth, $options["day"], $value);
         $foundStatisticsMonth->totalize();
@@ -356,7 +400,7 @@ class StatisticsManager implements ConfigureInterface
 
         return $foundStatisticsMonth;
     }
-    
+
     /**
      * Retorna el valor de un dia
      * @param type $day
@@ -408,7 +452,7 @@ class StatisticsManager implements ConfigureInterface
         $yearStatistics->setObject($this->options["object"]);
         $yearStatistics->setObjectId($this->objectId);
         $yearStatistics->setObjectType($this->objectType);
-        $yearStatistics->setCreatedFromIp($this->options["current_ip"]);        
+        $yearStatistics->setCreatedFromIp($this->options["current_ip"]);
         $this->adapter->persist($yearStatistics);
         for ($month = 1; $month <= 12; $month++) {
             $statisticsMonth = $this->adapter->newStatisticsMonth($this);
@@ -419,7 +463,7 @@ class StatisticsManager implements ConfigureInterface
             $statisticsMonth->setObject($this->options["object"]);
             $statisticsMonth->setObjectId($this->objectId);
             $statisticsMonth->setObjectType($this->objectType);
-            $statisticsMonth->setCreatedFromIp($this->options["current_ip"]);            
+            $statisticsMonth->setCreatedFromIp($this->options["current_ip"]);
             $yearStatistics->addMonth($statisticsMonth);
             $this->adapter->persist($statisticsMonth);
         }
@@ -435,7 +479,7 @@ class StatisticsManager implements ConfigureInterface
     public function addAdapter(StatisticsAdapterInterface $adapter, $objectType)
     {
         $this->adapters[$objectType] = $adapter;
-        
+
         return $this;
     }
 
@@ -449,7 +493,7 @@ class StatisticsManager implements ConfigureInterface
     public function addObjectValids($objectType, array $objectValids = array())
     {
         $this->objectValids[$objectType] = $objectValids;
-        
+
         return $this;
     }
 
@@ -461,13 +505,13 @@ class StatisticsManager implements ConfigureInterface
      */
     public function setObject($object = null)
     {
-        if ($this->options["object"] !== null && !in_array($this->options["object"], $this->objectValids[$this->objectType])) {
-            throw new InvalidArgumentException(sprintf("The object '%s' not add in object type '%s', please add. Available are %s", $this->options["object"], $this->objectType, implode(",", $this->objectValids[$this->objectType])));
+        if (count($this->objectValids) == 0 || ($this->options["object"] !== null && (!isset($this->objectValids[$this->objectType]) || !in_array($this->options["object"], $this->objectValids[$this->objectType])) )) {
+            throw new InvalidArgumentException(sprintf("The object '%s' not add in object type '%s', please add. Available are %s", $this->options["object"], $this->objectType, implode(",", $this->objectValids[$this->objectType] ?? [] )));
         }
         $this->options["object"] = $object;
         return $this;
     }
-    
+
     /**
      * Compatibilidad con lo viejo de getStatisticsMonthTotal
      * @param array $options
@@ -477,7 +521,7 @@ class StatisticsManager implements ConfigureInterface
     {
         //Compatibilidad con lo viejo de getStatisticsMonthTotal
         foreach ($options as $key => $value) {
-            if($value === null){
+            if ($value === null) {
                 unset($options[$key]);
             }
         }

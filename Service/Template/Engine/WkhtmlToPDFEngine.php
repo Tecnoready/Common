@@ -1,10 +1,9 @@
 <?php
 
-namespace Tecnoready\Common\Service\Template\Adapter;
+namespace Tecnoready\Common\Service\Template\Engine;
 
-use Tecnoready\Common\Service\Template\AdapterInterface;
 use Tecnoready\Common\Model\Template\TemplateInterface;
-use Twig_Environment;
+use Twig\Environment;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use mikehaertl\wkhtmlto\Pdf;
 use RuntimeException;
@@ -15,10 +14,12 @@ use RuntimeException;
  *
  * @author Carlos Mendoza <inhack20@gmail.com>
  */
-class PDFAdapter implements AdapterInterface
+class WkhtmlToPDFEngine extends BaseEngine
 {
+    const NAME = "WKHT_MLTO_PDF";
+    
     /**
-     * @var Twig_Environment 
+     * @var Environment 
      */
     private $twig;
     
@@ -28,7 +29,7 @@ class PDFAdapter implements AdapterInterface
      */
     private $options;
     
-    public function __construct(Twig_Environment $twig,array $options = [])
+    public function __construct(Environment $twig,array $options = [])
     {
         $this->twig = $twig;
         $resolver = new OptionsResolver();
@@ -49,7 +50,7 @@ class PDFAdapter implements AdapterInterface
         return $result;
     }
 
-    public function compile($filename, $string, array $parameters)
+    public function compile($filename, $string, array $parameters):void
     {
         $resolver = new OptionsResolver();
         $resolver->setRequired([
@@ -93,12 +94,11 @@ class PDFAdapter implements AdapterInterface
         if($forceDownload === true){
             $pdf->send(basename($filename));
         }
-        return true;
     }
 
     public function getExtension()
     {
-        return TemplateInterface::TYPE_PDF;
+        return "PDF";
     }
 
     public function getDefaultParameters()
@@ -120,6 +120,39 @@ class PDFAdapter implements AdapterInterface
                     'procEnv' => ['LANG' => 'es_ES.utf-8'],
             ]
         ];
+    }
+
+    public function checkAvailability(): bool
+    {
+        $result = true;
+        if(!class_exists("mikehaertl\wkhtmlto\Pdf")){
+            $this->addSolution(sprintf("The package '%s' is required, please install.",'"mikehaertl/phpwkhtmltopdf": "^2.4.2"'));
+        }
+        return $result;
+    }
+
+    public function getDescription(): string
+    {
+        return "wkhtmltopdf (mikehaertl/phpwkhtmltopdf)";
+    }
+
+    public function getId(): string
+    {
+        return self::NAME;
+    }
+
+    public function getExample(): string
+    {
+        $content = <<<EOF
+Html compiler
+Hola <b>{{ name }}</b>.
+EOF;
+        return $content;
+    }
+    
+    public function getLanguage(): string
+    {
+        return "TWIG";
     }
 
 }

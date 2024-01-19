@@ -33,7 +33,7 @@ abstract class BaseWebTestCase extends WebTestCase
     
     protected $tmpPath;
     
-    protected function setUp()
+    protected function setUp():void
     {
         $this->client = static::createClient();
         

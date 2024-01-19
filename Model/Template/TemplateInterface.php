@@ -8,21 +8,6 @@ namespace Tecnoready\Common\Model\Template;
  */
 interface TemplateInterface
 {
-    /**
-     * Se usa wkhtmltopdf para generar el PDF a partir de HTML
-     */
-    const TYPE_PDF = "PDF";
-    
-    /**
-     * Tipo: Texto
-     */
-    const TYPE_TXT = "TXT";
-//    const TYPE_WORD = "WORD";
-    /**
-     * Tipo: Excel
-     */
-    const TYPE_XLSX = "XLSX";
-    
     public function getTypeTemplate();
     
     public function getContent();
@@ -31,9 +16,20 @@ interface TemplateInterface
 
     public function setContent($content);
 
+    /**
+     * @return \Tecnocreaciones\Bundle\ToolsBundle\Model\ORM\Template\ModelVariable Description
+     */
     public function getVariables();
 
+    /**
+     * @return \Tecnocreaciones\Bundle\ToolsBundle\Model\ORM\Template\ModelParameter Description
+     */
     public function getParameters();
 
     public function setId($id);
+
+    public function getName();
+    
+    public function setName($name);
+    
 }

@@ -95,11 +95,19 @@ class DocumentManager implements DocumentAdapterInterface
         return $this->adapter->getMetadata($file);
     }
     
+    /**
+     * 
+     * @param type $subPath
+     * @return type
+     * @throws RuntimeException
+     */
     public function folder($subPath)
     {
         if(!in_array($subPath,$this->options["allow_folders"])){
             throw new RuntimeException(sprintf("The sub folder '%s' is not allowed. Olny are '%s'",$subPath,implode(",",$this->options["allow_folders"])));
         }
-        return $this->adapter->folder($subPath);
+        $this->adapter->folder($subPath);
+        
+        return $this;
     }
 }
