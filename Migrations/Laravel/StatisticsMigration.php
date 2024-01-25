@@ -12,7 +12,7 @@ use Illuminate\Database\Migrations\Migration;
  */
 final class StatisticsMigration extends Migration {
     public static function createTableYear(Blueprint $t) {
-        $t->tinyInteger('id')->unsigned();
+        $t->increments('id');
         $t->integer('year');
         $t->decimal("total",30,3);
         for($month = 1 ; $month <= 12 ; $month++){
@@ -28,14 +28,13 @@ final class StatisticsMigration extends Migration {
         $t->longText('user_agent');
         
         $t->timestamp('created_at');
-        
-        $t->primary('id');
+        $t->timestamp('updated_at');
 
         $t->engine = "InnoDB";
     }
     
     public static function createTableMonth($tableNameYear,Blueprint $t) {
-        $t->tinyInteger('id')->unsigned();
+        $t->increments('id');
         $t->integer('year');
         $t->integer('month');
         $t->decimal("total",30,3);
@@ -53,10 +52,9 @@ final class StatisticsMigration extends Migration {
         $t->longText('user_agent');
         
         $t->timestamp('created_at');
-        
-        $t->primary('id');
+        $t->timestamp('updated_at');
 
-        $t->tinyInteger('year_entity_id')->unsigned();
+        $t->integer('year_entity_id')->unsigned();
         $t->foreign('year_entity_id')->references('id')->on($tableNameYear);
         $t->engine = "InnoDB";
     }

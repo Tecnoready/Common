@@ -58,7 +58,7 @@ namespace Tecnoready\Common\Model\Statistics\LaravelEloquent;
  */
 abstract class StatisticsMonth extends \Illuminate\Database\Eloquent\Model implements \Tecnoready\Common\Model\Statistics\StatisticsMonthInterface
 {
-    use \Tecnoready\Common\Model\TraceableTrait;
+//    use \Tecnoready\Common\Model\TraceableTrait;
     
     const TABLE_NAME_PREFIX = "_statistics_monthly";
     
@@ -472,6 +472,32 @@ abstract class StatisticsMonth extends \Illuminate\Database\Eloquent\Model imple
         return $this;
     }
 
+    public function setObject($object) {
+        $this->object = $object;
+        return $this;
+    }
+    
+    public function getObject() {
+        return $this->object;
+    }
+    
+    public function setCreatedAt($createdAt) {
+        $this->created_at = $createdAt;
+        return $this;
+    }
+    
+    public function setCreatedFromIp($createdFromIp) {
+        $this->created_from_ip = $createdFromIp;
+        return $this;
+    }
+    
+    public function getCreatedAt() {
+        return $this->created_at;
+    }
+
+    public function getCreatedFromIp() {
+        return $this->created_from_ip;
+    }
 
     public function setUserAgent($userAgent) {
         $this->user_agent = $userAgent;

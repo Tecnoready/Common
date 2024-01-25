@@ -40,6 +40,8 @@ abstract class StatisticsYear extends \Illuminate\Database\Eloquent\Model implem
 {
     const TABLE_NAME_PREFIX = "_statistics_year";
     
+//    use \Tecnoready\Common\Model\TraceableTrait;
+    
     protected $fillable = [
         'year',
         'total', 
@@ -64,7 +66,7 @@ abstract class StatisticsYear extends \Illuminate\Database\Eloquent\Model implem
         'updated_at',
         'created_from_ip',
     ];
-
+    
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -73,8 +75,6 @@ abstract class StatisticsYear extends \Illuminate\Database\Eloquent\Model implem
         return $this->hasMany(StatisticsMonthly::class, ['yearEntity_id' => 'id']);
     }
     
-    use \Tecnoready\Common\Model\TraceableTrait;
-
     /**
      * Set year
      *
@@ -405,7 +405,7 @@ abstract class StatisticsYear extends \Illuminate\Database\Eloquent\Model implem
     public function addMonth(\Tecnoready\Common\Model\Statistics\StatisticsMonthInterface $month)
     {
         $month->setYearEntity($this);
-
+//        $this->months[] = $month;
         return $this;
     }
 
@@ -414,14 +414,15 @@ abstract class StatisticsYear extends \Illuminate\Database\Eloquent\Model implem
      */
     public function removeMonth(\Tecnoready\Common\Model\Statistics\StatisticsMonthInterface $month)
     {
-        $this->months->removeElement($month);
+        //$this->months->removeElement($month);
     }
 
     public function getMonth($month)
     {
         $month = (int)$month;
         $found = null;
-        foreach ($this->getMonths() as $value) {
+        $months = $this->getMonths()->getResults();
+        foreach ($months as $value) {
             if($value->getMonth() === $month){
                 $found = $value;
                 break;
@@ -432,25 +433,24 @@ abstract class StatisticsYear extends \Illuminate\Database\Eloquent\Model implem
     
     public function totalize() {
         $total = 0.0;
-        foreach ($this->getMonths() as $month) {
+        $months = $this->getMonths()->getResults();
+        foreach ($months as $month) {
                 $month->totalize();
                 $totalMonth = $month->getTotal();
                 $setTotalMonth = sprintf("setTotalMonth%s",$month->getMonth());
                 $this->$setTotalMonth($totalMonth);
-//                var_dump($setTotalMonth." = ".$totalMonth);
+//                var_dump("setTotalMonth: ".$setTotalMonth." = totalMonth".$totalMonth);
                 $total = $total + $totalMonth;
         }
 //        var_dump("total year ".$total);
         $this->total = $total;
     }
     
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getMonths()
-    {
-        return $this->hasMany(StatisticsMonth::className(), ['yearEntity_id' => 'id'])->all();
-    }
+    //Implementar en hijo
+//    public function getMonths()
+//    {
+//        return $this->hasMany(StatisticsMonth::class, "year_entity_id");
+//    }
 
     public function getDescription() {
         return $this->description;
@@ -497,6 +497,32 @@ abstract class StatisticsYear extends \Illuminate\Database\Eloquent\Model implem
         return $this;
     }
     
+    public function setObject($object) {
+        $this->object = $object;
+        return $this;
+    }
+    
+    public function getObject() {
+        return $this->object;
+    }
+    
+    public function setCreatedAt($createdAt) {
+        $this->created_at = $createdAt;
+        return $this;
+    }
+    
+    public function setCreatedFromIp($createdFromIp) {
+        $this->created_from_ip = $createdFromIp;
+        return $this;
+    }
+    
+    public function getCreatedAt() {
+        return $this->created_at;
+    }
+
+    public function getCreatedFromIp() {
+        return $this->created_from_ip;
+    }
     
     
     public function getUser() {

@@ -430,6 +430,9 @@ class StatisticsManager implements ConfigureInterface
     private function setValueDay($foundStatistics, $day, $value)
     {
         $statisticsPropertyPath = "day" . $day;
+        if($foundStatistics === null){
+            throw new InvalidArgumentException(sprintf("El objeto de la propiedad '%s' no puede ser null.",$statisticsPropertyPath));
+        }
         $this->propertyAccess->setValue($foundStatistics, $statisticsPropertyPath, $value);
     }
 
