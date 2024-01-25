@@ -46,6 +46,12 @@ class StatisticsManager implements ConfigureInterface
      * @var array
      */
     protected $options;
+    
+    /**
+     * Opciones por defecto (se hace merge con las otras opciones)
+     * @var array
+     */
+    private $defaultOptions;
 
     /**
      * Adaptadores disponibles
@@ -65,7 +71,7 @@ class StatisticsManager implements ConfigureInterface
      */
     private $objectValids;
 
-    public function __construct(StatisticsAdapterInterface $adapter = null)
+    public function __construct(StatisticsAdapterInterface $adapter = null,array $defaultOptions = [])
     {
         if (!class_exists("Symfony\Component\PropertyAccess\PropertyAccess")) {
             throw new \Exception(sprintf("The package '%s' is required, please install https://packagist.org/packages/symfony/property-access", '"symfony/property-access": "^3.1"'));
@@ -79,6 +85,7 @@ class StatisticsManager implements ConfigureInterface
         $this->propertyAccess = $builder->getPropertyAccessor();
         $this->defaultAdapter = $adapter;
         $this->objectValids = [];
+        $this->defaultOptions = $defaultOptions;
     }
 
     /**
@@ -111,7 +118,13 @@ class StatisticsManager implements ConfigureInterface
         ]);
         $resolver->setAllowedTypes("extras", "array");
         $this->options = $resolver->resolve($options);
-
+        
+        //Mejora: para evitar pasar la opcion "current_ip" en cada llamada de "configure"
+        if($this->options["current_ip"] === null){
+            unset($this->options["current_ip"]);
+        }
+        $this->options = array_merge($this->defaultOptions,$this->options);
+        
         $this->setObject($this->options["object"]);
         $this->adapter->configure($objectId, $objectType);
         $instance = $this;
