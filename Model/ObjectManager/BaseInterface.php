@@ -31,7 +31,8 @@ interface BaseInterface
     
     public function getCreatedFromIp();
     
-    public function setCreatedAt(DateTime $createdAt);
+    //Se comoento por conflicto al heredar de laravel el modelo de base de datos
+//    public function setCreatedAt(DateTime $createdAt);
     
     public function getCreatedAt();
     

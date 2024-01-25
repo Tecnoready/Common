@@ -52,13 +52,15 @@ namespace Tecnoready\Common\Model\Statistics\LaravelEloquent;
  * @property string $deleted_at
  * @property string $created_from_ip
  * @property string $updated_from_ip
- * @property integer $yearEntity_id
+ * @property integer $year_entity_id
  *
  * @property StatisticsYear $yearEntity
  */
 abstract class StatisticsMonth extends \Illuminate\Database\Eloquent\Model implements \Tecnoready\Common\Model\Statistics\StatisticsMonthInterface
 {
     use \Tecnoready\Common\Model\TraceableTrait;
+    
+    const TABLE_NAME_PREFIX = "_statistics_monthly";
     
     protected $fillable = [
         'year',
@@ -102,24 +104,8 @@ abstract class StatisticsMonth extends \Illuminate\Database\Eloquent\Model imple
         'object_type',
         'created_at',
         'updated_at',
-        'yearEntity_id',
+        'year_entity_id',
     ];
-    
-    /**
-     * @inheritdoc
-     */
-    public static function tableName()
-    {
-        return 'statistics_monthly';
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getYearEntity()
-    {
-        return $this->hasOne(StatisticsYear::className(), ['id' => 'yearEntity_id']);
-    }
     
     public function getYear() {
         return $this->year;
@@ -438,7 +424,7 @@ abstract class StatisticsMonth extends \Illuminate\Database\Eloquent\Model imple
     }
     
     public function setYearEntity(\Tecnoready\Common\Model\Statistics\StatisticsYearInterface $yearEntity) {
-        $this->yearEntity_id = $yearEntity->id;
+        $this->year_entity_id = $yearEntity->id;
         return $this;
     }
 

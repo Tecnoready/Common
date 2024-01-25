@@ -28,68 +28,49 @@ namespace Tecnoready\Common\Model\Statistics\LaravelEloquent;
  * @property string $deleted_at
  * @property string $created_from_ip
  * @property string $updated_from_ip
+ * @property string $description
+ * @property string $object
+ * @property string $user_agent
+ * @property string $object_id
+ * @property string $object_type
  *
  * @property StatisticsMonthly[] $statisticsMonthlies
  */
-class StatisticsYear extends \Illuminate\Database\Eloquent\Model implements \Tecnoready\Common\Model\Statistics\StatisticsYearInterface
+abstract class StatisticsYear extends \Illuminate\Database\Eloquent\Model implements \Tecnoready\Common\Model\Statistics\StatisticsYearInterface
 {
-    /**
-     * @inheritdoc
-     */
-    public static function tableName()
-    {
-        return 'statistics_year';
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function rules()
-    {
-        return [
-            [['year', 'total', 'total_month_1', 'total_month_2', 'total_month_3', 'total_month_4', 'total_month_5', 'total_month_6', 'total_month_7', 'total_month_8', 'total_month_9', 'total_month_10', 'total_month_11', 'total_month_12', 'created_at', 'updated_at'], 'required'],
-            [['year'], 'integer'],
-            [['created_at', 'updated_at', 'deleted_at'], 'safe'],
-            //[['total', 'total_month_1', 'total_month_2', 'total_month_3', 'total_month_4', 'total_month_5', 'total_month_6', 'total_month_7', 'total_month_8', 'total_month_9', 'total_month_10', 'total_month_11', 'total_month_12'], 'string', 'max' => 255],
-            [['created_from_ip', 'updated_from_ip'], 'string', 'max' => 45],
-        ];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function attributeLabels()
-    {
-        return [
-            'id' => 'ID',
-            'year' => 'Year',
-            'total' => 'Total',
-            'total_month_1' => 'Total Month 1',
-            'total_month_2' => 'Total Month 2',
-            'total_month_3' => 'Total Month 3',
-            'total_month_4' => 'Total Month 4',
-            'total_month_5' => 'Total Month 5',
-            'total_month_6' => 'Total Month 6',
-            'total_month_7' => 'Total Month 7',
-            'total_month_8' => 'Total Month 8',
-            'total_month_9' => 'Total Month 9',
-            'total_month_10' => 'Total Month 10',
-            'total_month_11' => 'Total Month 11',
-            'total_month_12' => 'Total Month 12',
-            'created_at' => 'Created At',
-            'updated_at' => 'Updated At',
-            'deleted_at' => 'Deleted At',
-            'created_from_ip' => 'Created From Ip',
-            'updated_from_ip' => 'Updated From Ip',
-        ];
-    }
+    const TABLE_NAME_PREFIX = "_statistics_year";
+    
+    protected $fillable = [
+        'year',
+        'total', 
+        'total_month_1',
+        'total_month_2',
+        'total_month_3', 
+        'total_month_4', 
+        'total_month_5', 
+        'total_month_6', 
+        'total_month_7', 
+        'total_month_8', 
+        'total_month_9', 
+        'total_month_10', 
+        'total_month_11', 
+        'total_month_12', 
+        'object',
+        'description',
+        'user_agent',
+        'object_id',
+        'object_type',
+        'created_at',
+        'updated_at',
+        'created_from_ip',
+    ];
 
     /**
      * @return \yii\db\ActiveQuery
      */
     public function getStatisticsMonthlies()
     {
-        return $this->hasMany(StatisticsMonthly::className(), ['yearEntity_id' => 'id']);
+        return $this->hasMany(StatisticsMonthly::class, ['yearEntity_id' => 'id']);
     }
     
     use \Tecnoready\Common\Model\TraceableTrait;
@@ -469,5 +450,60 @@ class StatisticsYear extends \Illuminate\Database\Eloquent\Model implements \Tec
     public function getMonths()
     {
         return $this->hasMany(StatisticsMonth::className(), ['yearEntity_id' => 'id'])->all();
+    }
+
+    public function getDescription() {
+        return $this->description;
+    }
+
+    public function getId() {
+        return $this->id;
+    }
+
+    public function getObjectId() {
+        return $this->object_id;
+    }
+
+    public function getObjectType() {
+        return $this->object_type;
+    }
+
+    public function getUserAgent() {
+        return $this->user_agent;
+    }
+
+    public function setDescription($description) {
+        $this->description = $description;
+        return $this;
+    }
+
+    public function setId($id) {
+        $this->id = $id;
+        return $this;
+    }
+
+    public function setObjectId($objectId) {
+        $this->object_id = $objectId;
+        return $this;
+    }
+
+    public function setObjectType($objectType) {
+        $this->object_type = $objectType;
+        return $this;
+    }
+
+    public function setUserAgent($userAgent) {
+        $this->user_agent = $userAgent;
+        return $this;
+    }
+    
+    
+    
+    public function getUser() {
+        null;
+    }
+
+    public function setUser($user) {
+        
     }
 }
