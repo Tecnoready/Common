@@ -94,7 +94,7 @@ class StatisticsManager implements ConfigureInterface
     {
         $this->adapter = $this->defaultAdapter;
         if (isset($this->adapters[$objectType])) {
-            $this->adapter = $this->adapters[$objectType];
+            $this->adapter = $this->adapters[$objectType]["adapter"];
         }
         if ($this->adapter === null) {
             throw new RuntimeException(sprintf("No hay ningun adaptador configurado para '%s' en '%s' debe agregar por lo menos uno.", $objectType, StatisticsManager::class));
@@ -107,7 +107,9 @@ class StatisticsManager implements ConfigureInterface
         $resolver->setDefaults([
             "object" => null,
             "current_ip" => null,
+            "extras" => [],
         ]);
+        $resolver->setAllowedTypes("extras", "array");
         $this->options = $resolver->resolve($options);
 
         $this->setObject($this->options["object"]);
@@ -329,7 +331,8 @@ class StatisticsManager implements ConfigureInterface
             "object" => $this->options["object"],
             "objectId" => $this->objectId,
             "objectType" => $this->objectType,
-            "year" => $year
+            "year" => $year,
+            "extras" => $this->options["extras"],
         ]);
         if (!$foundStatistics) {
             $foundStatistics = null;
@@ -448,17 +451,21 @@ class StatisticsManager implements ConfigureInterface
         if ($year === null) {
             $year = $now->format("Y");
         }
-
-        $yearStatistics = $this->adapter->newYearStatistics($this);
+        $adapterConfig = $this->adapters[$this->objectType];
+        
+        $yearStatistics = $this->adapter->newYearStatistics($this,$this->options);
         $yearStatistics->setYear($year);
         $yearStatistics->setCreatedAt($now);
         $yearStatistics->setObject($this->options["object"]);
         $yearStatistics->setObjectId($this->objectId);
         $yearStatistics->setObjectType($this->objectType);
         $yearStatistics->setCreatedFromIp($this->options["current_ip"]);
+        if(is_callable($adapterConfig["post_new_year_statistics_callback"])){
+            call_user_func_array($adapterConfig["post_new_year_statistics_callback"],[&$yearStatistics,$this->options]);
+        }
         $this->adapter->persist($yearStatistics);
         for ($month = 1; $month <= 12; $month++) {
-            $statisticsMonth = $this->adapter->newStatisticsMonth($this);
+            $statisticsMonth = $this->adapter->newStatisticsMonth($this,$this->options);
             $statisticsMonth->setMonth($month);
             $statisticsMonth->setYear($year);
             $statisticsMonth->setYearEntity($yearStatistics);
@@ -468,6 +475,9 @@ class StatisticsManager implements ConfigureInterface
             $statisticsMonth->setObjectType($this->objectType);
             $statisticsMonth->setCreatedFromIp($this->options["current_ip"]);
             $yearStatistics->addMonth($statisticsMonth);
+            if(is_callable($adapterConfig["post_new_statistics_month_callback"])){
+                call_user_func_array($adapterConfig["post_new_statistics_month_callback"],[&$statisticsMonth,$this->options]);
+            }
             $this->adapter->persist($statisticsMonth);
         }
         $this->adapter->flush();
@@ -479,9 +489,16 @@ class StatisticsManager implements ConfigureInterface
      * Agrega un adaptador
      * @param StatisticsAdapterInterface $adapter
      */
-    public function addAdapter(StatisticsAdapterInterface $adapter, $objectType)
+    public function addAdapter(StatisticsAdapterInterface $adapter, $objectType,array $options = [])
     {
-        $this->adapters[$objectType] = $adapter;
+        $resolver = new OptionsResolver();
+        $resolver->setDefaults([
+            "adapter" => $adapter,
+            "post_new_year_statistics_callback" => null,//Llamada de callback a realizar despues de crear la instancia
+            "post_new_statistics_month_callback" => null,//Llamada de callback a realizar despues de crear la instancia
+        ]);
+        //ObjectValids
+        $this->adapters[$objectType] = $resolver->resolve($options);
 
         return $this;
     }
@@ -529,6 +546,14 @@ class StatisticsManager implements ConfigureInterface
             }
         }
         return $options;
+    }
+    
+    /**
+     * Opciones por si se necesita acceder desde los adaptadores (caso laravel)
+     * @return array
+     */
+    public function getOptions() {
+        return $this->options;
     }
 
 }

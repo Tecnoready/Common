@@ -31,6 +31,9 @@ class LaravelEloquentAdapter implements StatisticsAdapterInterface {
     
     private function setOptions(array $options = []) {
         $resolver = new OptionsResolver();
+        $resolver->setDefaults([
+            "find_statistics_year_callback" => null,
+        ]);
         $resolver->setRequired([
             "connection",
             "model_statistics_month",
@@ -88,12 +91,15 @@ class LaravelEloquentAdapter implements StatisticsAdapterInterface {
      */
     public function findStatisticsYear(array $options = []) {
         $className = $this->options["model_statistics_year"];
-        $result = $className::where("year",$options["year"])
+        $qb = $className::where("year",$options["year"])
                 ->where("object_type",$options["objectType"])
                 ->where("object_id",$options["objectId"])
                 ->where("object",$options["object"])
-                ->first()
                 ;
+        if(is_callable($this->options["find_statistics_year_callback"])){
+            call_user_func_array($this->options["find_statistics_year_callback"],[&$qb,$options["extras"]]);
+        }
+        $result = $qb ->first();
         return $result;
     }
     
