@@ -442,6 +442,7 @@ abstract class StatisticsYear extends \Illuminate\Database\Eloquent\Model implem
 //                var_dump("setTotalMonth: ".$setTotalMonth." = totalMonth".$totalMonth);
                 $total = $total + $totalMonth;
         }
+        $months = null;//free memory
 //        var_dump("total year ".$total);
         $this->total = $total;
     }

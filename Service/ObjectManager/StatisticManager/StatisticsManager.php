@@ -413,7 +413,8 @@ class StatisticsManager implements ConfigureInterface
         $foundStatisticsYear->totalize();
         $this->adapter->persist($foundStatisticsYear);
         $this->adapter->flush();
-
+        
+        $foundStatisticsYear = null;//clean memory
         return $foundStatisticsMonth;
     }
 
