@@ -88,6 +88,7 @@ class DoctrineORMAdapter implements StatisticsAdapterInterface,ConfigureInterfac
      */
     public function findStatisticsYear(array $params = array())
     {
+        unset($params["extras"]);
         return $this->em->getRepository($this->classYearName)->findOneBy(array_merge(["objectType" => $this->objectType],$params));
     }
 
