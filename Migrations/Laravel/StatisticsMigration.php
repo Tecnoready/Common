@@ -14,10 +14,10 @@ final class StatisticsMigration extends Migration {
     public static function createTableYear(Blueprint $t) {
         $t->increments('id');
         $t->integer('year');
-        $t->decimal("total",30,3);
+        $t->decimal("total",18,3);
         for($month = 1 ; $month <= 12 ; $month++){
             $property = sprintf("total_month_%s",$month);
-            $t->decimal($property,30,3);
+            $t->decimal($property,18,3);
         }
         
         $t->string('object', 100)->nullable();
@@ -37,11 +37,11 @@ final class StatisticsMigration extends Migration {
         $t->increments('id');
         $t->integer('year');
         $t->integer('month');
-        $t->decimal("total",30,3);
+        $t->decimal("total",18,3);
         
         for($day = 1 ; $day <= 31 ; $day++){
             $property = sprintf("day%s",$day);
-            $t->decimal($property,30,3);
+            $t->decimal($property,18,3);
         }
         
         $t->string('object', 100)->nullable();
