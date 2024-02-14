@@ -113,16 +113,13 @@ class StatisticsManager implements ConfigureInterface
         $resolver = new OptionsResolver();
         $resolver->setDefaults([
             "object" => null,
-            "current_ip" => null,
+            //Mejora: para evitar pasar la opcion "current_ip" en cada llamada de "configure"
+            "current_ip" => isset($this->defaultOptions["current_ip"]) ? $this->defaultOptions["current_ip"] : null,
             "extras" => [],
         ]);
         $resolver->setAllowedTypes("extras", "array");
         $this->options = $resolver->resolve($options);
         
-        //Mejora: para evitar pasar la opcion "current_ip" en cada llamada de "configure"
-        if($this->options["current_ip"] === null){
-            unset($this->options["current_ip"]);
-        }
         $this->options = array_merge($this->defaultOptions,$this->options);
         
         $this->setObject($this->options["object"]);
@@ -569,5 +566,18 @@ class StatisticsManager implements ConfigureInterface
     public function getOptions() {
         return $this->options;
     }
+    
+    /**
+     * Agregar una opcion por defecto
+     * @param type $option
+     * @param type $value
+     * @return $this
+     */
+    public function setDefaultOption($option,$value) {
+        $this->defaultOptions[$option] = $value;
+        return $this;
+    }
+
+
 
 }
