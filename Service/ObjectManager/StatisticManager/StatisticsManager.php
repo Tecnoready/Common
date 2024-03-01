@@ -388,7 +388,8 @@ class StatisticsManager implements ConfigureInterface
         $foundStatisticsMonth = $foundStatisticsYear->getMonth($options["month"]);
 
         $value = $options["value"];
-        if ($options["mode"] === "cumulative" || ($value && is_string($value))) {
+        if ($options["mode"] === "cumulative") {
+            // || ($value && is_string($value)) Corrigue error cuando se pasaba un monto string y mode "set"
             $value = doubleval($value);
             $value = $this->getValueDay($options["day"], $foundStatisticsMonth) + doubleval($value);
         } elseif ($options["mode"] === "count" || $value === null) {
