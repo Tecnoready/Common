@@ -14,7 +14,7 @@ class FormWidget extends ModelShowWidget {
      * @var string
      */
     protected $content;
-
+    
     public function __construct() {
         parent::__construct("form");
     }
