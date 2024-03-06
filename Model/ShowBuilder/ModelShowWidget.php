@@ -56,6 +56,18 @@ abstract class ModelShowWidget implements \JsonSerializable
      */
     protected $widthRequest;
     
+    /**
+     * Color de fondo
+     * @var string
+     */
+    protected $backgroundColor;
+    
+    /**
+     * Color de fondo (tema)
+     * @var string
+     */
+    protected $backgroundColorResource;
+    
     public function __construct($widgetName)
     {
         $this->widget = $widgetName;
@@ -125,7 +137,26 @@ abstract class ModelShowWidget implements \JsonSerializable
         $this->widthRequest = $widthRequest;
         return $this;
     }
+    
+    public function getBackgroundColor() {
+        return $this->backgroundColor;
+    }
 
+    public function getBackgroundColorResource() {
+        return $this->backgroundColorResource;
+    }
+
+    public function setBackgroundColor($backgroundColor) {
+        $this->backgroundColor = $backgroundColor;
+        return $this;
+    }
+
+    public function setBackgroundColorResource($backgroundColorResource) {
+        $this->backgroundColorResource = $backgroundColorResource;
+        return $this;
+    }
+
+    
         
     public function jsonSerialize() {
         $arr = get_object_vars( $this );
