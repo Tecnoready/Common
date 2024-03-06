@@ -39,10 +39,22 @@ abstract class ModelShowWidget implements \JsonSerializable
     protected $textColor;
     
     /**
+     * (color) Color del texto (color dinamico de tema)
+     * @var string|null
+     */
+    protected $textColorResource;
+    
+    /**
      * (Tamaño) Texto a mostrar
      * @var int|null
      */
     protected $textFontSize;
+    
+    /**
+     * Ancho del elemento
+     * @var string
+     */
+    protected $widthRequest;
     
     public function __construct($widgetName)
     {
@@ -96,6 +108,25 @@ abstract class ModelShowWidget implements \JsonSerializable
         return $this;
     }
     
+    public function getTextColorResource() {
+        return $this->textColorResource;
+    }
+
+    public function getWidthRequest() {
+        return $this->widthRequest;
+    }
+
+    public function setTextColorResource($textColorResource) {
+        $this->textColorResource = $textColorResource;
+        return $this;
+    }
+
+    public function setWidthRequest($widthRequest) {
+        $this->widthRequest = $widthRequest;
+        return $this;
+    }
+
+        
     public function jsonSerialize() {
         $arr = get_object_vars( $this );
         
