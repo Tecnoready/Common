@@ -163,5 +163,5 @@ abstract class ModelShowWidget implements \JsonSerializable
         
         return $arr;
     }
-
+    
 }
