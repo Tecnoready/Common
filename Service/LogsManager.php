@@ -10,7 +10,7 @@ use Monolog\Logger as MonoLogger;
 
 /**
  * Manejador de logs
- *
+ * Log manager paga genera logs dedicados a procesos
  * @author Carlos Mendoza <inhack20@gmail.com>
  */
 class LogsManager {
