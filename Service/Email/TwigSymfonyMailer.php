@@ -93,7 +93,7 @@ EOF;
     /**
      * Renderiza la plantilla del email
      */
-    private function render($templateName, $toEmail, $context,array $attachs = [])
+    public function render($templateName, $toEmail, $context,array $attachs = [])
     {
         $context = $this->buildDocumentContext($templateName, $context, $toEmail, $attachs);
     	$template = $this->twig->createTemplate($this->templateSource);
