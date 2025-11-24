@@ -144,6 +144,10 @@ EOF;
         $tplSubjet = $this->twig->createTemplate("{% block subject %}{% include (template_from_string(subjectString)) %}{% endblock subject %}");
         $subject = $tplSubjet->renderBlock('subject', $context);
         $htmlBody = $template->render($context);
+        
+        if (isset($context['_subjectSuffix']) && !empty($context['_subjectSuffix'])) {
+            $subject .= $context['_subjectSuffix'];
+        }
 
         $fromEmail = new Address($this->options["from_email"], $this->options["from_name"]);
         // Message
