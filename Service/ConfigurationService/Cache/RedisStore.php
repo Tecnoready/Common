@@ -90,7 +90,12 @@ class RedisStore extends BaseCache
 
     public function flush()
     {
-        return $this->redis->flushDB();
+        $pattern = $this->options['prefix'] . '*';
+        $it = NULL;
+        while ($keys = $this->redis->scan($it, $pattern, 100)) {
+            $this->redis->del($keys);
+        }
+        return true;
     }
 
     public function save($key, $wrapperName, $data, $lifeTime = 0)
