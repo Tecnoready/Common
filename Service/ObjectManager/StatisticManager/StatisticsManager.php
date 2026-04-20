@@ -323,6 +323,13 @@ class StatisticsManager implements ConfigureInterface
         $foundStatistics = null;
         if ($foundStatisticsYear !== null) {
             $foundStatistics = $foundStatisticsYear->getMonth($options["month"]);
+            // Si no se encuentra la estadistica del mes, se registran los meses del año y se vuelve a consultar el mes para obtener la referencia a la entidad
+            if ($foundStatistics === null) {
+                // Registramos los meses en caso de no tener un mes previamente registrado
+                $this->newStatisticsMonths($foundStatisticsYear);
+                // Vuelvo a consultar el mes para obtener la referencia a la entidad
+                $foundStatistics = $foundStatisticsYear->getMonth($options["month"]);
+            }
         }
 
         return $foundStatistics;
@@ -385,7 +392,15 @@ class StatisticsManager implements ConfigureInterface
             $foundStatisticsYear = $this->newYearStatistics($options["year"]);
             $this->adapter->persist($foundStatisticsYear);
         }
+        
         $foundStatisticsMonth = $foundStatisticsYear->getMonth($options["month"]);
+        // Si no se encuentra la estadistica del mes, se registran los meses del año y se vuelve a consultar el mes para obtener la referencia a la entidad
+        if ($foundStatisticsMonth === null) {
+            // Registramos los meses en caso de no tener un mes previamente registrado
+            $this->newStatisticsMonths($foundStatisticsYear);
+            // Vuelvo a consultar el mes para obtener la referencia a la entidad
+            $foundStatisticsMonth = $foundStatisticsYear->getMonth($options["month"]);
+        }
 
         $value = $options["value"];
         if ($options["mode"] === "cumulative") {
@@ -476,7 +491,34 @@ class StatisticsManager implements ConfigureInterface
             call_user_func_array($adapterConfig["post_new_year_statistics_callback"],[&$yearStatistics,$this->options]);
         }
         $this->adapter->persist($yearStatistics);
+        
+        // Agregamos los meses al año
+        $this->newStatisticsMonths($yearStatistics);
+
+        // Registramos los cambios
+        $this->adapter->flush();
+
+        return $yearStatistics;
+    }
+
+    /**
+     * Se agrega poder registrar nuevos meses a un año
+     * @param mixed $yearStatistics
+     * @return void
+     */
+    public function newStatisticsMonths($yearStatistics)
+    {
+        $now = new DateTime();
+        $year = $yearStatistics->getYear();
+        $adapterConfig = $this->adapters[$this->objectType];
+
         for ($month = 1; $month <= 12; $month++) {
+            // Si el mes ya existe, se continua con el siguiente
+            $foundStatistics = $yearStatistics->getMonth($month);
+            if ($foundStatistics !== null) {
+                continue;
+            }
+            
             $statisticsMonth = $this->adapter->newStatisticsMonth($this,$this->options);
             $statisticsMonth->setMonth($month);
             $statisticsMonth->setYear($year);
@@ -492,9 +534,6 @@ class StatisticsManager implements ConfigureInterface
             }
             $this->adapter->persist($statisticsMonth);
         }
-        $this->adapter->flush();
-
-        return $yearStatistics;
     }
 
     /**
@@ -578,7 +617,4 @@ class StatisticsManager implements ConfigureInterface
         $this->defaultOptions[$option] = $value;
         return $this;
     }
-
-
-
 }
