@@ -70,6 +70,27 @@ abstract class ModelEmailQueue implements EmailQueueInterface
      * @ORM\Column(name="attachs", type="json_array")
      */
     protected $attachs;
+
+    /**
+     * @var \DateTime $sentAt
+     *
+     * @ORM\Column(name="created_at", type="datetime", nullable=true)
+     */
+    protected $createdAt;
+
+    /**
+     * @var \DateTime $sendAt
+     *
+     * @ORM\Column(name="send_at", type="datetime", nullable=true)
+     */
+    protected $sendAt;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="retries", type="integer")
+     */
+    protected $retries = 0;
     
     use \Tecnoready\Common\Model\Traits\ExtraDataTrait;
     
@@ -137,6 +158,72 @@ abstract class ModelEmailQueue implements EmailQueueInterface
 
     public function setAttachs($attachs) {
         $this->attachs = $attachs;
+        return $this;
+    }
+
+    public function getCreatedAt()
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTime $createdAt)
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function onCreatedAt()
+    {
+        $this->createdAt = new \DateTime();
+
+        return $this;
+    }
+
+    public function getSendAt()
+    {
+        return $this->sendAt;
+    }
+
+    public function setSendAt(\DateTime $sendAt)
+    {
+        $this->sendAt = $sendAt;
+
+        return $this;
+    }
+
+    public function onSendAt()
+    {
+        $this->sendAt = new \DateTime();
+
+        return $this;
+    }
+
+    public function onSendSuccessAt()
+    {
+        $this->onSendAt();
+        $this->status = self::STATUS_SENT;
+        
+        return $this;
+    }
+
+    public function onSendErrorAt()
+    {
+        $this->retries = $this->retries + 1;
+        $this->status = self::STATUS_FAIL;
+        
+        return $this;
+    }
+
+    public function getRetries()
+    {
+        return $this->retries;
+    }
+
+    public function setRetries($retries)
+    {
+        $this->retries = $retries;
+
         return $this;
     }
 }

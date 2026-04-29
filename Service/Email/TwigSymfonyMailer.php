@@ -9,6 +9,7 @@ use Symfony\Component\Mime\Address;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Twig\Environment;
 use Tecnoready\Common\Service\Email\Adapter\EmailAdapterInterface;
+use Tecnoready\Common\Model\Email\EmailQueueInterface;
 
 /**
  * Servicio para enviar correo con una plantilla twig
@@ -40,13 +41,26 @@ class TwigSymfonyMailer
      */
     private $options;
 
-    public function __construct(MailerInterface $mailer, Environment $twig, EmailAdapterInterface $adapter, array $options = [])
+    /**
+     * Plantilla base Twig renderizada en runtime.
+     *
+     * @var string
+     */
+    private $templateSource;
+
+    /**
+     * @var EmailProviderOrchestrator|null
+     */
+    private $emailProviderOrchestrator;
+
+    public function __construct(MailerInterface $mailer, Environment $twig, EmailAdapterInterface $adapter, array $options = [], ?EmailProviderOrchestrator $emailProviderOrchestrator = null)
     {
         $this->mailer = $mailer;
         $this->twig = $twig;
         $this->twig->addExtension(new \Twig\Extension\StringLoaderExtension());
 
         $this->adapter = $adapter;
+        $this->emailProviderOrchestrator = $emailProviderOrchestrator;
 
         $resolver = new OptionsResolver();
         $resolver->setDefaults([
@@ -79,6 +93,109 @@ EOF;
     }
 
     /**
+     * Genera un email y lo guarda en base de datos para enviar luego
+     *
+     * @param   string $templateName
+     * @param   string | array $toEmail
+     * @param   array $context
+     * @param   array  $attachs
+     * @param   array  $extras
+     *
+     * @return  []
+     */
+    public function emailQueue(string $templateName, $toEmail, array $context, array $attachs = [], array $extras = []): EmailQueueInterface
+    {
+        $email = $this->render($templateName,$toEmail,$context,$attachs);
+        
+        if ($email) {
+            $email->setAttachs($attachs);
+            $email->setExtras($extras);
+            $email->setEnvironment($this->options["env"]);
+            $this->adapter->persist($email);
+        }
+
+        return $email === null ? false : $email;
+    }
+
+    /**
+     * Envia un email guardado en base de datos
+     *
+     * @param   EmailQueueInterface  $emailQueue
+     * @param   array                $attachs
+     *
+     * @return  bool
+     */
+    public function sendEmailQueue(EmailQueueInterface $emailQueue = null, array $attachs = []): bool
+    {
+        $success = false;
+
+        try {
+            if (empty($attachs) && method_exists($emailQueue, 'getAttachs')) {
+                $attachs = $emailQueue->getAttachs();
+                if (!is_array($attachs)) {
+                    $attachs = [];
+                }
+            }
+
+            // Message
+            $fromEmail = null;
+            foreach ($emailQueue->getFromEmail() as $address => $name) {
+                $fromEmail = new Address($address,$name);
+            }
+            
+            // Prepare and send message
+            foreach ($emailQueue->getToEmail() as $to) {
+                $email = (new Email());
+                $email
+                    ->from($fromEmail)
+                    ->to($to)
+                    ->subject($emailQueue->getSubject())
+                    ->html($emailQueue->getBody())
+                ;
+
+                // Attachments
+                foreach ($attachs as $name => $path) {
+                    $email->attachFromPath($path,$name);
+                }
+
+                if ($this->emailProviderOrchestrator !== null && $this->emailProviderOrchestrator->isEnabled()) {
+                    $this->sendByOrchestrator($this->emailProviderOrchestrator, $emailQueue, $email);
+                } else {
+                    $this->send($email);
+                }
+            }
+
+            $success = true;
+
+            // Mark success
+            $emailQueue->onSendSuccessAt();
+        } catch (\Exception $exc) {
+            // Mark error
+            $emailQueue->onSendErrorAt();
+            // throw $exc;
+        }
+
+        return $success;
+    }
+
+    /**
+     * Envia un email sin guardar en base de datos
+     *
+     * @param   string $templateName
+     * @param   string $toEmail
+     * @param   array  $context
+     * @param   array  $attachs
+     * @param   array  $extras
+     *
+     * @return  bool
+     */
+    public function sendEmail(string $templateName, $toEmail, array $context, array $attachs = [], array $extras = []): bool
+    {
+        $email = $this->render($templateName,$toEmail,$context,$attachs);
+        return $this->sendEmailQueue($email,$attachs);
+    }
+
+    /**
      * Construye y envia un email inmediatamente
      */
     public function email($templateName, $toEmail, $context, array $attachs = [])
@@ -104,17 +221,27 @@ EOF;
     /**
      * Envia el email usando el trasport
      */
-    private function send($message)
+    private function send($message): bool
     {
-        $r = false;
         try {
-            $r = $this->mailer->send($message);
+            $this->mailer->send($message);
+            return true;
         } catch (TransportExceptionInterface $e) {
-            // some error prevented the email sending; display an
-            // error message or try to resend the message
-//            throw $e;
+           throw $e;
         }
-        return $r;
+    }
+
+    /**
+     * Envia correo a traves de un orquestador de proveedores.
+     */
+    private function sendByOrchestrator(EmailProviderOrchestrator $orchestrator, EmailQueueInterface $emailQueue, Email $email): bool
+    {
+        $result = $orchestrator->sendQueueEmail($emailQueue, $email);
+        if ($result !== true) {
+            throw new \RuntimeException('Email delivery failed for all configured providers.');
+        }
+
+        return true;
     }
 
 	/**
@@ -129,6 +256,11 @@ EOF;
         if($this->options["debug"] === true){
             $toEmail = $this->options["debug_mail"];
         }
+
+        if(!is_array($toEmail)){
+            $toEmail = [$toEmail];
+        }
+
         $context['toEmail'] = $toEmail;   
         $context['appName'] = $this->options["from_name"];
         
@@ -149,15 +281,20 @@ EOF;
             $subject .= $context['_subjectSuffix'];
         }
 
-        $fromEmail = new Address($this->options["from_email"], $this->options["from_name"]);
-        // Message
-        $message = (new Email())
-            ->from($fromEmail)
-            ->to($toEmail)
-            ->subject($subject)
-            ->html($htmlBody);
+        $fromEmail = array($this->options["from_email"] => $this->options["from_name"]);
 
-        return $message;
+        $email = $this->adapter->createEmailQueue();
+        $email
+                ->setStatus(EmailQueueInterface::STATUS_NOT_SENT)
+                ->setSubject($subject)
+                ->setFromEmail($fromEmail)
+                ->setToEmail($toEmail)
+                ->setRetries(0)
+                ->onCreatedAt()
+        ;
+        $email->setBody($htmlBody);
+        
+        return $email;
     }
 
     /**
