@@ -42,6 +42,8 @@ class EmailProviderOrchestrator
 
         $totalProviders = \count($this->providers);
         $providersExhausted = 0;
+        $forceStop = 5;
+        $totalTry = 0;
 
         while ($providersExhausted < $totalProviders) {
             $provider = $this->pickProvider();
@@ -51,7 +53,7 @@ class EmailProviderOrchestrator
 
             $providerName = $provider['name'];
             $failuresOnThisProvider = 0;
-
+            
             while ($failuresOnThisProvider < $this->failuresBeforeSwitch) {
                 $this->registerAttempt($emailQueue, $providerName);
                 try {
@@ -67,6 +69,15 @@ class EmailProviderOrchestrator
                     $this->safeSetExtraData($emailQueue, self::EXTRA_LAST_ERROR, $exception->getMessage());
                     $this->appendHistory($emailQueue, $providerName, $exception->getMessage());
                 }
+                //Detenemos si fallo mucho
+                if($failuresOnThisProvider > 2){
+                    break;
+                }
+            }
+            $totalTry++;
+            //Detenemos si falla mucho
+            if($totalTry > 3){
+                break;
             }
 
             $this->switchToNextProvider();
