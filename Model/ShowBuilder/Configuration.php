@@ -42,11 +42,14 @@ class Configuration implements \JsonSerializable {
         $this->addScrollView = $addScrollView;
         return $this;
     }
-        
-    public function jsonSerialize() {
+     
+    /**
+     * @return array
+     */
+    public function jsonSerialize() : array 
+    {
         $arr = get_object_vars( $this );
         
         return $arr;
     }
-
 }

@@ -118,10 +118,13 @@ class ShowView implements \JsonSerializable
         return $data;
     }
     
-    public function jsonSerialize() {
+    /**
+     * @return array
+     */
+    public function jsonSerialize() : array
+    {
         $arr = get_object_vars( $this );
         
         return $arr;
     }
-
 }

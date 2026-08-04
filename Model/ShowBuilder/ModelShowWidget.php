@@ -157,11 +157,13 @@ abstract class ModelShowWidget implements \JsonSerializable
     }
 
     
-        
-    public function jsonSerialize() {
+    /**
+     * @return array
+     */
+    public function jsonSerialize() : array
+    {
         $arr = get_object_vars( $this );
         
         return $arr;
     }
-    
 }
