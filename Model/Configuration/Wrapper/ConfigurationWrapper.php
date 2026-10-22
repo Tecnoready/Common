@@ -47,7 +47,16 @@ abstract class ConfigurationWrapper
     {
         return $this->manager->get($key,$this->getName(),$default);
     }
-    
+
+    /**
+     * Persist - Regenera la cache de un indice especifico
+     * @param mixed $key
+     * @return \Tecnoready\Common\Service\ConfigurationService\ConfigurationManager
+     */
+    public function persist($key)
+    {
+        return $this->manager->warmUpOne($key);
+    }
     
     public final function clearCache() {
         $this->manager->clearCache();

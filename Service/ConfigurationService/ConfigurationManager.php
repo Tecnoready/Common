@@ -274,6 +274,18 @@ class ConfigurationManager {
         $this->cache->warmUp($configurations);
         return $this;
     }
+
+    /**
+     * WarmUpOne
+     * @param mixed $key
+     * @return static
+     */
+    function warmUpOne($key)
+    {
+        $configuration = $this->adapter->find($key);
+        $this->cache->warmUp([$configuration]);
+        return $this;
+    }
     
     /**
      * Limpia la cache
