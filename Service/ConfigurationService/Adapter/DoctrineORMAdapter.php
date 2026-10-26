@@ -18,7 +18,7 @@ use Tecnoready\Common\Model\Configuration\BaseEntity\ConfigurationInterface;
  *
  * @author Carlos Mendoza <inhack20@gmail.com>
  */
-class DoctrineORMAdapter implements ConfigurationAdapterInterface
+class DoctrineORMAdapter implements ScopedConfigurationAdapterInterface
 {
     /**
      * Manejador de entidades
@@ -38,8 +38,13 @@ class DoctrineORMAdapter implements ConfigurationAdapterInterface
     }
 
     public function find($key) {
+        return $this->em->getRepository($this->className)->findOneBy(["key" => $key]);
+    }
+
+    public function findByKeyAndWrapper($key, $wrapperName) {
         return $this->em->getRepository($this->className)->findOneBy([
             "key" => $key,
+            "nameWrapper" => $wrapperName,
         ]);
     }
 

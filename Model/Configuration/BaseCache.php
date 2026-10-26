@@ -39,20 +39,22 @@ abstract class BaseCache implements CacheInterface
     /**
      * @param type $key
      * @param type $wrapperName
-     * @return BaseEntity\ConfigurationInterface
+    * @return BaseEntity\ConfigurationInterface|null
      */
     public function getConfiguration($key,$wrapperName)
     {
-        if($this->contains($key, $wrapperName)){
-            $data = $this->fetch($key, $wrapperName);
-            $configuration = $this->adapter->createNew();
-            $configuration->setValue($data["value"]);
-            $configuration->setType($data["type"]);
-            $configuration->setDataType(isset($data["dataType"]) ? $data["dataType"] : null);
-            $configuration->setDescription($data["description"]);
-            return $configuration;
+        $data = $this->fetch($key, $wrapperName);
+        if (!is_array($data) || !array_key_exists("value", $data)) {
+            return null;
         }
-        return null;
+
+        $configuration = $this->adapter->createNew();
+        $configuration->setValue($data["value"]);
+        $configuration->setType($data["type"] ?? null);
+        $configuration->setDataType(isset($data["dataType"]) ? $data["dataType"] : null);
+        $configuration->setDescription($data["description"] ?? null);
+
+        return $configuration;
     }
     
     /**

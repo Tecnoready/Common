@@ -93,9 +93,12 @@ class DiskStore extends BaseCache
 
     public function fetch($key, $wrapperName) {
         $this->init();
-        $data = null;
-        $data = unserialize($this->decrypt($this->values[$this->getId($key, $wrapperName)]));
-        return $data;
+        $value = $this->values[$this->getId($key, $wrapperName)] ?? false;
+        if ($value === false) {
+            return false;
+        }
+
+        return unserialize($this->decrypt($value));
     }
 
     public function save($key, $wrapperName, $data, $lifeTime = 0) {

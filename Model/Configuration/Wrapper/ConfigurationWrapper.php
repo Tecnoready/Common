@@ -55,7 +55,7 @@ abstract class ConfigurationWrapper
      */
     public function persist($key)
     {
-        return $this->manager->warmUpOne($key);
+        return $this->manager->warmUpOne($key, $this->getName());
     }
     
     public final function clearCache() {

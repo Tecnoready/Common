@@ -46,10 +46,7 @@ class Yii2ActiveRecordAdapter implements ConfigurationAdapterInterface
     }
 
     public function find($key) {
-        return ConfigurationYii2AR::find()
-                ->andWhere(["key" => $key])
-                ->one()
-                ;
+        return ConfigurationYii2AR::find()->andWhere(["key" => $key])->one();
     }
 
     public function flush() {

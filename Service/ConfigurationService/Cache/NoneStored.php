@@ -43,8 +43,7 @@ class NoneStored extends BaseCache
         //Forzar lectura de la BD para evitar cache de memorira
 //        $this->warmUp($this->adapter->findAll());
         
-        $data = $this->configurations[$this->getId($key, $wrapperName)];
-        return $data;
+        return $this->configurations[$this->getId($key, $wrapperName)] ?? false;
     }
 
     public function save($key, $wrapperName, $data, $lifeTime = 0) {

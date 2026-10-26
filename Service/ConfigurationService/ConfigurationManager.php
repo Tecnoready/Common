@@ -166,7 +166,7 @@ class ConfigurationManager {
         $key = strtoupper($key);
         $wrapperName = strtoupper($wrapperName);
         $this->hasWrapper($wrapperName,true);
-        $configuration = $this->adapter->find($key);
+        $configuration = $this->findConfiguration($key, $wrapperName);
         if($configuration === null){
             $configuration = $this->adapter->createNew();
             $configuration->setKey($key);
@@ -188,20 +188,12 @@ class ConfigurationManager {
         $this->adapter->persist($configuration);
         $success = $this->adapter->flush();
         
-        $isWarmUp = false;
-        //Sino existe el valor en la cache se debe refrescar en base la informacion actualizada
-        if(!$this->cache->contains($key, $wrapperName)){
-            $this->cache->flush();
-            $this->warmUp();
-            $isWarmUp = true;
-        }else{
-            $this->cache->save($key, $wrapperName, $valueTransformed);
+        if ($success === true) {
+            $this->cache->save($key, $wrapperName, $this->getCacheData($configuration));
         }
         if($success === true && $clearCache){
             $this->clearCache();
-            if(!$isWarmUp){
-                $this->warmUp();
-            }
+            $this->warmUp();
         }
         return $success;
     }
@@ -257,7 +249,6 @@ class ConfigurationManager {
     {
         $this->adapter->flush();
         if($andClearCache){
-            $this->clearCache();
             $this->warmUp();
         }
     }
@@ -280,10 +271,19 @@ class ConfigurationManager {
      * @param mixed $key
      * @return static
      */
-    function warmUpOne($key)
+    function warmUpOne($key, $wrapperName = null)
     {
-        $configuration = $this->adapter->find($key);
-        $this->cache->warmUp([$configuration]);
+        if ($wrapperName === null) {
+            $wrapperName = \Tecnoready\Common\Model\Configuration\Wrapper\DefaultConfigurationWrapper::getName();
+        }
+        $key = strtoupper($key);
+        $wrapperName = strtoupper($wrapperName);
+        $configuration = $this->findConfiguration($key, $wrapperName);
+        if ($configuration !== null) {
+            $this->cache->save($key, $wrapperName, $this->getCacheData($configuration));
+        } else {
+            $this->cache->delete($key, $wrapperName);
+        }
         return $this;
     }
     
@@ -309,11 +309,36 @@ class ConfigurationManager {
         $key = strtoupper($key);
         $wrapperName = strtoupper($wrapperName);
         $this->cache->setAdapter($this->adapter);
-        if(!$this->cache->contains($key, $wrapperName)){
-            $this->clearCache();//Pre-calencar cache
-            $this->warmUp();//Pre-calencar cache
+        $configuration = $this->cache->getConfiguration($key, $wrapperName);
+        if ($configuration !== null) {
+            return $configuration;
         }
-        return $this->cache->getConfiguration($key, $wrapperName);
+
+        $configuration = $this->findConfiguration($key, $wrapperName);
+        if ($configuration !== null) {
+            $this->cache->save($key, $wrapperName, $this->getCacheData($configuration));
+        }
+
+        return $configuration;
+    }
+
+    private function findConfiguration($key, $wrapperName)
+    {
+        if ($this->adapter instanceof Adapter\ScopedConfigurationAdapterInterface) {
+            return $this->adapter->findByKeyAndWrapper($key, $wrapperName);
+        }
+
+        return $this->adapter->find($key);
+    }
+
+    private function getCacheData($configuration)
+    {
+        return [
+            "value" => $configuration->getValue(),
+            "type" => $configuration->getType(),
+            "data_type" => $configuration->getDataType(),
+            "description" => $configuration->getDescription(),
+        ];
     }
     
     /**
